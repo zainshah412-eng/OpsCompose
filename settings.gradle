@@ -10,5 +10,5 @@ dependencyResolutionManagement {
         maven { url "https://jitpack.io" }
     }
 }
-rootProject.name = "OpsAirportrCompose"
+rootProject.name = "OpsCompose"
 include ':app'
