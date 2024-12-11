@@ -1,0 +1,245 @@
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
+    id 'kotlin-parcelize'
+}
+//id 'kotlin-parcelize'
+android {
+    namespace 'com.ops.airportr'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.ops.airportr"
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName "1.0.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary true
+        }
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = '17'
+        freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+    }
+    buildFeatures {
+        compose true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion compose_compiler_version
+        kotlinCompilerVersion kotlin_version
+    }
+    packagingOptions {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+            excludes += 'META-INF/DEPENDENCIES'
+        }
+    }
+    viewBinding {
+        enabled = true
+    }
+
+    flavorDimensions "version"
+    productFlavors {
+        dev {
+            dimension "version"
+         //   applicationId = "com.project.androidairportr.uat"
+            applicationId = "com.ops.airportr"
+            versionCode = 268
+            versionName = "2.6.8"
+            buildConfigField "String", "ENVIRONMENT", "\"dev\""
+            buildConfigField "String", "DEV_SUBSCRIPTION_KEY", "\"36b6808337a249b7bd4fe63f6b9f1ada\""
+            buildConfigField "String", "UAT_SUBSCRIPTION_KEY", "\"3834cca156ed43d19caaa3d4f3d911ca\""
+            buildConfigField "String", "LIVE_SUBSCRIPTION_KEY", "\"bc5fa227fd1e4a6db0f1e3987c6e0008\""
+            buildConfigField "String", "AMPLITUDE_KEY", "\"363518d3b7ac120397c87d0c80fa12fa\""
+            buildConfigField "String", "IMAGE_AUTHORITY", "\"com.project.androidairportr.uat.provider\""
+            buildConfigField "String", "PRODUCTION_URL_ABC_LIVE", "\"https://connect.airportr.com/\""
+            buildConfigField "String", "PRODUCTION_URL_ABC_UAT", "\"https://puat-api.airportr.com/\""
+            buildConfigField "String", "PRODUCTION_URL_ABC_DEV", "\"https://devapi.portr.com/\""
+            buildConfigField "String", "PRODUCTION_URL_CCD_LIVE", "\"https://apigateway.airportr.com/\""
+            buildConfigField "String", "PRODUCTION_URL_CCD_DEV", "\"https://dev-apigateway.airportr.com/\""
+            buildConfigField "String", "PRODUCTION_URL_CCD_UAT", "\"https://uat-apigateway.airportr.com/\""
+            buildConfigField "String", "TWILIO", "\"https://puat-twiliotoken.azurewebsites.net/accesstoken\""
+            buildConfigField "String", "CLARITY_", "\"mndfs6v68g\""
+            buildConfigField "String", "EMAILS", "\"zainshah412.za@gmail.com;saad7aeed@gmail.com;shazuvirk@gmail.com\""
+        }
+        uat {
+            dimension "version"
+           // applicationId = "com.project.androidairportr.uat"
+            applicationId = "com.ops.airportr"
+            versionCode = 230
+            versionName = "2.3.0"
+            buildConfigField "String", "ENVIRONMENT", "\"uat\""
+            buildConfigField "String", "DEV_SUBSCRIPTION_KEY", "\"36b6808337a249b7bd4fe63f6b9f1ada\""
+            buildConfigField "String", "UAT_SUBSCRIPTION_KEY", "\"3834cca156ed43d19caaa3d4f3d911ca\""
+            buildConfigField "String", "LIVE_SUBSCRIPTION_KEY", "\"bc5fa227fd1e4a6db0f1e3987c6e0008\""
+            buildConfigField "String", "AMPLITUDE_KEY", "\"363518d3b7ac120397c87d0c80fa12fa\""
+            buildConfigField "String", "IMAGE_AUTHORITY", "\"com.project.androidairportr.uat.provider\""
+            buildConfigField "String", "PRODUCTION_URL_ABC_LIVE", "\"https://connect.airportr.com/\""
+            buildConfigField "String", "PRODUCTION_URL_ABC_UAT", "\"https://puat-api.airportr.com/\""
+            buildConfigField "String", "PRODUCTION_URL_ABC_DEV", "\"https://devapi.portr.com/\""
+            buildConfigField "String", "PRODUCTION_URL_CCD_LIVE", "\"https://apigateway.airportr.com/\""
+            buildConfigField "String", "PRODUCTION_URL_CCD_DEV", "\"https://dev-apigateway.airportr.com/\""
+            buildConfigField "String", "PRODUCTION_URL_CCD_UAT", "\"https://uat-apigateway.airportr.com/\""
+            buildConfigField "String", "TWILIO", "\"https://puat-twiliotoken.azurewebsites.net/accesstoken\""
+            buildConfigField "String", "CLARITY_", "\"mndfs6v68g\""
+            buildConfigField "String", "EMAILS", "\"zainshah412.za@gmail.com;saad7aeed@gmail.com;shazuvirk@gmail.com\""
+
+        }
+        live {
+            dimension "version"
+          //  applicationId = "com.project.androidairportr"
+            applicationId = "com.ops.airportr"
+            versionCode = 753
+            versionName = "7.5.3"
+            buildConfigField "String", "ENVIRONMENT", "\"live\""
+            buildConfigField "String", "DEV_SUBSCRIPTION_KEY", "\"36b6808337a249b7bd4fe63f6b9f1ada\""
+            buildConfigField "String", "UAT_SUBSCRIPTION_KEY", "\"3834cca156ed43d19caaa3d4f3d911ca\""
+            buildConfigField "String", "LIVE_SUBSCRIPTION_KEY", "\"bc5fa227fd1e4a6db0f1e3987c6e0008\""
+            buildConfigField "String", "AMPLITUDE_KEY", "\"c7fa18bdc3443d6c1119f50c8d881985\""
+            buildConfigField "String", "IMAGE_AUTHORITY", "\"com.project.androidairportr.provider\""
+            buildConfigField "String", "PRODUCTION_URL_ABC_LIVE", "\"https://connect.airportr.com/\""
+            buildConfigField "String", "PRODUCTION_URL_ABC_UAT", "\"https://puat-api.airportr.com/\""
+            buildConfigField "String", "PRODUCTION_URL_ABC_DEV", "\"https://devapi.portr.com/\""
+            buildConfigField "String", "PRODUCTION_URL_CCD_LIVE", "\"https://apigateway.airportr.com/\""
+            buildConfigField "String", "PRODUCTION_URL_CCD_DEV", "\"https://dev-apigateway.airportr.com/\""
+            buildConfigField "String", "PRODUCTION_URL_CCD_UAT", "\"https://uat-apigateway.airportr.com/\""
+            buildConfigField "String", "TWILIO", "\"https://twimldialer.azurewebsites.net/accesstoken\""
+            buildConfigField "String", "CLARITY_", "\"o89e9dvfwq\""
+            buildConfigField "String", "EMAILS", "\"appfeedback@portr.com;ggreen@portr.com;ccollins@portr.com;sgehnich@portr.com\""
+
+        }
+    }
+
+}
+
+dependencies {
+
+    //AndroidX
+    implementation 'androidx.core:core-ktx:1.12.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation "androidx.compose.ui:ui:1.5.4"
+    implementation "androidx.compose.material:material:1.5.4"
+    implementation "androidx.compose.material:material-icons-extended:1.5.4"
+    implementation "androidx.compose.ui:ui-tooling-preview:1.5.4"
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.2'
+    implementation 'androidx.activity:activity-compose:1.8.0'
+    implementation 'androidx.navigation:navigation-runtime-ktx:2.7.5'
+    implementation 'androidx.work:work-runtime-ktx:2.8.1'
+    implementation platform('androidx.compose:compose-bom:2023.03.00')
+    androidTestImplementation platform('androidx.compose:compose-bom:2023.03.00')
+    androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
+    debugImplementation "androidx.compose.ui:ui-tooling:1.5.4"
+
+    //Compose
+    implementation 'androidx.compose.ui:ui'
+    implementation 'androidx.compose.material3:material3'
+    implementation 'androidx.compose.ui:ui-graphics'
+    implementation 'androidx.compose.ui:ui-tooling-preview'
+
+    // Pager
+    implementation "com.google.accompanist:accompanist-pager:0.22.0-rc"
+
+    // Network
+    implementation "com.squareup.retrofit2:retrofit:2.9.0"
+    implementation "com.squareup.retrofit2:converter-gson:2.9.0"
+    implementation "com.squareup.okhttp3:okhttp:4.11.0"
+    implementation "com.squareup.okhttp3:logging-interceptor:4.9.3"
+
+    // Paging
+    implementation "androidx.paging:paging-compose:3.3.0-alpha02"
+
+    // Coil
+    implementation "io.coil-kt:coil-compose:2.4.0"
+
+    // Dagger Hilt
+    // hilt
+    implementation "com.google.dagger:hilt-android:2.48"
+    kapt "com.google.dagger:hilt-android-compiler:2.47"
+    // compose navigation
+    implementation "androidx.navigation:navigation-compose:2.7.5"
+    implementation "androidx.hilt:hilt-navigation-compose:1.1.0"
+
+    //Debug
+    debugImplementation 'androidx.compose.ui:ui-tooling'
+    debugImplementation 'androidx.compose.ui:ui-test-manifest'
+
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.10.0'
+
+
+    implementation platform('androidx.compose:compose-bom:2022.10.00')
+
+    //for StatusBar Color
+    implementation "com.google.accompanist:accompanist-systemuicontroller:0.28.0"
+
+    //Graph
+    implementation 'com.github.jaikeerthick:Composable-Graphs:v1.0'
+    //Circular ProgressBar
+    implementation 'com.github.hitanshu-dhawan:CircularProgressBar-Compose:1.0.0-rc01'
+    implementation "com.github.ayoubbk:Compose-Circular-Progress-View:1.4.0"
+
+    implementation "com.google.accompanist:accompanist-flowlayout:0.28.0"
+
+    // timber log
+    implementation 'com.jakewharton.timber:timber:5.0.1'
+    // multidex
+    implementation "androidx.multidex:multidex:2.0.1"
+    //Constraint
+    implementation "androidx.constraintlayout:constraintlayout-compose:1.0.1"
+
+    //locale
+    implementation 'com.zeugmasolutions.localehelper:locale-helper-android:1.5.1'
+
+    //Language
+    implementation 'com.zeugmasolutions.localehelper:locale-helper-android:1.5.1'
+
+    implementation 'com.android.billingclient:billing:6.1.0'
+
+    implementation 'com.github.Felix-Kariuki:InAppPurchasesComposeLibrary:0.1.3'
+    //room Database
+
+    implementation "androidx.room:room-runtime:2.6.0"
+    annotationProcessor "androidx.room:room-compiler:2.6.0"
+    kapt "androidx.room:room-compiler:2.6.0"
+    implementation("androidx.room:room-ktx:2.6.0")
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.6.2"
+    //Stacked BarChart
+    //implementation "co.yml:ycharts:2.1.0"
+    //Web view
+    implementation 'androidx.webkit:webkit:1.8.0'
+
+    implementation "io.coil-kt:coil-compose:2.4.0"
+    implementation 'com.google.accompanist:accompanist-permissions:0.21.1-beta'
+
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0-beta01")
+    def appCenterSdkVersion = '4.1.0'
+
+    androidTestImplementation('com.microsoft.appcenter:espresso-test-extension:1.4')
+    implementation "com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}"
+    implementation "com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}"
+
+    //pager
+    implementation "com.google.accompanist:accompanist-pager:0.30.1"
+
+    // size
+    implementation 'com.intuit.sdp:sdp-android:1.0.6'
+    implementation 'com.intuit.ssp:ssp-android:1.0.6'
+
+}

@@ -1,0 +1,9 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:alpha="0.87"
+        android:color="@color/air_purple_path" android:state_focused="true"/>
+
+    <item android:alpha="0.87"
+        android:color="@color/air_purple_path" android:state_focused="false"/>
+
+
+</selector>
