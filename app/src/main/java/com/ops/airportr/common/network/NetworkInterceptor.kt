@@ -1,4 +1,4 @@
-package com.ops.airportr.common.utils
+package com.ops.airportr.common.network
 
 import android.content.Context
 import android.net.ConnectivityManager
@@ -6,6 +6,9 @@ import android.net.NetworkCapabilities
 import android.os.Build
 import com.microsoft.appcenter.utils.HandlerUtils.runOnUiThread
 import com.ops.airportr.R
+import com.ops.airportr.common.utils.LoggerUtils
+import com.ops.airportr.common.utils.NoConnectivityException
+import com.ops.airportr.common.utils.toast
 import okhttp3.Interceptor
 import okhttp3.Response
 class NetworkInterceptor(context: Context) : Interceptor {

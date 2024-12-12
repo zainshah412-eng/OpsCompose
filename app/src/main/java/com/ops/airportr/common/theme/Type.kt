@@ -9,7 +9,7 @@ import androidx.compose.ui.unit.sp
 import com.ops.airportr.R
 
 // Set of Material typography styles to start with
-val Typography = Typography(
+val Typo = Typography(
     h1 = TextStyle(
         fontWeight = FontWeight.Bold,
         fontSize = 30.sp,
@@ -52,7 +52,15 @@ val customTextLabelSmallStyle = TextStyle(
 )
 
 
+val customTextLabelBoldStyle = TextStyle(
+    fontFamily = fonts,
+    fontWeight = FontWeight.ExtraBold,
+    fontSize = 12.sp,
+    color = WhiteColor
+)
 
 
-val fonts get() = FontFamily( listOf(Font(R.font.urbanist_light), Font(R.font.urbanist_regular), Font(
-    R.font.urbanist_bold),Font(R.font.urbanist_extra_bold)))
+
+
+val fonts get() = FontFamily( listOf(Font(R.font.objective_regular), Font(R.font.objective_regular), Font(
+    R.font.objective_bold),Font(R.font.objective_extra_bold)))

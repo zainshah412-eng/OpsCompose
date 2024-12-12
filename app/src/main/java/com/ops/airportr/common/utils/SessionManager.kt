@@ -3,6 +3,9 @@ package com.ops.airportr.common.utils
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Resources
+import com.google.gson.Gson
+import com.ops.airportr.domain.model.BaseUrl
+import com.ops.airportr.domain.model.login.AuthTokenResp
 
 class SessionManager(
     // Context
@@ -28,16 +31,16 @@ class SessionManager(
      * @param token is a secret key which generated from id and username
      */
 
-//    fun createLoginSession(
-//        authTokenResp: AuthTokenResp,
-//    ) {
-////        editor.putBoolean(IS_LOGIN, true)
-//        editor.putString(KEY_ACCESS_TOKEN, authTokenResp.accessToken)
-//        editor.putString(KEY_TOKEN_TYPE, authTokenResp.tokenType)
-//        authTokenResp.expiresIn?.let { editor.putInt(KEY_EXPIRES_IN, it) }
-//
-//        editor.commit()
-//    }
+    fun createLoginSession(
+        authTokenResp: AuthTokenResp,
+    ) {
+//        editor.putBoolean(IS_LOGIN, true)
+        editor.putString(KEY_ACCESS_TOKEN, authTokenResp.accessToken)
+        editor.putString(KEY_TOKEN_TYPE, authTokenResp.tokenType)
+        authTokenResp.expiresIn?.let { editor.putInt(KEY_EXPIRES_IN, it) }
+
+        editor.commit()
+    }
 
     fun saveIsLogIn(isLogIn: Boolean) {
         editor.remove(IS_LOGIN)
@@ -71,12 +74,12 @@ class SessionManager(
 //        editor.commit()
 //    }
 //
-//    fun saveBaseUrl(url: BaseUrl) {
-//        editor.remove(KEY_BASE_URL)
-//        val json = Gson().toJson(url)
-//        editor.putString(KEY_BASE_URL, json)
-//        editor.commit()
-//    }
+    fun saveBaseUrl(url: BaseUrl) {
+        editor.remove(KEY_BASE_URL)
+        val json = Gson().toJson(url)
+        editor.putString(KEY_BASE_URL, json)
+        editor.commit()
+    }
 //
 //    fun saveLoginCred(loginCred: LoginCred) {
 //        editor.remove(KEY_LOGIN_CRED)
@@ -396,17 +399,17 @@ class SessionManager(
 //        return true
 //    }
 
-//    val authDetails: AuthTokenResp
-//        get() {
-//            // return user
-//            return AuthTokenResp(
-//                pref.getString(KEY_ACCESS_TOKEN, null),
-//                pref.getInt(KEY_EXPIRES_IN, 0),
-//                pref.getString(
-//                    KEY_TOKEN_TYPE, null
-//                )
-//            )
-//        }
+    val authDetails: AuthTokenResp
+        get() {
+            // return user
+            return AuthTokenResp(
+                pref.getString(KEY_ACCESS_TOKEN, null),
+                pref.getInt(KEY_EXPIRES_IN, 0),
+                pref.getString(
+                    KEY_TOKEN_TYPE, null
+                )
+            )
+        }
 
 //    val userDetails: User
 //        get() {
@@ -458,11 +461,11 @@ class SessionManager(
 //
 //        }
 //
-//    val baseUrl: BaseUrl?
-//        get() {
-//            val json: String? = pref.getString(KEY_BASE_URL, "")
-//            return Gson().fromJson(json, BaseUrl::class.java)
-//        }
+    val baseUrl: BaseUrl?
+        get() {
+            val json: String? = pref.getString(KEY_BASE_URL, "")
+            return Gson().fromJson(json, BaseUrl::class.java)
+        }
 
     val subscriptionKey: String?
         get() {

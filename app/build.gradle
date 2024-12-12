@@ -59,7 +59,7 @@ android {
     productFlavors {
         dev {
             dimension "version"
-         //   applicationId = "com.project.androidairportr.uat"
+            //   applicationId = "com.project.androidairportr.uat"
             applicationId = "com.ops.airportr"
             versionCode = 268
             versionName = "2.6.8"
@@ -81,7 +81,7 @@ android {
         }
         uat {
             dimension "version"
-           // applicationId = "com.project.androidairportr.uat"
+            // applicationId = "com.project.androidairportr.uat"
             applicationId = "com.ops.airportr"
             versionCode = 230
             versionName = "2.3.0"
@@ -104,7 +104,7 @@ android {
         }
         live {
             dimension "version"
-          //  applicationId = "com.project.androidairportr"
+            //  applicationId = "com.project.androidairportr"
             applicationId = "com.ops.airportr"
             versionCode = 753
             versionName = "7.5.3"
@@ -134,10 +134,6 @@ dependencies {
     //AndroidX
     implementation 'androidx.core:core-ktx:1.12.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation "androidx.compose.ui:ui:1.5.4"
-    implementation "androidx.compose.material:material:1.5.4"
-    implementation "androidx.compose.material:material-icons-extended:1.5.4"
-    implementation "androidx.compose.ui:ui-tooling-preview:1.5.4"
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.2'
     implementation 'androidx.activity:activity-compose:1.8.0'
     implementation 'androidx.navigation:navigation-runtime-ktx:2.7.5'
@@ -152,6 +148,13 @@ dependencies {
     implementation 'androidx.compose.material3:material3'
     implementation 'androidx.compose.ui:ui-graphics'
     implementation 'androidx.compose.ui:ui-tooling-preview'
+    implementation "androidx.compose.runtime:runtime:1.5.4"
+    implementation "androidx.compose.ui:ui:1.5.4"
+    implementation "androidx.compose.material:material:1.5.4"
+    implementation "androidx.compose.material:material-icons-extended:1.5.4"
+    implementation "androidx.compose.ui:ui-tooling-preview:1.5.4"
+    //Constraint
+    implementation "androidx.constraintlayout:constraintlayout-compose:1.0.1"
 
     // Pager
     implementation "com.google.accompanist:accompanist-pager:0.22.0-rc"
@@ -201,8 +204,7 @@ dependencies {
     implementation 'com.jakewharton.timber:timber:5.0.1'
     // multidex
     implementation "androidx.multidex:multidex:2.0.1"
-    //Constraint
-    implementation "androidx.constraintlayout:constraintlayout-compose:1.0.1"
+
 
     //locale
     implementation 'com.zeugmasolutions.localehelper:locale-helper-android:1.5.1'
@@ -242,4 +244,7 @@ dependencies {
     implementation 'com.intuit.sdp:sdp-android:1.0.6'
     implementation 'com.intuit.ssp:ssp-android:1.0.6'
 
+    //Glide
+    implementation 'com.github.bumptech.glide:glide:4.13.2'
+    kapt 'com.github.bumptech.glide:compiler:4.13.2'
 }

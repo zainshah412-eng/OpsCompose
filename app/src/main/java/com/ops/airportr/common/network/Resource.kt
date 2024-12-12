@@ -1,4 +1,4 @@
-package com.ops.airportr.common
+package com.ops.airportr.common.network
 
 
 sealed class Resource<T>(val data: T? = null, val message: String? = null) {

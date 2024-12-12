@@ -4,17 +4,21 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.widget.ImageView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.FloatingActionButton
@@ -42,13 +46,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.PopupProperties
+import com.bumptech.glide.Glide
 import com.ops.airportr.R
 import com.ops.airportr.common.theme.fonts
 import com.ops.airportr.common.theme.red
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import com.ops.airportr.common.theme.air_awesome_purple_200
+import com.ops.airportr.common.theme.air_purple_awesome_light
+import com.ops.airportr.common.theme.white
 import com.ops.airportr.common.utils.changeLanguage
 import kotlinx.coroutines.delay
 
@@ -60,8 +69,9 @@ fun CustomButton(
     paddingHorizontal: Int = 0,
     modifier: Modifier,
     fontSize: TextUnit = 16.sp,
-    containerColor: Color = air_awesome_purple_200,
-    textColor:Color = air_awesome_purple_200
+    containerColor: Color = air_purple_awesome_light,
+    textColor:Color = air_awesome_purple_200,
+    isEnabled: Boolean = false // Default to true
 ) {
     Button(
         modifier = modifier
@@ -75,9 +85,9 @@ fun CustomButton(
             defaultElevation = 8.dp, pressedElevation = 20.dp, focusedElevation = 20.dp
         ),
         shape = RoundedCornerShape(50),
-        // shape = RoundedCornerShape(30.dp),
         colors = ButtonDefaults.buttonColors(containerColor = containerColor),
-        onClick = onButtonClick
+        onClick = onButtonClick,
+        enabled = true
     ) {
         Text(
             text = name,
@@ -172,5 +182,31 @@ fun MyFloatingActionButton(onClick: () -> Unit) {
     }
 }
 
+@Composable
+fun LoaderDialog(showDialog: Boolean, onDismiss: () -> Unit = {}) {
+    if (showDialog) {
+      //  Dialog(onDismissRequest = onDismiss) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .background(white)
+                    .wrapContentSize(Alignment.Center)
+            ) {
+                AndroidView(
+                    modifier = Modifier.size(100.dp),
+                    factory = { context ->
+                        ImageView(context).apply {
+                            Glide.with(context)
+                                .asGif()
+                                .load(R.drawable.ic_logo_loader)
+                                .into(this)
+                        }
+                    }
+                )
+            }
+        }
+//    }
+}
 
 

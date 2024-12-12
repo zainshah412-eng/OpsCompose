@@ -5,7 +5,10 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 
 import com.ops.airportr.common.Constants.PRODUCTION_URL
-import com.ops.airportr.common.utils.NetworkInterceptor
+import com.ops.airportr.common.network.AuthApiKeyInterceptor
+import com.ops.airportr.common.network.AuthInterceptor
+import com.ops.airportr.common.network.NetworkInterceptor
+import com.ops.airportr.common.network.SessionApiKeyInterceptor
 import com.ops.airportr.data.remote.ApiService
 import com.ops.airportr.data.repository.CoinRepositoryImpl
 import com.ops.airportr.domain.repository.CoinRepository
@@ -40,9 +43,10 @@ object AppModule {
     @Provides
     fun provideHttpClient(@ApplicationContext context: Context): OkHttpClient {
         val okHttpClient = OkHttpClient.Builder()
-        //       okHttpClient.addInterceptor(AuthInterceptor(context))
+        okHttpClient.addInterceptor(AuthInterceptor(context))
         okHttpClient.addInterceptor(NetworkInterceptor(context))
-        //     okHttpClient.addInterceptor(AuthApiKeyInterceptor(context))
+        okHttpClient.addInterceptor(AuthApiKeyInterceptor(context))
+        okHttpClient.addInterceptor(SessionApiKeyInterceptor(context))
         okHttpClient.hostnameVerifier { hostname, session -> true }
         okHttpClient.addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
         okHttpClient.readTimeout(60, TimeUnit.SECONDS)
