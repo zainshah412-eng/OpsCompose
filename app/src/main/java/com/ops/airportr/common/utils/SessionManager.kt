@@ -6,6 +6,8 @@ import android.content.res.Resources
 import com.google.gson.Gson
 import com.ops.airportr.domain.model.BaseUrl
 import com.ops.airportr.domain.model.login.AuthTokenResp
+import com.ops.airportr.domain.model.login.logincred.LoginCred
+import com.ops.airportr.domain.model.user.User
 
 class SessionManager(
     // Context
@@ -60,12 +62,12 @@ class SessionManager(
         editor.commit()
     }
 
-//    fun saveUserDetails(user: User) {
-//        editor.remove(KEY_USER_DETAILS)
-//        val json = Gson().toJson(user)
-//        editor.putString(KEY_USER_DETAILS, json)
-//        editor.commit()
-//    }
+    fun saveUserDetails(user: User) {
+        editor.remove(KEY_USER_DETAILS)
+        val json = Gson().toJson(user)
+        editor.putString(KEY_USER_DETAILS, json)
+        editor.commit()
+    }
 //
 //    fun saveAppVersions(appVersions: WhatsNewResponse) {
 //        editor.remove(KEY_APP_VERSIONS)
@@ -80,13 +82,13 @@ class SessionManager(
         editor.putString(KEY_BASE_URL, json)
         editor.commit()
     }
-//
-//    fun saveLoginCred(loginCred: LoginCred) {
-//        editor.remove(KEY_LOGIN_CRED)
-//        val json = Gson().toJson(loginCred)
-//        editor.putString(KEY_LOGIN_CRED, json)
-//        editor.commit()
-//    }
+
+    fun saveLoginCred(loginCred: LoginCred) {
+        editor.remove(KEY_LOGIN_CRED)
+        val json = Gson().toJson(loginCred)
+        editor.putString(KEY_LOGIN_CRED, json)
+        editor.commit()
+    }
 
     fun saveSubscriptionKey(key: String) {
         editor.remove(KEY_SUBSCRIPTION)
@@ -411,40 +413,40 @@ class SessionManager(
             )
         }
 
-//    val userDetails: User
-//        get() {
-//            try {
-//                // some code
-//                val json: String? = pref.getString(KEY_USER_DETAILS, "")
-//                return Gson().fromJson(json, User::class.java)
-//            } catch (e: Exception) {
-//                // handler
-//                return return Gson().fromJson("", User::class.java)
-//            } finally {
-//                // optional finally block
-//            }
-//
-//        }
-//
-//    val loginCred: LoginCred
-//        get() {
-//            return try {
-//                // Retrieve the JSON string from shared preferences
-//                val json: String? = pref.getString(KEY_LOGIN_CRED, "")
-//
-//                // Check if the JSON string is null or empty
-//                if (json.isNullOrEmpty()) {
-//                    // Return a default instance of LoginCred if JSON is invalid
-//                    LoginCred()
-//                } else {
-//                    // Parse the JSON string into a LoginCred object
-//                    Gson().fromJson(json, LoginCred::class.java) ?: LoginCred()
-//                }
-//            } catch (e: Exception) {
-//                // Return a default instance of LoginCred in case of an exception
-//                LoginCred()
-//            }
-//        }
+    val userDetails: User
+        get() {
+            try {
+                // some code
+                val json: String? = pref.getString(KEY_USER_DETAILS, "")
+                return Gson().fromJson(json, User::class.java)
+            } catch (e: Exception) {
+                // handler
+                return return Gson().fromJson("", User::class.java)
+            } finally {
+                // optional finally block
+            }
+
+        }
+
+    val loginCred: LoginCred
+        get() {
+            return try {
+                // Retrieve the JSON string from shared preferences
+                val json: String? = pref.getString(KEY_LOGIN_CRED, "")
+
+                // Check if the JSON string is null or empty
+                if (json.isNullOrEmpty()) {
+                    // Return a default instance of LoginCred if JSON is invalid
+                    LoginCred()
+                } else {
+                    // Parse the JSON string into a LoginCred object
+                    Gson().fromJson(json, LoginCred::class.java) ?: LoginCred()
+                }
+            } catch (e: Exception) {
+                // Return a default instance of LoginCred in case of an exception
+                LoginCred()
+            }
+        }
 
 //    val appVersions: WhatsNewResponse
 //        get() {
