@@ -64,6 +64,7 @@ import com.ops.airportr.AppApplication
 import com.ops.airportr.BuildConfig
 import com.ops.airportr.R
 import com.ops.airportr.common.Constants
+import com.ops.airportr.common.Constants.GET_CURRENT_USER_API
 import com.ops.airportr.common.theme.air_awesome_purple_200
 import com.ops.airportr.common.theme.air_orange_dark
 import com.ops.airportr.common.theme.air_purple
@@ -82,11 +83,17 @@ import com.ops.airportr.common.utils.getNetworkType
 import com.ops.airportr.common.utils.isCameraPermissionAllowed
 import com.ops.airportr.common.utils.isLocationPermissionAllowed
 import com.ops.airportr.common.utils.isValidEmail
+import com.ops.airportr.common.utils.moveOnNewScreen
+import com.ops.airportr.domain.model.BaseUrl
 import com.ops.airportr.domain.model.language.LanguageListItemModel
+import com.ops.airportr.domain.model.login.logincred.LoginCred
+import com.ops.airportr.route.Screen
 import com.ops.airportr.ui.componts.BackPressHandler
 import com.ops.airportr.ui.componts.CustomButton
 import com.ops.airportr.ui.componts.LoaderDialog
+import com.ops.airportr.ui.componts.SnackbarDemo
 import com.ops.airportr.ui.componts.Space
+import kotlinx.coroutines.delay
 
 @Composable
 fun LoginScreen(
@@ -103,12 +110,17 @@ fun LoginScreen(
             activity?.finish()
         }
     }
-    var errorMessage by remember { mutableStateOf("") }
+    var loginCredEmail by remember { mutableStateOf("") }
+    var loginCredPassword by remember { mutableStateOf("") }
     var emailId by remember { mutableStateOf(TextFieldValue("")) }
     var password by remember { mutableStateOf(TextFieldValue("")) }
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
     var emailError by rememberSaveable { mutableStateOf(false) }
     var passwordError by rememberSaveable { mutableStateOf(false) }
+    var snackBarShowFlag by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+
+
     val context = LocalContext.current
     val outlinedTextFieldColors = TextFieldDefaults.outlinedTextFieldColors(
         focusedBorderColor = purple_100,
@@ -160,21 +172,24 @@ fun LoginScreen(
     }
     var showLoader by remember { mutableStateOf(false) }
     val state = viewModel.state.value
+    val stateUserDetail = viewModel.stateUserDetail.value
 
+    if (state.loginResponse?.accessToken != "" && state.loginResponse?.accessToken != null) {
+        if (!AppApplication.sessionManager.getBiometricStatus) {
+            var loginCredModal = LoginCred(loginCredEmail, loginCredPassword)
+            AppApplication.sessionManager.saveLoginCred(loginCredModal)
+        }
+        AppApplication.sessionManager.createLoginSession(state.loginResponse!!)
+        state.loginResponse = null
+        state.error = null
+        state.isLoading = false
+        showLoader = false
+        viewModel.getUserDetail(
+            AppApplication.sessionManager.baseUrl?.url + GET_CURRENT_USER_API
+        )
 
-    ConstraintLayout(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(white)
-    ) {
-        val (topBox, logoImage, languageSpinner, errorBox, authBox, resetAccount, bottomBox,
-            loaderBox) = createRefs()
+//       navHostController.moveOnNewScreen(Screen.HomeScreen.route, true)
 
-        Log.wtf("STATA",state.loginResponse.toString())
-        if (state.loginResponse?.accessToken != "" && state.loginResponse?.accessToken != null) {
-            Log.wtf("ResponseTTT", state.loginResponse.toString())
-//                navHostController.moveOnNewScreen(Screen.HomeScreen.route, true)
-            state.loginResponse = null
 //            viewModel.getUserDetail(
 //                AppApplication.sessionManager.baseUrl?.url + GET_CURRENT_USER_API
 //            )
@@ -186,7 +201,29 @@ fun LoginScreen(
 //            navHostController.navigate(Screen.HomeScreen.route) {
 //                popUpTo(0) { inclusive = true }
 //            }
+    }
+
+    if (stateUserDetail.userDetailResponse != null) {
+        stateUserDetail.userDetailResponse?.user?.let { it1 ->
+            AppApplication.sessionManager.saveUserDetails(
+                it1
+            )
         }
+        stateUserDetail.userDetailResponse = null
+        stateUserDetail.error = null
+        stateUserDetail.isLoading = false
+        showLoader = false
+        navHostController.moveOnNewScreen(Screen.WelcomeScreen.route, true)
+    }
+
+    ConstraintLayout(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(white)
+    ) {
+        val (topBox, logoImage, languageSpinner, errorBox, authBox, resetAccount, bottomBox) = createRefs()
+
+
 
         Box(modifier = Modifier.constrainAs(topBox) {
             top.linkTo(parent.top)
@@ -265,6 +302,8 @@ fun LoginScreen(
         ) {
             state.loginResponse = null
             state.error = null
+            stateUserDetail.userDetailResponse = null
+            stateUserDetail.error = null
             Text(
                 text = stringResource(id = R.string.email),
                 fontFamily = fonts,
@@ -389,21 +428,79 @@ fun LoginScreen(
             CustomButton(
                 name = stringResource(id = R.string.login_text),
                 onButtonClick = {
+                    var email = emailId.text
+                    if (email.isValidEmail()) {
+                        println("Valid Email")
+                    } else {
+                        println("Invalid Email")
+                    }
+
                     if (emailId.text.trim().isNotEmpty() && password.text.trim().isNotEmpty()) {
-                        if (emailId.text.isValidEmail()) {
+                        if (!emailId.text.isValidEmail()) {
                             emailError = true
                         } else if (password.text.length < 6) {
                             passwordError = true
                         } else {
                             emailError = false
                             passwordError = false
-                            callForApiToken(
-                                Constants.PRODUCTION_URL + Constants.TOKEN_ENDPOINT,
-                                emailId.text,
-                                password.text,
-                                viewModel,
-                                context
-                            )
+
+                            var email = ""
+                            var baseUrl = ""
+                            var subscriptionKey = ""
+                            var baseUrlEnv = ""
+                            var flag = false
+                            if (BuildConfig.ENVIRONMENT == "live") {
+                                email = emailId.text
+                                baseUrl = Constants.PRODUCTION_URL_LIVE
+                                baseUrlEnv = "-live"
+                                subscriptionKey = Constants.LIVE_SUBSCRIPTION_KEY
+                                flag = true
+                            } else {
+                                when {
+                                    (emailId.text.trim().contains("-uat")) -> {
+                                        email = emailId.text.replace("-uat", "")
+                                        baseUrl = Constants.PRODUCTION_URL
+                                        baseUrlEnv = "-uat"
+                                        subscriptionKey = Constants.UAT_SUBSCRIPTION_KEY
+                                        flag = true
+                                    }
+
+                                    (emailId.text.trim().contains("-dev")) -> {
+                                        email = emailId.text.replace("-dev", "")
+                                        baseUrl = Constants.PRODUCTION_URL
+                                        baseUrlEnv = "-uat"
+                                        subscriptionKey = Constants.UAT_SUBSCRIPTION_KEY
+                                        flag = true
+                                    }
+
+                                    else -> {
+                                        flag = false
+                                        snackBarShowFlag = true
+                                        errorMessage =
+                                            "You need to use -uat or -dev with email for Login"
+                                    }
+                                }
+                            }
+                            if (flag) {
+
+                                AppApplication.sessionManager.biometricEnabled(false)
+                                AppApplication.sessionManager.saveBaseUrl(
+                                    BaseUrl(
+                                        baseUrl,
+                                        baseUrlEnv
+                                    )
+                                )
+                                AppApplication.sessionManager.saveSubscriptionKey(subscriptionKey)
+                                loginCredEmail = email
+                                loginCredPassword = password.text
+                                callForApiToken(
+                                    baseUrl + Constants.TOKEN_ENDPOINT,
+                                    email,
+                                    password.text,
+                                    viewModel,
+                                    context
+                                )
+                            }
                         }
                     }
                 },
@@ -437,7 +534,7 @@ fun LoginScreen(
             fontSize = 14.sp,
             color = air_purple,
             modifier = Modifier
-                .constrainAs(loaderBox) {
+                .constrainAs(resetAccount) {
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                     bottom.linkTo(parent.bottom)
@@ -454,22 +551,35 @@ fun LoginScreen(
             OverlappingImagesBottom()
         }
 
-        if (state.error != null) {
-            errorMessage = state.error ?: context.getString(R.string.no_internet)
-//            navHostController.navigate(Screen.HomeScreen.route) {
-//                launchSingleTop =
-//                    true  // Ensures that if you are already on the HomeScreen, it won't add it again to the stack
-//            }
-//            navHostController.moveOnNewScreen(Screen.HomeScreen.route, true){
-//            }
-//            navHostController.navigate(Screen.HomeScreen.route) {
-//                popUpTo(0) { inclusive = true }
-//            }
+        if (snackBarShowFlag) {
+            SnackbarDemo(errorMessage)
+            LaunchedEffect(Unit) {
+                delay(3000L)
+                snackBarShowFlag = false
+                errorMessage = ""
+            }
+
         }
-        if (state.isLoading) {
-            showLoader = true
-            LoaderDialog(showDialog = showLoader)
-        }
+    }
+
+    if (state.error != null ) {
+        errorMessage = state.error ?: context.getString(R.string.no_internet)
+        snackBarShowFlag = true
+    }
+    if (state.isLoading ) {
+        Log.wtf("StateLoadingAuth", "Called")
+        showLoader = true
+        LoaderDialog(showDialog = showLoader)
+    }
+
+    if (stateUserDetail.error != null) {
+        errorMessage = state.error ?: context.getString(R.string.no_internet)
+        snackBarShowFlag = true
+    }
+    if (stateUserDetail.isLoading) {
+        Log.wtf("StateLoadingDetail", "Called")
+        showLoader = true
+        LoaderDialog(showDialog = showLoader)
     }
 
 }
