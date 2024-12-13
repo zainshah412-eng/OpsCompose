@@ -22,9 +22,13 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Scaffold
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,6 +36,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,6 +65,7 @@ import com.ops.airportr.common.theme.air_purple_awesome_light
 import com.ops.airportr.common.theme.white
 import com.ops.airportr.common.utils.changeLanguage
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun CustomButton(
@@ -209,4 +215,23 @@ fun LoaderDialog(showDialog: Boolean, onDismiss: () -> Unit = {}) {
 //    }
 }
 
+@Composable
+fun SnackbarDemo(message:String) {
+    // Create a SnackbarHostState
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
+    // Show the Snackbar immediately
+    LaunchedEffect(Unit) {
+        snackbarHostState.showSnackbar(
+            message = message,
+            actionLabel = "Dismiss"
+        )
+    }
+
+    // SnackbarHost to display the Snackbar
+    SnackbarHost(
+        hostState = snackbarHostState
+    )
+}
 

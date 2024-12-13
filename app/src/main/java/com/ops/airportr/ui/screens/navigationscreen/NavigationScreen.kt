@@ -85,9 +85,6 @@ fun NavigationScreen(
     }
 
     androidx.compose.material.Scaffold(
-        topBar = {
-            topBar()
-        },
         bottomBar = {
             bottomBar()
         },

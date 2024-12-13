@@ -102,11 +102,11 @@ class LoginViewModel @Inject constructor(
                 }
 
                 is Resource.Error -> {
-                    _state.value = LoginState(error = it.message)
+                    _stateUserDetail.value = UserDetailState(error = it.message)
                 }
 
                 is Resource.Loading -> {
-                    _state.value = LoginState(isLoading = true)
+                    _stateUserDetail.value = UserDetailState(isLoading = true)
                 }
             }
         }.launchIn(viewModelScope)
