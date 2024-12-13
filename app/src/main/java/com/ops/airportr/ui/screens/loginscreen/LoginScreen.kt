@@ -1,12 +1,8 @@
 package com.ops.airportr.ui.screens.loginscreen
 
-import android.app.LocaleManager
+import android.app.Activity
 import android.content.Context
-import android.content.res.Configuration
-import android.os.Build
-import android.os.LocaleList
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatDelegate
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -14,15 +10,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -39,18 +34,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -60,25 +56,36 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.PopupProperties
-import androidx.core.os.LocaleListCompat
+import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.ops.airportr.AppApplication
+import com.ops.airportr.BuildConfig
 import com.ops.airportr.R
+import com.ops.airportr.common.Constants
 import com.ops.airportr.common.theme.air_awesome_purple_200
+import com.ops.airportr.common.theme.air_orange_dark
 import com.ops.airportr.common.theme.air_purple
 import com.ops.airportr.common.theme.air_purple_awesome_light
+import com.ops.airportr.common.theme.customTextLabelBoldStyle
 import com.ops.airportr.common.theme.customTextLabelStyle
 import com.ops.airportr.common.theme.dark_blue
 import com.ops.airportr.common.theme.fonts
 import com.ops.airportr.common.theme.grey
+import com.ops.airportr.common.theme.light_orange_new
 import com.ops.airportr.common.theme.purple_100
 import com.ops.airportr.common.theme.white
 import com.ops.airportr.common.utils.changeLanguage
+import com.ops.airportr.common.utils.getDeviceUUID
+import com.ops.airportr.common.utils.getNetworkType
+import com.ops.airportr.common.utils.isCameraPermissionAllowed
+import com.ops.airportr.common.utils.isLocationPermissionAllowed
+import com.ops.airportr.common.utils.isValidEmail
 import com.ops.airportr.domain.model.language.LanguageListItemModel
-import com.ops.airportr.route.Screen
+import com.ops.airportr.ui.componts.BackPressHandler
 import com.ops.airportr.ui.componts.CustomButton
+import com.ops.airportr.ui.componts.LoaderDialog
 import com.ops.airportr.ui.componts.Space
 
 @Composable
@@ -86,20 +93,22 @@ fun LoginScreen(
     navHostController: NavHostController,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
-//    LaunchedEffect(Unit) {
-//        viewModel.resetError()
-//    }
-//    val activity = LocalContext.current as? Activity
-//    BackPressHandler(activity) {
-//        if (!navHostController.popBackStack()) {
-//            // Finish the activity to close the app
-//            activity?.finish()
-//        }
-//    }
-
+    LaunchedEffect(Unit) {
+        viewModel.resetAuthError()
+    }
+    val activity = LocalContext.current as? Activity
+    BackPressHandler(activity) {
+        if (!navHostController.popBackStack()) {
+            // Finish the activity to close the app
+            activity?.finish()
+        }
+    }
+    var errorMessage by remember { mutableStateOf("") }
     var emailId by remember { mutableStateOf(TextFieldValue("")) }
     var password by remember { mutableStateOf(TextFieldValue("")) }
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
+    var emailError by rememberSaveable { mutableStateOf(false) }
+    var passwordError by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
     val outlinedTextFieldColors = TextFieldDefaults.outlinedTextFieldColors(
         focusedBorderColor = purple_100,
@@ -139,258 +148,314 @@ fun LoginScreen(
             "en" -> {
                 selectedLanguage = LanguageListItemModel("English", R.drawable.england)
             }
+
             "de" -> {
                 selectedLanguage = LanguageListItemModel("Deutsch", R.drawable.germany)
             }
+
             else -> {
                 selectedLanguage = LanguageListItemModel("Français", R.drawable.france)
             }
         }
     }
-
-
-
-//    var selectedItem by remember { mutableStateOf<LanguageListItemModel?>(null) }
+    var showLoader by remember { mutableStateOf(false) }
     val state = viewModel.state.value
 
-    Box(
+
+    ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
             .background(white)
     ) {
+        val (topBox, logoImage, languageSpinner, errorBox, authBox, resetAccount, bottomBox,
+            loaderBox) = createRefs()
 
-//        Log.wtf("RESPONSE_DATA", state.loginResponse.toString())
-        if (state.loginResponse?.status == true) {
+        Log.wtf("STATA",state.loginResponse.toString())
+        if (state.loginResponse?.accessToken != "" && state.loginResponse?.accessToken != null) {
+            Log.wtf("ResponseTTT", state.loginResponse.toString())
 //                navHostController.moveOnNewScreen(Screen.HomeScreen.route, true)
             state.loginResponse = null
+//            viewModel.getUserDetail(
+//                AppApplication.sessionManager.baseUrl?.url + GET_CURRENT_USER_API
+//            )
 //                navHostController.navigate(Screen.HomeScreen.route) {
 //                    launchSingleTop =
 //                        true  // Ensures that if you are already on the HomeScreen, it won't add it again to the stack
 //                }
-            AppApplication.sessionManager.saveIsLogIn(true)
-            navHostController.navigate(Screen.HomeScreen.route) {
-                popUpTo(0) { inclusive = true }
-            }
+//            AppApplication.sessionManager.saveIsLogIn(true)
+//            navHostController.navigate(Screen.HomeScreen.route) {
+//                popUpTo(0) { inclusive = true }
+//            }
         }
 
-
-        state.loginResponse.let {
+        Box(modifier = Modifier.constrainAs(topBox) {
+            top.linkTo(parent.top)
+            start.linkTo(parent.start)
+            end.linkTo(parent.end)
+        }) {
+            OverlappingImagesTop()
+        }
+        Image(
+            painter = painterResource(id = R.drawable.airportr_logo),
+            contentDescription = null, // provide content description if needed
+            modifier = Modifier
+                .constrainAs(logoImage) {
+                    top.linkTo(parent.top)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                }
+                .padding(top = 40.dp)
+                .height(120.dp), // make the image background transparent
+            contentScale = ContentScale.Inside // scale the image to fill the Box
+        )
+        CustomDropdownMenuForLanguageChange(
+            selectedLanguage,
+            listLanguageListItemModel,
+            dark_blue,
+            modifier = Modifier
+                .constrainAs(languageSpinner) {
+                    top.linkTo(logoImage.bottom)
+                    end.linkTo(parent.end)
+                }
+                .fillMaxWidth() // Ensure the item takes full width if needed
+                .wrapContentWidth(Alignment.End)
+                .padding(end = 20.dp),
+            onSelected = { selectedIndex ->
+                selectedLanguage = listLanguageListItemModel[selectedIndex]
+            },
+            context
+        )
+        if (state.error != null) {
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .background(white)
-            ) {
-
-                OverlappingImagesTop()
-
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.CenterHorizontally
-
-                ) {
-                    Space(height = 50, width = 0)
-                    Image(
-                        painter = painterResource(id = R.drawable.airportr_logo),
-                        contentDescription = null, // provide content description if needed
-                        modifier = Modifier
-                            .height(120.dp)
-                            .fillMaxWidth(), // make the image background transparent
-                        contentScale = ContentScale.Inside // scale the image to fill the Box
-                    )
-                    Space(height = 50, width = 0)
-                    CustomDropdownMenuForLanguageChange(
-                        selectedLanguage,
-                        listLanguageListItemModel,
-                        dark_blue,
-                        modifier = Modifier
-                            .fillMaxWidth() // Ensure the item takes full width if needed
-                            .wrapContentWidth(Alignment.End)
-                            .padding(end = 20.dp),
-                        onSelected = { selectedIndex ->
-                            selectedLanguage = listLanguageListItemModel[selectedIndex]
-                        },
-                        context
-                    )
-
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight()
-                            .padding(start = 20.dp, end = 20.dp),
-                        verticalArrangement = Arrangement.Top,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Space(height = 20, width = 0)
-                        Text(
-                            text = stringResource(id = R.string.email),
-                            fontFamily = fonts,
-                            style = customTextLabelStyle,
-                            fontSize = 16.sp,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .align(Alignment.Start)
-                        )
-                        OutlinedTextField(
-                            value = emailId,
-                            onValueChange = { emailId = it },
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = Icons.Outlined.Email, "Email",
-                                    tint = dark_blue
-                                )
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 5.dp),
-                            label = {
-                                Text(
-                                    text = stringResource(id = R.string.enter_email),
-                                    fontFamily = fonts
-                                )
-                            },
-
-                            singleLine = true,
-                            placeholder = {
-                                Text(
-                                    text = stringResource(id = R.string.enter_email),
-                                    fontFamily = fonts
-                                )
-                            },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                            textStyle = androidx.compose.ui.text.TextStyle(fontFamily = fonts),
-                            colors = outlinedTextFieldColors
-                        )
-                        Space(height = 16, width = 0)
-
-                        Text(
-                            text = stringResource(id = R.string.password),
-                            fontFamily = fonts,
-                            style = customTextLabelStyle,
-                            fontSize = 16.sp,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .align(Alignment.Start)
-                        )
-
-                        OutlinedTextField(
-                            value = password,
-                            onValueChange = { password = it },
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = Icons.Outlined.Lock, "Email",
-                                    tint = dark_blue
-                                )
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 5.dp),
-                            label = {
-                                Text(
-                                    text = stringResource(id = R.string.password),
-                                    fontFamily = fonts
-                                )
-                            },
-                            singleLine = true,
-                            placeholder = {
-                                Text(
-                                    text = stringResource(id = R.string.enter_password),
-                                    fontFamily = fonts
-                                )
-                            },
-                            visualTransformation = if (passwordVisible) VisualTransformation.None else
-                                PasswordVisualTransformation(),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                            textStyle = androidx.compose.ui.text.TextStyle(fontFamily = fonts),
-                            trailingIcon = {
-                                val image = if (passwordVisible) Icons.Filled.Visibility
-                                else Icons.Filled.VisibilityOff
-                                // Please provide localized description for accessibility services
-                                val description =
-                                    if (passwordVisible) "Hide password" else "Show password"
-                                IconButton(onClick = {
-                                    passwordVisible = !passwordVisible
-                                }) {
-                                    Icon(
-                                        imageVector = image, description,
-                                        tint = grey
-                                    )
-                                }
-                            },
-                            colors = outlinedTextFieldColors
-                        )
-                        Space(height = 10, width = 0)
-
-                        CustomButton(
-                            name = stringResource(id = R.string.login_text),
-                            onButtonClick = {
-                                if (emailId.text.isNullOrEmpty() && password.text.isNullOrEmpty()) {
-                                    Toast.makeText(
-                                        context,
-                                        "Please enter correct detail.",
-                                        Toast.LENGTH_SHORT
-                                    )
-                                        .show()
-                                } else {
-//                                    viewModel.getLogin(
-//                                        USER_AUTHENTICATE + emailId.text
-//                                                + "&Password=" + password.text + "&IMEI=865753025921006"
-//                                    )
-                                }
-                            },
-                            paddingTop = 10,
-                            paddingHorizontal = 0,
-                            modifier = Modifier.height(70.dp),
-                            containerColor = if (emailId.text.isNotEmpty() && password.text.isNotEmpty()) air_purple else air_purple_awesome_light,
-                            textColor = if (emailId.text.isNotEmpty() && password.text.isNotEmpty()) white else air_awesome_purple_200
-
-                        )
-                        Space(height = 20, width = 0)
-                        Text(
-                            text = stringResource(id = R.string.login_with_biometrics_text),
-                            fontFamily = fonts,
-                            style = customTextLabelStyle,
-                            color = air_purple,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .wrapContentWidth(Alignment.CenterHorizontally)
-                        )
+                    .constrainAs(errorBox) {
+                        top.linkTo(languageSpinner.bottom)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
                     }
-
-
-                }
+                    .fillMaxWidth()
+                    .padding(16.dp) // Apply padding first
+                    .clip(RoundedCornerShape(10.dp)) // Then clip the corners
+                    .background(light_orange_new) // Background should respect the clipping
+            ) {
                 Text(
-                    text = stringResource(id = R.string.login_trouble_text),
-                    fontFamily = fonts,
+                    text = state.error.toString(),
+                    color = air_orange_dark,
                     style = customTextLabelStyle,
-                    color = air_purple,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentWidth(Alignment.CenterHorizontally)
-                        .align(Alignment.BottomCenter)
-                        .padding(0.dp, 0.dp, 0.dp, 40.dp)
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(14.dp) // Optional inner padding for Text
                 )
-                Box(modifier = Modifier.align(Alignment.BottomEnd)) {
-                    OverlappingImagesBottom()
-                }
-
             }
         }
-
-
-        if (state.loginResponse?.status == false) {
-            Toast.makeText(
-                context,
-                state.loginResponse?.msg ?: "Incorrect Id or Password",
-                Toast.LENGTH_SHORT
-            )
-                .show()
-
+        val errorBarrier = createBottomBarrier(languageSpinner, errorBox)
+        Column(
+            modifier = Modifier
+                .constrainAs(authBox) {
+                    top.linkTo(
+                        errorBarrier
+                        // if (state.error != null) errorBox.bottom else languageSpinner.bottom
+                    )
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                }
+                .fillMaxWidth()
+                .padding(start = 20.dp, end = 20.dp),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             state.loginResponse = null
+            state.error = null
+            Text(
+                text = stringResource(id = R.string.email),
+                fontFamily = fonts,
+                style = customTextLabelStyle,
+                fontSize = 14.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.Start)
+            )
+            OutlinedTextField(
+                value = emailId,
+                onValueChange = { emailId = it },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Outlined.Email, "Email",
+                        tint = dark_blue
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 5.dp),
+                label = {
+                    Text(
+                        text = stringResource(id = R.string.enter_email),
+                        fontFamily = fonts
+                    )
+                },
+
+                singleLine = true,
+                placeholder = {
+                    Text(
+                        text = stringResource(id = R.string.enter_email),
+                        fontFamily = fonts
+                    )
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                textStyle = TextStyle(fontFamily = fonts),
+                colors = outlinedTextFieldColors
+            )
+            if (emailError) {
+                Text(
+                    text = stringResource(id = R.string.incorrect_email),
+                    fontFamily = fonts,
+                    style = customTextLabelStyle,
+                    fontSize = 12.sp,
+                    color = air_orange_dark,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.Start)
+                )
+            }
+            Space(height = 16, width = 0)
+
+            Text(
+                text = stringResource(id = R.string.password),
+                fontFamily = fonts,
+                style = customTextLabelStyle,
+                fontSize = 14.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.Start)
+            )
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Outlined.Lock, "Email",
+                        tint = dark_blue
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 5.dp),
+                label = {
+                    Text(
+                        text = stringResource(id = R.string.password),
+                        fontFamily = fonts
+                    )
+                },
+                singleLine = true,
+                placeholder = {
+                    Text(
+                        text = stringResource(id = R.string.enter_password),
+                        fontFamily = fonts
+                    )
+                },
+                visualTransformation = if (passwordVisible) VisualTransformation.None else
+                    PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                textStyle = androidx.compose.ui.text.TextStyle(fontFamily = fonts),
+                trailingIcon = {
+                    val image = if (passwordVisible) Icons.Filled.Visibility
+                    else Icons.Filled.VisibilityOff
+                    // Please provide localized description for accessibility services
+                    val description =
+                        if (passwordVisible) "Hide password" else "Show password"
+                    IconButton(onClick = {
+                        passwordVisible = !passwordVisible
+                    }) {
+                        Icon(
+                            imageVector = image, description,
+                            tint = grey
+                        )
+                    }
+                },
+                colors = outlinedTextFieldColors
+            )
+            if (passwordError) {
+                Text(
+                    text = stringResource(id = R.string.incorrect_password),
+                    fontFamily = fonts,
+                    style = customTextLabelStyle,
+                    fontSize = 12.sp,
+                    color = air_orange_dark,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.Start)
+                )
+            }
+            Space(height = 20, width = 0)
+            CustomButton(
+                name = stringResource(id = R.string.login_text),
+                onButtonClick = {
+                    if (emailId.text.trim().isNotEmpty() && password.text.trim().isNotEmpty()) {
+                        if (emailId.text.isValidEmail()) {
+                            emailError = true
+                        } else if (password.text.length < 6) {
+                            passwordError = true
+                        } else {
+                            emailError = false
+                            passwordError = false
+                            callForApiToken(
+                                Constants.PRODUCTION_URL + Constants.TOKEN_ENDPOINT,
+                                emailId.text,
+                                password.text,
+                                viewModel,
+                                context
+                            )
+                        }
+                    }
+                },
+                paddingTop = 10,
+                paddingHorizontal = 0,
+                modifier = Modifier.height(70.dp),
+                containerColor = if (emailId.text.isNotEmpty() && password.text.isNotEmpty()) air_purple else air_purple_awesome_light,
+                textColor = if (emailId.text.isNotEmpty() && password.text.isNotEmpty()) white else air_awesome_purple_200,
+                isEnabled = emailId.text.isNotEmpty() && password.text.isNotEmpty()
+
+            )
+            Space(height = 20, width = 0)
+
+            Text(
+                text = stringResource(id = R.string.login_with_biometrics_text),
+                fontFamily = fonts,
+                style = customTextLabelBoldStyle,
+                fontSize = 14.sp,
+                color = air_purple,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentWidth(Alignment.CenterHorizontally)
+            )
+
+        }
+
+        Text(
+            text = stringResource(id = R.string.login_trouble_text),
+            fontFamily = fonts,
+            style = customTextLabelBoldStyle,
+            fontSize = 14.sp,
+            color = air_purple,
+            modifier = Modifier
+                .constrainAs(loaderBox) {
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    bottom.linkTo(parent.bottom)
+                }
+                .fillMaxWidth()
+                .wrapContentWidth(Alignment.CenterHorizontally)
+                .padding(bottom = 20.dp)
+        )
+
+        Box(modifier = Modifier.constrainAs(bottomBox) {
+            end.linkTo(parent.end)
+            bottom.linkTo(parent.bottom)
+        }) {
+            OverlappingImagesBottom()
+        }
+
+        if (state.error != null) {
+            errorMessage = state.error ?: context.getString(R.string.no_internet)
 //            navHostController.navigate(Screen.HomeScreen.route) {
 //                launchSingleTop =
 //                    true  // Ensures that if you are already on the HomeScreen, it won't add it again to the stack
@@ -402,16 +467,12 @@ fun LoginScreen(
 //            }
         }
         if (state.isLoading) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            showLoader = true
+            LoaderDialog(showDialog = showLoader)
         }
-
-
     }
 
 }
-
-
-
 
 
 @Composable
@@ -425,8 +486,8 @@ fun OverlappingImagesTop() {
             painter = painterResource(id = R.drawable.ic_top_line),
             contentDescription = "Top Line",
             modifier = Modifier
-                .size(width = 200.dp, height = 100.dp)
-                .align(Alignment.TopStart), // Align to the bottom-end
+                .size(width = 200.dp, height = 70.dp),
+            // .align(Alignment.TopStart), // Align to the bottom-end
             contentScale = ContentScale.Crop
         )
         // First Image
@@ -434,8 +495,8 @@ fun OverlappingImagesTop() {
             painter = painterResource(id = R.drawable.ic_top_purple_line),
             contentDescription = "Top Purple Line",
             modifier = Modifier
-                .size(width = 100.dp, height = 250.dp)
-                .align(Alignment.TopStart), // Align to the top-start
+                .size(width = 70.dp, height = 200.dp),
+            //   .align(Alignment.TopStart), // Align to the top-start
             contentScale = ContentScale.Crop
         )
 
@@ -454,9 +515,9 @@ fun OverlappingImagesBottom() {
             painter = painterResource(id = R.drawable.ic_botton_line),
             contentDescription = "Bottom Line",
             modifier = Modifier
-                .size(width = 100.dp, height = 300.dp)
+                .size(width = 60.dp, height = 180.dp)
                 .align(Alignment.BottomEnd)
-                .padding(0.dp, 0.dp, 0.dp, 10.dp), // Align to the start
+                .padding(0.dp, 0.dp, 0.dp, 0.dp), // Align to the start
             contentScale = ContentScale.Crop
         )
 
@@ -465,7 +526,7 @@ fun OverlappingImagesBottom() {
             painter = painterResource(id = R.drawable.ic_bottom_line_purple),
             contentDescription = "Bottom Purple Line",
             modifier = Modifier
-                .size(width = 300.dp, height = 150.dp)
+                .size(width = 300.dp, height = 120.dp)
                 .align(Alignment.BottomEnd)
                 .padding(0.dp, 0.dp, 0.dp, 0.dp), // Align to the end
             contentScale = ContentScale.Crop
@@ -476,7 +537,7 @@ fun OverlappingImagesBottom() {
 
 @Composable
 fun CustomDropdownMenuForLanguageChange(
-    selectedLanguage : LanguageListItemModel,
+    selectedLanguage: LanguageListItemModel,
     list: List<LanguageListItemModel>, // Menu Options
     color: Color, // Color
     modifier: Modifier, //
@@ -561,6 +622,49 @@ fun CustomDropdownMenuForLanguageChange(
         }
 
     }
+}
+
+@Composable
+fun BoxWithCustomBackground(message: String) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp) // Apply padding first
+            .clip(RoundedCornerShape(10.dp)) // Then clip the corners
+            .background(light_orange_new) // Background should respect the clipping
+    ) {
+        Text(
+            text = message,
+            color = air_orange_dark,
+            modifier = Modifier.padding(16.dp) // Optional inner padding for Text
+        )
+    }
+}
+
+
+private fun callForApiToken(
+    url: String,
+    email: String,
+    password: String,
+    viewModel: LoginViewModel,
+    context: Context
+) {
+    viewModel.authToken(
+        url,
+        "password",
+        email,
+        password, "1",
+        "None",
+        BuildConfig.VERSION_NAME,
+        "Android",
+        getDeviceUUID(context),
+        android.os.Build.MANUFACTURER,
+        android.os.Build.VERSION.RELEASE,
+        getNetworkType(context),
+        "N/A",
+        if (isCameraPermissionAllowed(context) == true) "Authorised" else "Not Authorised",
+        if (isLocationPermissionAllowed(context) == true) "Authorised" else "Not Authorised",
+    )
 }
 
 

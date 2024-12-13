@@ -34,7 +34,7 @@ fun OpsAirportrTheme(darkTheme: Boolean = true, content: @Composable() () -> Uni
 
     MaterialTheme(
         colors = colors,
-        typography = Typography,
+        typography = Typo,
         shapes = Shapes,
         content = content
     )

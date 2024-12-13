@@ -29,6 +29,7 @@ import com.ops.airportr.common.theme.air_purple
 import com.ops.airportr.common.theme.white
 import com.ops.airportr.common.utils.moveOnNewScreen
 import com.ops.airportr.route.Screen
+import com.ops.airportr.ui.componts.LoaderDialog
 import kotlinx.coroutines.delay
 
 
@@ -54,6 +55,7 @@ fun SplashScreen(
 //        }
 
     }
+//    LoaderDialog(showDialog = true)
     Column(
         modifier = Modifier
             .fillMaxSize()
