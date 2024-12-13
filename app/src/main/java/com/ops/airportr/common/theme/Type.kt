@@ -51,6 +51,20 @@ val customTextLabelSmallStyle = TextStyle(
     color = WhiteColor
 )
 
+val customTextDescriptionStyle = TextStyle(
+    fontFamily = fonts,
+    fontWeight = FontWeight.Normal,
+    fontSize = 18.sp,
+    color = light_grey
+)
+
+val customTextHeadingStyle = TextStyle(
+    fontFamily = fonts,
+    fontWeight = FontWeight.ExtraBold,
+    fontSize = 28.sp,
+    color = dark_blue
+)
+
 
 
 
