@@ -7,6 +7,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.ops.airportr.ui.screens.loginscreen.LoginScreen
 import com.ops.airportr.ui.screens.navigationscreen.NavigationScreen
+import com.ops.airportr.ui.screens.navigationscreen.bottomnav.bottom.ReservedScreen
+import com.ops.airportr.ui.screens.resetpassword.ResetPasswordScreen
 import com.ops.airportr.ui.screens.splashscreen.SplashScreen
 import com.ops.airportr.ui.screens.welcomescreen.WelcomeScreen
 
@@ -46,6 +48,12 @@ fun Navigation(navController: NavHostController) {
             route = Screen.HomeScreen.route
         ) {
             NavigationScreen(navController)
+        }
+
+        composable(
+            route = Screen.ResetPassword.route
+        ) {
+            ResetPasswordScreen(navController)
         }
 
     }

@@ -1,5 +1,6 @@
 package com.ops.airportr.ui.screens.resetpassword
 
+import android.app.Activity
 import android.app.LocaleManager
 import android.content.Context
 import android.content.res.Configuration
@@ -82,6 +83,7 @@ import com.ops.airportr.common.theme.white
 import com.ops.airportr.common.utils.changeLanguage
 import com.ops.airportr.domain.model.language.LanguageListItemModel
 import com.ops.airportr.route.Screen
+import com.ops.airportr.ui.componts.BackPressHandler
 import com.ops.airportr.ui.componts.CustomButton
 import com.ops.airportr.ui.componts.Space
 
@@ -93,13 +95,13 @@ fun ResetPasswordScreen(
 //    LaunchedEffect(Unit) {
 //        viewModel.resetError()
 //    }
-//    val activity = LocalContext.current as? Activity
-//    BackPressHandler(activity) {
-//        if (!navHostController.popBackStack()) {
-//            // Finish the activity to close the app
-//            activity?.finish()
-//        }
-//    }
+    val activity = LocalContext.current as? Activity
+    BackPressHandler(activity) {
+        if (!navHostController.popBackStack()) {
+            // Finish the activity to close the app
+            activity?.finish()
+        }
+    }
 
     var emailId by remember { mutableStateOf(TextFieldValue("")) }
 //    var password by remember { mutableStateOf(TextFieldValue("")) }

@@ -542,6 +542,10 @@ fun LoginScreen(
                 .fillMaxWidth()
                 .wrapContentWidth(Alignment.CenterHorizontally)
                 .padding(bottom = 20.dp)
+                .clickable {
+                    navHostController.moveOnNewScreen(Screen.ResetPassword.route,false)
+                }
+
         )
 
         Box(modifier = Modifier.constrainAs(bottomBox) {

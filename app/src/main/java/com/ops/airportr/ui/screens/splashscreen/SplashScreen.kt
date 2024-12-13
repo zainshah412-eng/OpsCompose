@@ -47,7 +47,7 @@ fun SplashScreen(
     )
     LaunchedEffect(key1 = true) {
         delay(3000L)
-        navHostController.moveOnNewScreen(Screen.HomeScreen.route, true)
+        navHostController.moveOnNewScreen(Screen.LoginScreen.route, true)
 //        if (AppApplication.sessionManager.isLoggedIn) {
 //            navHostController.moveOnNewScreen(Screen.HomeScreen.route, true)
 //        } else {
