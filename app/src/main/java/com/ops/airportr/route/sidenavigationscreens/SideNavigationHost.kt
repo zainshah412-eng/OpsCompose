@@ -6,12 +6,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.ops.airportr.data.viewmodel.MainViewModel
-import com.ops.airportr.ui.componts.dialog.LogoutDialog
-import com.ops.airportr.ui.screens.navigationscreen.bottomnav.bottom.FavoriteScreen
-import com.ops.airportr.ui.screens.navigationscreen.bottomnav.bottom.NearbyScreen
-import com.ops.airportr.ui.screens.navigationscreen.bottomnav.bottom.ReservedScreen
-import com.ops.airportr.ui.screens.navigationscreen.bottomnav.bottom.SavedScreen
-import com.ops.airportr.ui.screens.navigationscreen.sidenavscreens.HomeScreen
+import com.ops.airportr.ui.screens.navigationscreen.bottomnav.bottom.AirportsScreen
+import com.ops.airportr.ui.screens.navigationscreen.bottomnav.bottom.JobsScreen
+import com.ops.airportr.ui.screens.navigationscreen.bottomnav.bottom.ProfileScreen
+import com.ops.airportr.ui.screens.navigationscreen.bottomnav.bottom.ScannerScreen
 
 @Composable
 fun SideNavigationHost(
@@ -21,28 +19,17 @@ fun SideNavigationHost(
 ) {
     NavHost(
         navController = navController as NavHostController,
-        startDestination = SideNavigationScreens.SideDrawerScreens.Home.route
+        startDestination = BottomScreens.BottomNavigationScreens.Jobs.route
     ) {
-        composable(SideNavigationScreens.SideDrawerScreens.Home.route) {
-            HomeScreen(
+        composable(BottomScreens.BottomNavigationScreens.Jobs.route) {
+            JobsScreen(
                 viewModel = viewModel,
+                navController = navController,
                 navHostController = navHostController
             )
         }
-        composable(SideNavigationScreens.SideDrawerScreens.MyProfile.route) {
-            HomeScreen(
-                viewModel = viewModel,
-                navHostController = navHostController
-            )
-        }
-        composable(BottomScreens.BottomNavigationScreens.Favorite.route) { FavoriteScreen(viewModel = viewModel) }
-        composable(BottomScreens.BottomNavigationScreens.NearBy.route) { NearbyScreen(viewModel = viewModel) }
-        composable(BottomScreens.BottomNavigationScreens.Reserved.route) { ReservedScreen(viewModel = viewModel) }
-        composable(BottomScreens.BottomNavigationScreens.Saved.route) { SavedScreen(viewModel = viewModel) }
-        composable(SideNavigationScreens.SideDrawerScreens.Logout.route) {
-            LogoutDialog(
-                navHostController
-            )
-        }
+        composable(BottomScreens.BottomNavigationScreens.Scanner.route) { ScannerScreen(viewModel = viewModel) }
+        composable(BottomScreens.BottomNavigationScreens.Airports.route) { AirportsScreen(viewModel = viewModel) }
+        composable(BottomScreens.BottomNavigationScreens.Profile.route) { ProfileScreen(viewModel = viewModel) }
     }
 }

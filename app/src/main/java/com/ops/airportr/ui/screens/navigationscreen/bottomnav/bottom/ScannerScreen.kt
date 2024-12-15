@@ -12,11 +12,11 @@ import com.ops.airportr.data.viewmodel.MainViewModel
 import com.ops.airportr.route.sidenavigationscreens.BottomScreens
 
 @Composable
-fun NearbyScreen(
+fun ScannerScreen(
     modifier: Modifier = Modifier,
     viewModel: MainViewModel
 ) {
-    viewModel.setCurrentScreen(BottomScreens.BottomNavigationScreens.NearBy)
+    viewModel.setCurrentScreen(BottomScreens.BottomNavigationScreens.Scanner)
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,

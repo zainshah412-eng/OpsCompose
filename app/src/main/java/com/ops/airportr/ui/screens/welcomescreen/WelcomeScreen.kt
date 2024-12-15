@@ -51,8 +51,9 @@ fun WelcomeScreen(
     navHostController: NavHostController
 ) {
     val scope = rememberCoroutineScope()
-
     val activity = LocalContext.current as? Activity
+
+
 
     BackPressHandler(activity) {
         if (!navHostController.popBackStack()) {

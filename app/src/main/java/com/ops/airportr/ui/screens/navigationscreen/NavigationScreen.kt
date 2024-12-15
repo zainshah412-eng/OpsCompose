@@ -18,6 +18,7 @@ import com.ops.airportr.data.viewmodel.MainViewModel
 import com.ops.airportr.route.sidenavigationscreens.SideNavigationHost
 import com.ops.airportr.route.sidenavigationscreens.screensInHomeFromBottomNav
 import com.ops.airportr.ui.componts.BackPressHandler
+import com.ops.airportr.ui.componts.sidenavigation.BottomBar
 import com.ops.airportr.ui.componts.sidenavigation.BottomBarNewDesign
 import com.ops.airportr.ui.componts.sidenavigation.Drawer
 import com.ops.airportr.ui.componts.sidenavigation.TopBar
@@ -78,7 +79,7 @@ fun NavigationScreen(
 //        if (currentScreen == Screens.DrawerScreens.Home || currentScreen is Screens.HomeScreens) {
 //
 //        }
-        BottomBarNewDesign(
+        BottomBar(
             navController = navController,
             screens = screensInHomeFromBottomNav
         )

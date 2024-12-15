@@ -13,11 +13,11 @@ import com.ops.airportr.route.sidenavigationscreens.BottomScreens
 
 
 @Composable
-fun SavedScreen(
+fun ProfileScreen(
     modifier: Modifier = Modifier,
     viewModel: MainViewModel
 ) {
-    viewModel.setCurrentScreen(BottomScreens.BottomNavigationScreens.Saved)
+    viewModel.setCurrentScreen(BottomScreens.BottomNavigationScreens.Profile)
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,

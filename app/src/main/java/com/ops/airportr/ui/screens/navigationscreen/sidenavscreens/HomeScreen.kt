@@ -33,6 +33,7 @@ import com.ops.airportr.data.viewmodel.MainViewModel
 import com.ops.airportr.route.sidenavigationscreens.SideNavigationScreens
 import com.ops.airportr.ui.componts.AutoSlidingPager
 import com.ops.airportr.ui.componts.Space
+import com.ops.airportr.ui.screens.navigationscreen.bottomnav.bottom.MultiFloatingActionButtons
 
 @Composable
 fun HomeScreen(
@@ -44,7 +45,11 @@ fun HomeScreen(
 
     Scaffold(
         floatingActionButton = {
-            MultiFloatingActionButtons()
+            MultiFloatingActionButtons(
+                onClick = {
+
+                }
+            )
         }
 
     ) { paddingValues ->
@@ -122,45 +127,7 @@ fun HomeScreen(
 
 }
 
-@Composable
-fun MultiFloatingActionButtons() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.BottomEnd
-    ) {
-        Column(
-            verticalArrangement = Arrangement.SpaceAround,
-            horizontalAlignment = Alignment.End,
-            modifier = Modifier.padding(16.dp)
-        ) {
-            FloatingActionButton(
-                onClick = { },
-                backgroundColor = Color.Black,
-                contentColor = Color.White,
-                modifier = Modifier.size(56.dp)
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_plus_circle_fill_24), // Replace with your drawable's ID
-                    contentDescription = "Example Icon",
-                    modifier = Modifier.size(56.dp) // Adjust the size as needed
-                )
-            }
-            Space(height = 10, width = 2)
-            FloatingActionButton(
-                onClick = {},
-                backgroundColor = Color.Black,
-                contentColor = Color.White,
-                modifier = Modifier.size(56.dp)
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_plus_circle_fill_24), // Replace with your drawable's ID
-                    contentDescription = "Example Icon",
-                    modifier = Modifier.size(56.dp) // Adjust the size as needed
-                )
-            }
-        }
-    }
-}
+
 
 @Composable
 @Preview

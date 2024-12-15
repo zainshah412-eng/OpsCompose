@@ -12,11 +12,11 @@ import com.ops.airportr.data.viewmodel.MainViewModel
 import com.ops.airportr.route.sidenavigationscreens.BottomScreens
 
 @Composable
-fun ReservedScreen(
+fun AirportsScreen(
     modifier: Modifier = Modifier,
     viewModel: MainViewModel
 ) {
-    viewModel.setCurrentScreen(BottomScreens.BottomNavigationScreens.Reserved)
+    viewModel.setCurrentScreen(BottomScreens.BottomNavigationScreens.Airports)
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,

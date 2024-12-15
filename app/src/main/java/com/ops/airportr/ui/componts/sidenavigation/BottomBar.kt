@@ -15,8 +15,6 @@ import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -31,10 +29,12 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.ops.airportr.common.theme.air_awesome_light_white
+import com.ops.airportr.common.theme.air_awesome_purple_100
+import com.ops.airportr.common.theme.air_purple
+import com.ops.airportr.common.theme.custom_white
 import com.ops.airportr.common.theme.fonts
 import com.ops.airportr.route.sidenavigationscreens.BottomScreens
-import com.bks.circularporgressview.ui.theme.Purple700
-import com.ops.airportr.common.theme.air_awesome_light_white
 
 
 @Composable
@@ -45,20 +45,29 @@ fun BottomBar(
 ) {
     BottomNavigation(
         modifier = modifier,
-        backgroundColor = Purple700
+        backgroundColor = custom_white
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
+        val currentDestination = navBackStackEntry?.destination
+        val contentColor = Color.White
         screens.forEach { screen ->
+            val selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
+
             BottomNavigationItem(
                 icon = {
                     Icon(
-                        imageVector = Icons.Filled.Home,
-                        contentDescription = "Home Icon",
-                        tint = Color.Blue // Optional: Set icon color
+                        painter = painterResource(id = if (selected) screen.icon_focused else screen.icon),
+                        contentDescription = "icon",
+                        tint = if (selected) air_purple else air_awesome_purple_100
                     )
                 },
-                label = { Text(screen.title) },
+                label = {
+                    Text(
+                        screen.title,
+                        color = if (selected) air_purple else air_awesome_purple_100
+                    )
+                },
                 selected = currentRoute == screen.route,
                 onClick = {
                     navController.navigate(screen.route) {
@@ -145,7 +154,8 @@ fun AddItem_(
             androidx.compose.material3.Icon(
                 painter = painterResource(id = if (selected) screen.icon_focused else screen.icon),
                 contentDescription = "icon",
-                tint = Color.White)
+                tint = Color.White
+            )
 
             AnimatedVisibility(visible = selected) {
                 androidx.compose.material3.Text(
