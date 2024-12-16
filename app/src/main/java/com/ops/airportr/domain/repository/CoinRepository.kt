@@ -3,6 +3,8 @@ package com.ops.airportr.domain.repository
 import com.ops.airportr.common.network.Either
 import com.ops.airportr.domain.model.apierror.ApiError
 import com.ops.airportr.domain.model.login.AuthTokenResp
+import com.ops.airportr.domain.model.resetpassword.ResetPasswordParam
+import com.ops.airportr.domain.model.resetpassword.ResetPasswordResponse
 import com.ops.airportr.domain.model.user.UserDetails
 
 interface CoinRepository {
@@ -16,4 +18,6 @@ interface CoinRepository {
                              permissionsLocation: String?): Either<AuthTokenResp, ApiError>
 
     suspend fun getUserDetails(url: String): Either<UserDetails, ApiError>
+
+    suspend fun resetPassword(url: String, emailAddress: String): Either<ResetPasswordResponse,ApiError>
 }

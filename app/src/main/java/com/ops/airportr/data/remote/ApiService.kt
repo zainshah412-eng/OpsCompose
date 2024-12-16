@@ -2,6 +2,8 @@ package com.ops.airportr.data.remote
 
 
 import com.ops.airportr.domain.model.login.AuthTokenResp
+import com.ops.airportr.domain.model.resetpassword.ResetPasswordParam
+import com.ops.airportr.domain.model.resetpassword.ResetPasswordResponse
 import com.ops.airportr.domain.model.user.UserDetails
 import retrofit2.Response
 import retrofit2.http.Field
@@ -35,4 +37,11 @@ interface ApiService {
     suspend fun getUserDetails(
         @Url url: String
     ): Response<UserDetails>
+
+    @POST
+    @FormUrlEncoded
+    suspend fun resetPassword(
+        @Url url: String,
+        @Field("emailAddress") emailAddress: String,
+    ): Response<ResetPasswordResponse>
 }

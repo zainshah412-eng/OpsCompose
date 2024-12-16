@@ -5,6 +5,8 @@ import com.ops.airportr.common.network.Either
 import com.ops.airportr.data.remote.ApiService
 import com.ops.airportr.domain.model.apierror.ApiError
 import com.ops.airportr.domain.model.login.AuthTokenResp
+import com.ops.airportr.domain.model.resetpassword.ResetPasswordParam
+import com.ops.airportr.domain.model.resetpassword.ResetPasswordResponse
 import com.ops.airportr.domain.model.user.UserDetails
 import com.ops.airportr.domain.repository.CoinRepository
 import retrofit2.HttpException
@@ -83,6 +85,34 @@ class CoinRepositoryImpl @Inject constructor(
             }
             Either.Error(errorResponse ?: ApiError("unknown_error", e.message(), null, null))
         }
+    }
+
+    override suspend fun resetPassword(url: String,
+                                       emailAddress: String): Either<ResetPasswordResponse, ApiError> {
+        return try {
+            val response = api.resetPassword(url,emailAddress)
+            if (response.isSuccessful) {
+                val resetPassword = response.body()
+                if (resetPassword != null) {
+                    Either.Success(resetPassword)
+                } else {
+                    Either.Error(ApiError("null_body", "Response body is null", null, null))
+                }
+            } else {
+                val errorBody = response.errorBody()?.string()
+                val errorResponse = errorBody?.let {
+                    Gson().fromJson(it, ApiError::class.java)
+                }
+                Either.Error(errorResponse ?: ApiError("unknown_error", response.message(), null, null))
+            }
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val errorResponse = errorBody?.let {
+                Gson().fromJson(it, ApiError::class.java)
+            }
+            Either.Error(errorResponse ?: ApiError("unknown_error", e.message(), null, null))
+        }
+
     }
 
 }

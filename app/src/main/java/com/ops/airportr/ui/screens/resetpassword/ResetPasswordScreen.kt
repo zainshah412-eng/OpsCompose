@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
 import android.os.LocaleList
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.Image
@@ -23,6 +24,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.DropdownMenuItem
@@ -48,6 +50,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -69,8 +72,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.ops.airportr.AppApplication
+import com.ops.airportr.BuildConfig
 import com.ops.airportr.R
+import com.ops.airportr.common.Constants
 import com.ops.airportr.common.theme.air_awesome_purple_200
+import com.ops.airportr.common.theme.air_orange_dark
 import com.ops.airportr.common.theme.air_purple
 import com.ops.airportr.common.theme.air_purple_awesome_light
 import com.ops.airportr.common.theme.customTextDescriptionStyle
@@ -79,23 +85,32 @@ import com.ops.airportr.common.theme.customTextLabelStyle
 import com.ops.airportr.common.theme.dark_blue
 import com.ops.airportr.common.theme.fonts
 import com.ops.airportr.common.theme.grey
+import com.ops.airportr.common.theme.light_orange_new
 import com.ops.airportr.common.theme.purple_100
 import com.ops.airportr.common.theme.white
 import com.ops.airportr.common.utils.changeLanguage
+import com.ops.airportr.common.utils.getDeviceUUID
+import com.ops.airportr.common.utils.getNetworkType
+import com.ops.airportr.common.utils.isCameraPermissionAllowed
+import com.ops.airportr.common.utils.isLocationPermissionAllowed
+import com.ops.airportr.common.utils.isValidEmail
+import com.ops.airportr.common.utils.toast
 import com.ops.airportr.domain.model.language.LanguageListItemModel
 import com.ops.airportr.route.Screen
 import com.ops.airportr.ui.componts.BackPressHandler
 import com.ops.airportr.ui.componts.CustomButton
+import com.ops.airportr.ui.componts.LoaderDialog
 import com.ops.airportr.ui.componts.Space
+import com.ops.airportr.ui.screens.loginscreen.LoginViewModel
 
 @Composable
 fun ResetPasswordScreen(
     navHostController: NavHostController,
-//    viewModel: LoginViewModel = hiltViewModel()
+    viewModel: ResetPasswordViewModel = hiltViewModel()
 ) {
-//    LaunchedEffect(Unit) {
-//        viewModel.resetError()
-//    }
+    LaunchedEffect(Unit) {
+        viewModel.resetPasswordError()
+    }
     val activity = LocalContext.current as? Activity
     BackPressHandler(activity) {
         if (!navHostController.popBackStack()) {
@@ -103,16 +118,27 @@ fun ResetPasswordScreen(
             activity?.finish()
         }
     }
-
+    var emailError by rememberSaveable { mutableStateOf(false) }
+    var snackBarShowFlag by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+    var showLoader by remember { mutableStateOf(false) }
     var emailId by remember { mutableStateOf(TextFieldValue("")) }
     val context = LocalContext.current
+    val state = viewModel.state.value
+    if (state.resetPasswordResponse?.responseStatus == 1){
+        state.resetPasswordResponse = null
+        state.error = null
+        state.isLoading = false
+        showLoader = false
+        Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
+    }
 
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
             .background(white)
     ) {
-        val (backImage, titleDescBox, centerBox) = createRefs()
+        val (backImage, titleDescBox, errorBox, centerBox) = createRefs()
         val outlinedTextFieldColors = TextFieldDefaults.outlinedTextFieldColors(
             focusedBorderColor = purple_100,
             unfocusedBorderColor = Color.Gray,
@@ -132,6 +158,9 @@ fun ResetPasswordScreen(
                 }
                 .padding(start = 20.dp, top = 20.dp)
                 .size(width = 25.dp, height = 25.dp)
+                .clickable {
+                    navHostController.popBackStack()
+                }
         )
         Column(
             modifier = Modifier
@@ -163,10 +192,33 @@ fun ResetPasswordScreen(
                     .padding(start = 15.dp, end = 15.dp)
             )
         }
+        if (state.error != null) {
+            Box(
+                modifier = Modifier
+                    .constrainAs(errorBox) {
+                        top.linkTo(titleDescBox.bottom)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
+                    .fillMaxWidth()
+                    .padding(16.dp) // Apply padding first
+                    .clip(RoundedCornerShape(10.dp)) // Then clip the corners
+                    .background(light_orange_new) // Background should respect the clipping
+            ) {
+                Text(
+                    text = state.error.toString(),
+                    color = air_orange_dark,
+                    style = customTextLabelStyle,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(14.dp) // Optional inner padding for Text
+                )
+            }
+        }
+        val errorBarrier = createBottomBarrier(titleDescBox, errorBox)
         Column(
             modifier = Modifier
                 .constrainAs(centerBox) {
-                    top.linkTo(titleDescBox.bottom)
+                    top.linkTo(errorBarrier)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
@@ -218,18 +270,28 @@ fun ResetPasswordScreen(
             CustomButton(
                 name = stringResource(id = R.string.password_reset),
                 onButtonClick = {
-                    if (emailId.text.isNullOrEmpty()) {
-                        Toast.makeText(
-                            context,
-                            "Please enter correct detail.",
-                            Toast.LENGTH_SHORT
-                        )
-                            .show()
+                    var email = emailId.text
+                    if (email.isValidEmail()) {
+                        println("Valid Email")
                     } else {
-//                                    viewModel.getLogin(
-//                                        USER_AUTHENTICATE + emailId.text
-//                                                + "&Password=" + password.text + "&IMEI=865753025921006"
-//                                    )
+                        println("Invalid Email")
+                    }
+                    if (emailId.text.trim().isNotEmpty()){
+                        if (!emailId.text.isValidEmail()){
+                            emailError = true
+                        }else{
+                            emailError = false
+                            var baseUrl = ""
+                            var subscriptionKey = ""
+                            var baseUrlEnv = ""
+                            var flag = false
+                            callForApiResetPassword(
+                                baseUrl + Constants.RESET_PASSWORD,
+                                email,
+                                viewModel,
+                                context
+                            )
+                        }
                     }
                 },
                 paddingTop = 10,
@@ -244,6 +306,28 @@ fun ResetPasswordScreen(
 
     }
 
+    if (state.error != null ) {
+        errorMessage = state.error ?: context.getString(R.string.no_internet)
+        snackBarShowFlag = true
+    }
+    if (state.isLoading ) {
+        Log.wtf("StateLoadingAuth", "Called")
+        showLoader = true
+        LoaderDialog(showDialog = showLoader)
+    }
+
+}
+
+private fun callForApiResetPassword(
+    url: String,
+    email: String,
+    viewModel: ResetPasswordViewModel,
+    context: Context
+) {
+    viewModel.resetPassword(
+        url,
+        email,
+    )
 }
 
 
