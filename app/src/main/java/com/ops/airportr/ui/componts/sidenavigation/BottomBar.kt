@@ -11,10 +11,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -43,18 +43,18 @@ fun BottomBar(
     screens: List<BottomScreens.BottomNavigationScreens>,
     navController: NavController
 ) {
-    BottomNavigation(
+    NavigationBar(
         modifier = modifier,
-        backgroundColor = custom_white
+        containerColor = custom_white // Background color of the Bottom Bar
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
-        val currentDestination = navBackStackEntry?.destination
-        val contentColor = Color.White
-        screens.forEach { screen ->
-            val selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
 
-            BottomNavigationItem(
+        screens.forEach { screen ->
+            // Check if the current route matches the screen's route
+            val selected = currentRoute == screen.route
+
+            NavigationBarItem(
                 icon = {
                     Icon(
                         painter = painterResource(id = if (selected) screen.icon_focused else screen.icon),
@@ -68,10 +68,11 @@ fun BottomBar(
                         color = if (selected) air_purple else air_awesome_purple_100
                     )
                 },
-                selected = currentRoute == screen.route,
+                selected = selected,
                 onClick = {
                     navController.navigate(screen.route) {
-                        popUpTo = navController.graph.startDestinationId
+                        // Ensure the selected screen is always pushed on top
+//                        popUpTo = navController.graph.startDestinationId
                         launchSingleTop = true
                     }
                 }
@@ -80,42 +81,9 @@ fun BottomBar(
     }
 }
 
-@Composable
-fun BottomBarNewDesign(
-    modifier: Modifier = Modifier,
-    screens: List<BottomScreens.BottomNavigationScreens>,
-    navController: NavController
-) {
 
-    BottomNavigation(
-        modifier = modifier
-    ) {
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentRoute = navBackStackEntry?.destination
 
-        Row(
-            modifier = Modifier
-                .padding(start = 15.dp, end = 15.dp, top = 8.dp, bottom = 15.dp)
-                .background(
-                    air_awesome_light_white,
-                    shape = RoundedCornerShape(35.dp)
-                )
-                .fillMaxWidth()
-                .padding(horizontal = 10.dp)
-                .height(100.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            screens.forEach { screen ->
-                AddItem_(
-                    screen = screen,
-                    currentDestination = currentRoute,
-                    navController = navController
-                )
-            }
-        }
-    }
-}
+
 
 @Composable
 fun AddItem_(

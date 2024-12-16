@@ -18,18 +18,20 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
-import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
+
 import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -95,6 +97,7 @@ import com.ops.airportr.ui.componts.SnackbarDemo
 import com.ops.airportr.ui.componts.Space
 import kotlinx.coroutines.delay
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
     navHostController: NavHostController,
@@ -710,28 +713,35 @@ fun CustomDropdownMenuForLanguageChange(
                     onClick = {
                         selectedIndex = index
                         expand = false
-                        stroke = if (expand) 2 else 1
-                        onSelected(selectedIndex)
-                        changeLanguage(item, context)
+                        stroke = if (expand) 2 else 1 // Ensure `stroke` logic is meaningful
+                        onSelected(selectedIndex) // Notify about the selected index
+                        changeLanguage(item, context) // Update language
+                    },
+                    text = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            // Flag Image
+                            Image(
+                                painter = painterResource(id = item.flag),
+                                contentDescription = "language",
+                                modifier = Modifier
+                                    .size(41.dp) // Use fixed size for consistency
+                                    .padding(end = 8.dp) // Space between image and text
+                            )
+
+                            // Language Text
+                            Text(
+                                text = item.languageName,
+                                fontFamily = fonts,
+                                style = customTextLabelStyle,
+                                fontSize = 16.sp
+                            )
+                        }
                     }
-                ) {
-                    Row {
-                        Image(
-                            painter = painterResource(id = item.flag), // Replace with your image resource
-                            contentDescription = "language",
-                            modifier = Modifier
-                                .size(width = 41.dp, height = 41.dp)
-                                .padding(vertical = 10.dp),
-                        )
-                        Text(
-                            text = item.languageName,
-                            fontFamily = fonts,
-                            style = customTextLabelStyle,
-                            fontSize = 16.sp,
-                            modifier = Modifier.padding(vertical = 10.dp)
-                        )
-                    }
-                }
+                )
+
             }
         }
 

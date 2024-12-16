@@ -13,9 +13,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -132,14 +133,21 @@ fun WelcomeScreen(
                         )
                         .weight(1f)
                         .clickable { /* Handle click */ },
-                    elevation = dimensionResource(id = R.dimen._20sdp),
+                    elevation = CardDefaults.elevatedCardElevation(
+                        defaultElevation = dimensionResource(
+                            id = R.dimen._20sdp
+                        )
+                    ),
                     shape = RoundedCornerShape(dimensionResource(id = R.dimen._20sdp)),
-                    backgroundColor = air_awesome_white
+                    colors = CardDefaults.cardColors(
+                        containerColor = air_awesome_white,
+                        contentColor = MaterialTheme.colorScheme.onSurface
+                    )
                 ) {
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(MaterialTheme.colors.primary.copy(alpha = 0.1f))
+                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
                             .clickable(onClick = {
                                 navHostController.navigate(Screen.HomeScreen.route) {
                                     popUpTo(0) { inclusive = true }
@@ -180,14 +188,21 @@ fun WelcomeScreen(
                         )
                         .weight(1f)
                         .clickable { /* Handle click */ },
-                    elevation = dimensionResource(id = R.dimen._20sdp),
+                    elevation = CardDefaults.elevatedCardElevation(
+                        defaultElevation = dimensionResource(
+                            id = R.dimen._20sdp
+                        )
+                    ),
                     shape = RoundedCornerShape(dimensionResource(id = R.dimen._20sdp)),
-                    backgroundColor = air_awesome_white
+                    colors = CardDefaults.cardColors(
+                        containerColor = air_awesome_white,
+                        contentColor = MaterialTheme.colorScheme.onSurface
+                    )
                 ) {
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(MaterialTheme.colors.primary.copy(alpha = 0.1f))
+                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
                             .clickable(onClick = { /* Handle inner click */ }),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center

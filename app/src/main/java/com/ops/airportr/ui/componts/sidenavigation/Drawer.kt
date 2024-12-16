@@ -16,8 +16,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -66,13 +66,13 @@ fun Drawer(
                 Column(modifier = modifier.padding(15.dp)) {
                     Text(
                         text = "Zain Ali",
-                        style = MaterialTheme.typography.h5,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = air_awesome_light_white
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
                         text = "zainshah412.za@gmail.com",
-                        style = MaterialTheme.typography.body2,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = air_awesome_light_white
                     )
                 }
