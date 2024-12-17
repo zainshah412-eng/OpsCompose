@@ -3,8 +3,8 @@ package com.ops.airportr.data.di
 import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.ops.airportr.common.AppConstants.PRODUCTION_URL_UAT
 
-import com.ops.airportr.common.Constants.PRODUCTION_URL
 import com.ops.airportr.common.network.AuthApiKeyInterceptor
 import com.ops.airportr.common.network.AuthInterceptor
 import com.ops.airportr.common.network.NetworkInterceptor
@@ -35,7 +35,7 @@ object AppModule {
         client: OkHttpClient
     ): Retrofit =
         Retrofit.Builder()
-            .baseUrl(PRODUCTION_URL)
+            .baseUrl(PRODUCTION_URL_UAT)
             .client(client)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()

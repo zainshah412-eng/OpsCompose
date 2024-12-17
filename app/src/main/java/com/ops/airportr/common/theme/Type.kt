@@ -36,7 +36,7 @@ val customTextDescriptionStyle = TextStyle(
 
 val customTextHeadingStyle = TextStyle(
     fontFamily = fonts,
-    fontWeight = FontWeight.ExtraBold,
+    fontWeight = FontWeight.Light,
     fontSize = 28.sp,
     color = dark_blue
 )

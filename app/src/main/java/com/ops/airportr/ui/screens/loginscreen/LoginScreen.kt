@@ -65,8 +65,8 @@ import androidx.navigation.compose.rememberNavController
 import com.ops.airportr.AppApplication
 import com.ops.airportr.BuildConfig
 import com.ops.airportr.R
-import com.ops.airportr.common.Constants
-import com.ops.airportr.common.Constants.GET_CURRENT_USER_API
+import com.ops.airportr.common.AppConstants
+import com.ops.airportr.common.AppConstants.GET_CURRENT_USER_API
 import com.ops.airportr.common.theme.air_awesome_purple_200
 import com.ops.airportr.common.theme.air_orange_dark
 import com.ops.airportr.common.theme.air_purple
@@ -176,6 +176,7 @@ fun LoginScreen(
     var showLoader by remember { mutableStateOf(false) }
     val state = viewModel.state.value
     val stateUserDetail = viewModel.stateUserDetail.value
+  //  val stateRegisterDevice = viewModel.stateRegisterDevice.value
 
     if (state.loginResponse?.accessToken != "" && state.loginResponse?.accessToken != null) {
         if (!AppApplication.sessionManager.getBiometricStatus) {
@@ -190,20 +191,6 @@ fun LoginScreen(
         viewModel.getUserDetail(
             AppApplication.sessionManager.baseUrl?.url + GET_CURRENT_USER_API
         )
-
-//       navHostController.moveOnNewScreen(Screen.HomeScreen.route, true)
-
-//            viewModel.getUserDetail(
-//                AppApplication.sessionManager.baseUrl?.url + GET_CURRENT_USER_API
-//            )
-//                navHostController.navigate(Screen.HomeScreen.route) {
-//                    launchSingleTop =
-//                        true  // Ensures that if you are already on the HomeScreen, it won't add it again to the stack
-//                }
-//            AppApplication.sessionManager.saveIsLogIn(true)
-//            navHostController.navigate(Screen.HomeScreen.route) {
-//                popUpTo(0) { inclusive = true }
-//            }
     }
 
     if (stateUserDetail.userDetailResponse != null) {
@@ -212,12 +199,34 @@ fun LoginScreen(
                 it1
             )
         }
+        AppApplication.sessionManager.saveIsLogIn(true)
         stateUserDetail.userDetailResponse = null
         stateUserDetail.error = null
         stateUserDetail.isLoading = false
         showLoader = false
         navHostController.moveOnNewScreen(Screen.WelcomeScreen.route, true)
+//        viewModel.registerDevice(
+//            AppApplication.sessionManager.baseUrl?.url + REGISTER_DEVICE,
+//            RegisterDeviceParams(
+//                fcmToken,
+//                AppActionValues.FCM_V1,
+//                AppApplication.sessionManager.userDetails.userId
+//            )
+//        )
     }
+
+//    if (stateRegisterDevice.registerDeviceResponse != null) {
+//        stateUserDetail.userDetailResponse?.user?.let { it1 ->
+//            AppApplication.sessionManager.saveUserDetails(
+//                it1
+//            )
+//        }
+//        stateUserDetail.userDetailResponse = null
+//        stateUserDetail.error = null
+//        stateUserDetail.isLoading = false
+//        showLoader = false
+//        navHostController.moveOnNewScreen(Screen.WelcomeScreen.route, true)
+//    }
 
     ConstraintLayout(
         modifier = Modifier
@@ -454,25 +463,25 @@ fun LoginScreen(
                             var flag = false
                             if (BuildConfig.ENVIRONMENT == "live") {
                                 email = emailId.text
-                                baseUrl = Constants.PRODUCTION_URL_LIVE
+                                baseUrl = AppConstants.PRODUCTION_URL_LIVE
                                 baseUrlEnv = "-live"
-                                subscriptionKey = Constants.LIVE_SUBSCRIPTION_KEY
+                                subscriptionKey = AppConstants.LIVE_SUBSCRIPTION_KEY
                                 flag = true
                             } else {
                                 when {
                                     (emailId.text.trim().contains("-uat")) -> {
                                         email = emailId.text.replace("-uat", "")
-                                        baseUrl = Constants.PRODUCTION_URL
+                                        baseUrl = AppConstants.PRODUCTION_URL_UAT
                                         baseUrlEnv = "-uat"
-                                        subscriptionKey = Constants.UAT_SUBSCRIPTION_KEY
+                                        subscriptionKey = AppConstants.UAT_SUBSCRIPTION_KEY
                                         flag = true
                                     }
 
                                     (emailId.text.trim().contains("-dev")) -> {
                                         email = emailId.text.replace("-dev", "")
-                                        baseUrl = Constants.PRODUCTION_URL
-                                        baseUrlEnv = "-uat"
-                                        subscriptionKey = Constants.UAT_SUBSCRIPTION_KEY
+                                        baseUrl = AppConstants.PRODUCTION_URL_DEV
+                                        baseUrlEnv = "-dev"
+                                        subscriptionKey = AppConstants.DEV_SUBSCRIPTION_KEY
                                         flag = true
                                     }
 
@@ -497,7 +506,7 @@ fun LoginScreen(
                                 loginCredEmail = email
                                 loginCredPassword = password.text
                                 callForApiToken(
-                                    baseUrl + Constants.TOKEN_ENDPOINT,
+                                    baseUrl + AppConstants.TOKEN_ENDPOINT,
                                     email,
                                     password.text,
                                     viewModel,
@@ -588,6 +597,16 @@ fun LoginScreen(
         showLoader = true
         LoaderDialog(showDialog = showLoader)
     }
+//
+//    if (stateRegisterDevice.error != null) {
+//        errorMessage = state.error ?: context.getString(R.string.no_internet)
+//        snackBarShowFlag = true
+//    }
+//    if (stateRegisterDevice.isLoading) {
+//        Log.wtf("StateLoadingDetail", "Called")
+//        showLoader = true
+//        LoaderDialog(showDialog = showLoader)
+//    }
 
 }
 

@@ -61,6 +61,19 @@ fun BackPressHandler(activity: Activity?, onBackPressed: () -> Unit) {
 }
 
 
+//       navHostController.moveOnNewScreen(Screen.HomeScreen.route, true)
+//            viewModel.getUserDetail(
+//                AppApplication.sessionManager.baseUrl?.url + GET_CURRENT_USER_API
+//            )
+//                navHostController.navigate(Screen.HomeScreen.route) {
+//                    launchSingleTop =
+//                        true  // Ensures that if you are already on the HomeScreen, it won't add it again to the stack
+//                }
+//            AppApplication.sessionManager.saveIsLogIn(true)
+//            navHostController.navigate(Screen.HomeScreen.route) {
+//                popUpTo(0) { inclusive = true }
+//            }
+
 
 /**
  * This [CompositionLocal] is used to provide an [OnBackPressedDispatcher]:

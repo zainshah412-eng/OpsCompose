@@ -3,7 +3,6 @@ package com.ops.airportr.common.utils
 import android.app.LocaleManager
 import android.content.Context
 import android.content.pm.PackageManager
-import android.content.res.Configuration
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
@@ -15,8 +14,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.os.LocaleListCompat
 import androidx.navigation.NavController
 import com.ops.airportr.AppApplication
-import com.ops.airportr.common.Constants
+import com.ops.airportr.common.AppConstants
 import com.ops.airportr.domain.model.language.LanguageListItemModel
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 fun NavController.moveOnNewScreen(id: String, isClear: Boolean = false) {
@@ -30,7 +31,7 @@ fun NavController.moveOnNewScreen(id: String, isClear: Boolean = false) {
 }
 
 fun String.isValidEmail(): Boolean = this.isNotEmpty() &&
-        Constants.EMAIL_ADDRESS.matcher(this.trim()).matches()
+        AppConstants.EMAIL_ADDRESS.matcher(this.trim()).matches()
 fun Context.toast(message: CharSequence) =
     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
 
@@ -108,4 +109,25 @@ fun changeLanguage(languageName: LanguageListItemModel, context: Context) {
 
     }
 }
+fun Context.urlForAcceptance(): String {
+    val env = AppApplication.sessionManager.baseUrl?.env
+    val url = when {
+        env.equals("-uat") -> {
+            AppConstants.PRODUCTION_URL_UAT
+        }
 
+        env.equals("-dev") -> {
+            AppConstants.PRODUCTION_URL_DEV
+        }
+
+        else -> {
+            AppConstants.PRODUCTION_URL_LIVE
+        }
+    }
+    return url
+}
+fun getCurrentTimeStampIntoFormat(): String {
+    val sdfDate = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH)
+    val now = Date()
+    return sdfDate.format(now)
+}

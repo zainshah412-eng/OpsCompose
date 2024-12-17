@@ -2,7 +2,7 @@ package com.ops.airportr.common.utils
 
 import android.annotation.SuppressLint
 import android.util.Log
-import com.ops.airportr.common.Constants.SHOW_CONSOLE_LOGS
+import com.ops.airportr.common.AppConstants.SHOW_CONSOLE_LOGS
 
 @SuppressLint("LogNotTimber")
 object LoggerUtils {
