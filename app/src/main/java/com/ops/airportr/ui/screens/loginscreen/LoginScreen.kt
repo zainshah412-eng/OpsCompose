@@ -177,7 +177,6 @@ fun LoginScreen(
     val state = viewModel.state.value
     val stateUserDetail = viewModel.stateUserDetail.value
   //  val stateRegisterDevice = viewModel.stateRegisterDevice.value
-
     if (state.loginResponse?.accessToken != "" && state.loginResponse?.accessToken != null) {
         if (!AppApplication.sessionManager.getBiometricStatus) {
             var loginCredModal = LoginCred(loginCredEmail, loginCredPassword)
@@ -522,7 +521,6 @@ fun LoginScreen(
                 containerColor = if (emailId.text.isNotEmpty() && password.text.isNotEmpty()) air_purple else air_purple_awesome_light,
                 textColor = if (emailId.text.isNotEmpty() && password.text.isNotEmpty()) white else air_awesome_purple_200,
                 isEnabled = emailId.text.isNotEmpty() && password.text.isNotEmpty()
-
             )
             Space(height = 20, width = 0)
 

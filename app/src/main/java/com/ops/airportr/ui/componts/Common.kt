@@ -77,7 +77,10 @@ fun CustomButton(
     fontSize: TextUnit = 16.sp,
     containerColor: Color = air_purple_awesome_light,
     textColor:Color = air_awesome_purple_200,
-    isEnabled: Boolean = false // Default to true
+    isEnabled: Boolean = false, // Default to true
+    defaultElevation:Int = 8,
+    pressedElevation :Int = 20,
+    focusedElevation :Int = 20
 ) {
     Button(
         modifier = modifier
@@ -88,7 +91,9 @@ fun CustomButton(
                 top = paddingTop.dp
             ),
         elevation = ButtonDefaults.elevatedButtonElevation(
-            defaultElevation = 8.dp, pressedElevation = 20.dp, focusedElevation = 20.dp
+            defaultElevation = defaultElevation.dp,
+            pressedElevation = pressedElevation.dp,
+            focusedElevation = focusedElevation.dp
         ),
         shape = RoundedCornerShape(50),
         colors = ButtonDefaults.buttonColors(containerColor = containerColor),

@@ -1,6 +1,8 @@
 package com.ops.airportr.ui.screens.navigationscreen.bottomnav.bottom.jobs
 
 import android.app.DatePickerDialog
+import android.content.Context
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -19,8 +21,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
@@ -55,7 +55,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -77,26 +76,25 @@ import com.ops.airportr.AppApplication
 import com.ops.airportr.R
 import com.ops.airportr.common.AppConstants
 import com.ops.airportr.common.theme.air_awesome_purple_100
-import com.ops.airportr.common.theme.air_green_low_light
-import com.ops.airportr.common.theme.air_orange_lite
 import com.ops.airportr.common.theme.air_purple
-import com.ops.airportr.common.theme.air_red
-import com.ops.airportr.common.theme.air_yellow
-import com.ops.airportr.common.theme.customEditTextColorDarkTheme
-import com.ops.airportr.common.theme.customTextDescriptionStyle
+import com.ops.airportr.common.theme.air_purple_light_new
 import com.ops.airportr.common.theme.customTextHeadingStyle
 import com.ops.airportr.common.theme.customTextLabelSmallStyle
 import com.ops.airportr.common.theme.dark_blue
-import com.ops.airportr.common.theme.light_white
 import com.ops.airportr.common.theme.navigationBarColor
 import com.ops.airportr.common.theme.white
-import com.ops.airportr.common.utils.getCurrentTimeStampIntoFormat
+import com.ops.airportr.common.utils.changeDateFormat
 import com.ops.airportr.common.utils.urlForAcceptance
 import com.ops.airportr.domain.model.joblist.retrievejobs.params.RetrieveJobsParams
+import com.ops.airportr.domain.model.joblist.retrievejobs.response.RetrieveJob
 import com.ops.airportr.domain.model.user.User
-import com.ops.airportr.ui.componts.Space
+import com.ops.airportr.ui.componts.CustomButton
+import com.ops.airportr.ui.componts.LoaderDialog
+import com.ops.airportr.ui.screens.navigationscreen.bottomnav.bottom.jobs.item.jobsList
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 
 
 private lateinit var user: User
@@ -109,6 +107,7 @@ fun JobsScreen(
     navHostController: NavHostController,
 ) {
     val context = LocalContext.current
+    var sdf: SimpleDateFormat? = SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH)
 
     var upComingShowFlag by remember { mutableStateOf(true) }
     var locationIds: ArrayList<String> = ArrayList()
@@ -118,6 +117,16 @@ fun JobsScreen(
     val coroutineScope = rememberCoroutineScope()
     var isBottomSheetVisible by remember { mutableStateOf(false) }
     var floatingButtonVisible by remember { mutableStateOf(false) }
+    var snackBarShowFlag by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+    var showLoader by remember { mutableStateOf(false) }
+
+    var upComingBookingCount by remember {
+        mutableStateOf(0)
+    }
+    var upCompletedBookingCount by remember {
+        mutableStateOf(0)
+    }
     var onSheetTypeClicked by remember {
         mutableStateOf("1") // 1 for Floating 2 for Filter
     }
@@ -151,10 +160,12 @@ fun JobsScreen(
                     context.urlForAcceptance() + AppConstants.RETRIEVE_JOBS,
                     RetrieveJobsParams(
                         user.userId!!,
-                        getCurrentTimeStampIntoFormat(),
+                        "2024-12-31",
+                        // getCurrentTimeStampIntoFormat(),
                         locationIds,
                         jobType,
-                        getCurrentTimeStampIntoFormat()
+                        "2024-12-18"
+                        // getCurrentTimeStampIntoFormat()
                     )
                 )
             }
@@ -162,6 +173,9 @@ fun JobsScreen(
     }
     //TODO:==========================================================
 
+
+    val retrieveJobsArrayUpcoming = remember { mutableStateOf(ArrayList<RetrieveJob>()) }
+    val retrieveJobsArrayCompleted = remember { mutableStateOf(ArrayList<RetrieveJob>()) }
 
     val calendar = Calendar.getInstance()
     val year = calendar.get(Calendar.YEAR)
@@ -180,21 +194,30 @@ fun JobsScreen(
         DatePickerDialog(
             context,
             { _, selectedYear, selectedMonth, selectedDay ->
+                // Create a Calendar instance to hold the selected date
+                val calendar = Calendar.getInstance()
+                calendar.set(Calendar.YEAR, selectedYear)
+                calendar.set(Calendar.MONTH, selectedMonth)
+                calendar.set(Calendar.DAY_OF_MONTH, selectedDay)
+
+                // Format the date using SimpleDateFormat
+                val formattedDate = sdf!!.format(calendar.time)
+
+                // Update the selected date
                 if (isStartDateClick.value) {
-                    selectedStartDate.value = "$selectedDay/${selectedMonth + 1}/$selectedYear"
+                    selectedStartDate.value = formattedDate
                     showDialog.value = false
                 } else {
-                    selectedEndDate.value = "$selectedDay/${selectedMonth + 1}/$selectedYear"
+                    selectedEndDate.value = formattedDate
                     showDialog.value = false
                 }
             },
             year, month, day
         ).show()
+
     }
 
-
     val state = viewModel.state.value
-
 
     Scaffold(
         floatingActionButton = {
@@ -213,7 +236,8 @@ fun JobsScreen(
             }
         }
 
-    ) { paddingValues ->
+    )
+    { paddingValues ->
         // Main content
         ModalBottomSheetLayout(
             sheetState = sheetState,
@@ -221,7 +245,7 @@ fun JobsScreen(
                 Box(
                     Modifier
                         .fillMaxWidth()
-                        .height(if (onSheetTypeClicked == "1") 250.dp else 350.dp)
+                        .height(if (onSheetTypeClicked == "1") 250.dp else 430.dp)
                         .padding(6.dp),
                     contentAlignment = Alignment.TopCenter
                 ) {
@@ -237,13 +261,29 @@ fun JobsScreen(
 
 
                     } else {
-                        OnFilterSheet(onStartDateClick = {
-                            isStartDateClick.value = true
-                            showDialog.value = true
-                        }, onEndDateClick = {
-                            isStartDateClick.value = false
-                            showDialog.value = true
-                        },
+                        OnFilterSheet(
+                            onSearchClick = { startDate, endDate ->
+                                prepareParamForApi(
+                                    context,
+                                    viewModel,
+                                    startDate,
+                                    endDate,
+                                    locationIds,
+                                    jobType,
+                                )
+                                coroutineScope.launch {
+                                    sheetState.hide()
+                                }
+                                isBottomSheetVisible = false
+                                floatingButtonVisible = true
+                            },
+                            onStartDateClick = {
+                                isStartDateClick.value = true
+                                showDialog.value = true
+                            }, onEndDateClick = {
+                                isStartDateClick.value = false
+                                showDialog.value = true
+                            },
                             startDate = selectedStartDate.value,
                             endDate = selectedEndDate.value
                         )
@@ -382,33 +422,34 @@ fun JobsScreen(
 
 
                                     // Notification Badge
-                                    Box(
-                                        modifier = Modifier
-                                            .constrainAs(upComingCount) {
-                                                top.linkTo(upComingText.top)
-                                                start.linkTo(upComingText.end)
-                                            }
-                                            .offset(x = 4.dp) // Equivalent to layout_marginStart
-                                            .background(
-                                                color = air_purple, // Replace with your badge background color
-                                                shape = RoundedCornerShape(8.dp) // Adjust radius as needed
+                                    if (upComingBookingCount > 0) {
+                                        Box(
+                                            modifier = Modifier
+                                                .constrainAs(upComingCount) {
+                                                    top.linkTo(upComingText.top)
+                                                    start.linkTo(upComingText.end)
+                                                }
+                                                .offset(x = 4.dp) // Equivalent to layout_marginStart
+                                                .background(
+                                                    color = air_purple, // Replace with your badge background color
+                                                    shape = RoundedCornerShape(8.dp) // Adjust radius as needed
+                                                )
+                                                .padding(
+                                                    horizontal = 4.dp,
+                                                    vertical = 2.dp
+                                                ) // Equivalent to paddingHorizontal, paddingTop, paddingBottom
+                                            //.visible(false) // Replace with your visibility logic
+                                        ) {
+                                            Text(
+                                                text = upComingBookingCount.toString(),
+                                                color = Color.White, // Text color
+                                                style = customTextLabelSmallStyle, // Use your custom text style
+                                                fontSize = 8.sp,
+                                                modifier = Modifier.align(Alignment.Center)
                                             )
-                                            .padding(
-                                                horizontal = 4.dp,
-                                                vertical = 2.dp
-                                            ) // Equivalent to paddingHorizontal, paddingTop, paddingBottom
-                                        //.visible(false) // Replace with your visibility logic
-                                    ) {
-                                        Text(
-                                            text = "22",
-                                            color = Color.White, // Text color
-                                            style = customTextLabelSmallStyle, // Use your custom text style
-                                            fontSize = 8.sp,
-                                            modifier = Modifier.align(Alignment.Center)
-                                        )
+                                        }
                                     }
                                 }
-
                             }
 
                             // Bottom Line
@@ -424,6 +465,7 @@ fun JobsScreen(
                                 .weight(1f)
                                 .clickable {
                                     upComingShowFlag = false
+
                                 }// Equivalent to layout_weight="1"
                         ) {
                             Box(
@@ -455,33 +497,34 @@ fun JobsScreen(
 
 
                                     // Notification Badge
-                                    Box(
-                                        modifier = Modifier
-                                            .constrainAs(completedCount) {
-                                                top.linkTo(completedText.top)
-                                                start.linkTo(completedText.end)
-                                            }
-                                            .offset(x = 4.dp) // Equivalent to layout_marginStart
-                                            .background(
-                                                color = air_purple, // Replace with your badge background color
-                                                shape = RoundedCornerShape(8.dp) // Adjust radius as needed
+                                    if (upCompletedBookingCount > 0) {
+                                        Box(
+                                            modifier = Modifier
+                                                .constrainAs(completedCount) {
+                                                    top.linkTo(completedText.top)
+                                                    start.linkTo(completedText.end)
+                                                }
+                                                .offset(x = 4.dp) // Equivalent to layout_marginStart
+                                                .background(
+                                                    color = air_purple, // Replace with your badge background color
+                                                    shape = RoundedCornerShape(8.dp) // Adjust radius as needed
+                                                )
+                                                .padding(
+                                                    horizontal = 4.dp,
+                                                    vertical = 2.dp
+                                                ) // Equivalent to paddingHorizontal, paddingTop, paddingBottom
+                                            //.visible(false) // Replace with your visibility logic
+                                        ) {
+                                            Text(
+                                                text = upCompletedBookingCount.toString(),
+                                                color = Color.White, // Text color
+                                                style = customTextLabelSmallStyle, // Use your custom text style
+                                                fontSize = 8.sp,
+                                                modifier = Modifier.align(Alignment.Center)
                                             )
-                                            .padding(
-                                                horizontal = 4.dp,
-                                                vertical = 2.dp
-                                            ) // Equivalent to paddingHorizontal, paddingTop, paddingBottom
-                                        //.visible(false) // Replace with your visibility logic
-                                    ) {
-                                        Text(
-                                            text = "22",
-                                            color = Color.White, // Text color
-                                            style = customTextLabelSmallStyle, // Use your custom text style
-                                            fontSize = 8.sp,
-                                            modifier = Modifier.align(Alignment.Center)
-                                        )
+                                        }
                                     }
                                 }
-
                             }
 
                             // Bottom Line
@@ -503,12 +546,32 @@ fun JobsScreen(
                         }
                         .fillMaxWidth()) {
 
-                        if (state.jobsResponse != null) {
+                        if (state.jobsResponse != null && state.jobsResponse?.retrieveJobs!!.size > 0) {
 
-                            val sampleItems =
-                                listOf("Item 1", "Item 2", "Item 3", "Item 4", "Item 5")
-                            jobsList(items = sampleItems)
+                            retrieveJobsArrayUpcoming.value.clear()
+                            retrieveJobsArrayCompleted.value.clear()
+                            for (obj in state.jobsResponse?.retrieveJobs!!) {
+                                if (obj.jobs?.get(0)?.jobType == 1 || obj.jobs?.get(0)?.jobType == 6) {
+                                    if (obj.jobs!![0].jobActivityStatus == 1) {
+                                        retrieveJobsArrayUpcoming.value.add(obj)
+                                    } else if (obj.jobs!![0].jobActivityStatus == 5) {
+                                        retrieveJobsArrayCompleted.value.add(obj)
+                                    }
+                                }
+                            }
+                            upComingBookingCount = retrieveJobsArrayUpcoming.value.size
+                            upCompletedBookingCount = retrieveJobsArrayCompleted.value.size
+
+                            if (upComingShowFlag) {
+                                jobsList(context, onClick = {
+                                }, itemAtPos = retrieveJobsArrayUpcoming)
+                            } else {
+                                jobsList(context, onClick = {
+                                }, itemAtPos = retrieveJobsArrayCompleted)
+                            }
                         } else {
+                            upComingBookingCount  = 0
+                            upCompletedBookingCount = 0
                             Column(
                                 modifier = Modifier.fillMaxSize(),
                                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -555,6 +618,16 @@ fun JobsScreen(
                     }
 
 
+                }
+
+                if (state.error != null) {
+                    errorMessage = state.error ?: context.getString(R.string.no_internet)
+                    snackBarShowFlag = true
+                }
+                if (state.isLoading) {
+                    Log.wtf("StateLoadingAuth", "Called")
+                    showLoader = true
+                    LoaderDialog(showDialog = showLoader)
                 }
 
 
@@ -792,12 +865,16 @@ fun onFloatingBottomSheet(
 
 @Composable
 fun OnFilterSheet(
+    onSearchClick: (
+        startDate: String,
+        endDate: String
+    ) -> Unit,
     onStartDateClick: () -> Unit,
     onEndDateClick: () -> Unit,
     startDate: String = "",
     endDate: String = ""
 ) {
-    val context = LocalContext.current
+
     val scrollState = rememberScrollState()
 
     Column(
@@ -806,8 +883,6 @@ fun OnFilterSheet(
             .padding(start = 16.dp, top = 30.dp, end = 16.dp, bottom = 30.dp)
             .verticalScroll(scrollState)
     ) {
-
-        // Title TextView (tvFilter)
         Text(
             text = stringResource(id = R.string.filter),
             style = MaterialTheme.typography.h6,
@@ -978,307 +1053,92 @@ fun OnFilterSheet(
         Spacer(modifier = Modifier.height(22.dp))
 
         // Bottom Buttons Section
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
             // Reset Button
-            Text(
-                text = stringResource(id = R.string.reset),
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(vertical = 10.dp)
-                    .clickable { /* Handle reset click */ },
-                style = MaterialTheme.typography.button,
-                fontFamily = FontFamily(Font(R.font.objective_bold)),
-                fontSize = 14.sp
-            )
 
-            // Apply Button
-            Text(
-                text = stringResource(id = R.string.apply),
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(vertical = 10.dp)
-                    .clickable { /* Handle apply click */ },
-                style = MaterialTheme.typography.button,
-                color = Color.White,
-                fontFamily = FontFamily(Font(R.font.objective_bold)),
-                fontSize = 14.sp
-            )
-        }
-    }
-}
-
-@Composable
-fun jobsList(items: List<String>) {
-    LazyColumn {
-        items(items) { item ->
             Box(
                 modifier = Modifier
-                    .fillMaxSize() // Set content scale to crop
-            ) {
+                    .weight(1f)
+                    .padding(vertical = 5.dp),
 
-                ConstraintLayout(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(white)
-                        .padding(10.dp)
                 ) {
-                    val (tagsBox, spaceEnd, rlNotification, relParent,
-                        tvPassengerTitle, tvFlightNumber,
-                        tvDateTime,
-                        bagImg, tvBagCount, tvAddress, tvAddressNumber) = createRefs()
+                CustomButton(
+                    name = stringResource(id = R.string.reset),
+                    onButtonClick = {
 
-                    Row(
-                        modifier = Modifier
-                            .constrainAs(tagsBox) {
-                                top.linkTo(parent.top)
-                                start.linkTo(parent.start)
-                                end.linkTo(spaceEnd.start)
-                                width = Dimension.fillToConstraints
-                            },
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(5.dp)) // Apply rounded corners
-                                .background(air_green_low_light) // Set background color
-                                .border(0.dp, air_green_low_light, RoundedCornerShape(5.dp))
-                                .padding(6.dp)
 
-                        ) {
-                            Text(
-                                text = "ABC",
-                                color = customEditTextColorDarkTheme, // Text color
-                                style = customTextLabelSmallStyle, // Use your custom text style
-                                fontSize = 10.sp,
-                                modifier = Modifier.align(Alignment.Center)
-                            )
-                        }
-                        Space(height = 0, width = 5)
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(5.dp)) // Apply rounded corners
-                                .background(air_red) // Set background color
-                                .border(0.dp, air_red, RoundedCornerShape(5.dp))
-                                .padding(6.dp)
-
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.cancelled),
-                                color = white, // Text color
-                                style = customTextLabelSmallStyle, // Use your custom text style
-                                fontSize = 10.sp,
-                                modifier = Modifier.align(Alignment.Center)
-                            )
-                        }
-                        Space(height = 0, width = 5)
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(5.dp)) // Apply rounded corners
-                                .background(air_purple) // Set background color
-                                .border(0.dp, air_purple, RoundedCornerShape(5.dp))
-                                .padding(6.dp)
-
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.repatriated),
-                                color = white, // Text color
-                                style = customTextLabelSmallStyle, // Use your custom text style
-                                fontSize = 10.sp,
-                                modifier = Modifier.align(Alignment.Center)
-                            )
-                        }
-                        Space(height = 0, width = 5)
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(5.dp)) // Apply rounded corners
-                                .background(air_orange_lite) // Set background color
-                                .border(0.dp, air_orange_lite, RoundedCornerShape(5.dp))
-                                .padding(6.dp)
-
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.oversize),
-                                color = customEditTextColorDarkTheme, // Text color
-                                style = customTextLabelSmallStyle, // Use your custom text style
-                                fontSize = 10.sp,
-                                modifier = Modifier.align(Alignment.Center)
-                            )
-                        }
-                        Space(height = 0, width = 5)
-
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(5.dp)) // Apply rounded corners
-                                .background(air_yellow) // Set background color
-                                .border(0.dp, air_yellow, RoundedCornerShape(5.dp))
-                                .height(dimensionResource(id = R.dimen._9sdp))
-                                .width(dimensionResource(id = R.dimen._9sdp))
-
+                    },
+                    paddingTop = 10,
+                    paddingHorizontal = 0,
+                    modifier = Modifier.height(60.dp),
+                    containerColor = air_purple_light_new,
+                    textColor = air_purple,
+                    isEnabled = true,
+                    focusedElevation = 0,
+                    defaultElevation = 0,
+                )
+            }
+            // Apply Button
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(vertical = 5.dp)
+            ) {
+                CustomButton(
+                    name = stringResource(id = R.string.apply),
+                    onButtonClick = {
+                        onSearchClick(
+                            startDate.changeDateFormat(),
+                            endDate.changeDateFormat()
                         )
 
-                    }
-//                    Spacer(
-//                        modifier = Modifier
-//                            .constrainAs(spaceEnd) {
-//                                top.linkTo(parent.top)
-//                                start.linkTo(tagsBox.end)
-//                                end.linkTo(parent.end)
-//                                width = Dimension.fillToConstraints
-//                            }
-//                            .background(air_purple)
-//                            .height(0.dp)
-//                            .width(30.dp)
-//                    )
-                    Box(
-                        modifier = Modifier
-                            .constrainAs(rlNotification) {
-                                top.linkTo(parent.top)
-                                end.linkTo(parent.end)
-                            }
-                            .padding(top = 10.dp)
-                            .clip(RoundedCornerShape(5.dp)) // Apply rounded corners
-                            .background(air_purple) // Set background color
-                            .border(0.dp, air_purple, RoundedCornerShape(5.dp))
-                            .height(dimensionResource(id = R.dimen._9sdp))
-                            .width(dimensionResource(id = R.dimen._9sdp))
-                    )
-
-                    Box(modifier = Modifier
-                        .constrainAs(relParent) {
-                            top.linkTo(tagsBox.bottom)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                        }
-                        .fillMaxWidth()
-                        .padding(top = 10.dp))
-                    {
-                        ConstraintLayout(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(white)
-                        ) {
-                            Text(
-                                modifier = Modifier
-                                    .constrainAs(tvPassengerTitle) {
-                                        top.linkTo(parent.top)
-                                        start.linkTo(parent.start)
-                                    }
-                                    .padding(top = 5.dp)
-                                    .fillMaxWidth(),
-                                textAlign = TextAlign.Start,
-                                text = "Zain Ali",
-                                style = customTextLabelSmallStyle, // Use your custom text style here
-                                fontSize = 14.sp,
-                                color = dark_blue, // Replace with your desired color
-                            )
-                            Text(
-                                modifier = Modifier
-                                    .constrainAs(tvBagCount) {
-                                        top.linkTo(tvPassengerTitle.bottom)
-                                        end.linkTo(parent.end)
-                                    }
-                                    .padding(top = 5.dp, start = 10.dp),
-                                textAlign = TextAlign.Start,
-                                text = "2",
-                                style = customTextLabelSmallStyle, // Use your custom text style here
-                                fontSize = 18.sp,
-                                color = dark_blue, // Replace with your desired color
-                            )
-                            Image(
-                                painter = painterResource(id = R.drawable.delivery_bag_icon),
-                                contentDescription = null, // provide content description if needed
-                                modifier = Modifier
-                                    .constrainAs(bagImg) {
-                                        top.linkTo(tvPassengerTitle.bottom)
-                                        end.linkTo(tvBagCount.start)
-                                    }
-                                    .height(dimensionResource(id = R.dimen._35sdp))
-                                    .width(dimensionResource(id = R.dimen._35sdp)), // make the image background transparent
-                                contentScale = ContentScale.Inside // scale the image to fill the Box
-                            )
-                            Text(
-                                modifier = Modifier
-                                    .constrainAs(tvFlightNumber) {
-                                        top.linkTo(tvPassengerTitle.bottom)
-                                        start.linkTo(parent.start)
-                                        end.linkTo(bagImg.start)
-                                        width = Dimension.fillToConstraints
-
-                                    }
-                                    .padding(top = 5.dp),
-                                textAlign = TextAlign.Start,
-                                text = "AP1-AALHR-23X6",
-                                style = customTextDescriptionStyle, // Use your custom text style here
-                                fontSize = 18.sp,
-                                color = air_awesome_purple_100, // Replace with your desired color
-                            )
-
-
-                            Text(
-                                modifier = Modifier
-                                    .constrainAs(tvDateTime) {
-                                        top.linkTo(bagImg.bottom)
-                                        start.linkTo(parent.start)
-                                        end.linkTo(parent.end)
-                                    }
-                                    .padding(top = 5.dp)
-                                    .fillMaxWidth(),
-                                textAlign = TextAlign.Start,
-                                text = "19/12, 09:00-12:00",
-                                style = customTextHeadingStyle, // Use your custom text style here
-                                fontWeight = FontWeight.ExtraBold,
-                                fontSize = 18.sp,
-                                color = dark_blue// Replace with your desired color
-                            )
-                            Text(
-                                modifier = Modifier
-                                    .constrainAs(tvAddress) {
-                                        top.linkTo(tvDateTime.bottom)
-                                        start.linkTo(parent.start)
-                                        end.linkTo(parent.end)
-                                    }
-                                    .padding(top = 5.dp)
-                                    .fillMaxWidth(),
-                                textAlign = TextAlign.Start,
-                                text = "Po Box 427",
-                                style = customTextLabelSmallStyle, // Use your custom text style here
-                                fontSize = 12.sp,
-                                color = air_awesome_purple_100, // Replace with your desired color
-                            )
-                            Text(
-                                modifier = Modifier
-                                    .constrainAs(tvAddressNumber) {
-                                        top.linkTo(tvAddress.bottom)
-                                        start.linkTo(parent.start)
-                                        end.linkTo(parent.end)
-                                    }
-                                    .padding(top = 5.dp)
-                                    .fillMaxWidth(),
-                                textAlign = TextAlign.Start,
-                                text = "UB3 1ZQ",
-                                style = customTextLabelSmallStyle, // Use your custom text style here
-                                fontSize = 12.sp,
-                                color = air_awesome_purple_100, // Replace with your desired color
-                            )
-                        }
-
-                    }
-
-                }
-
+                    },
+                    paddingTop = 10,
+                    paddingHorizontal = 0,
+                    modifier = Modifier.height(60.dp),
+                    containerColor = dark_blue,
+                    textColor = white,
+                    isEnabled = true
+                )
             }
-            Divider(
-                color = light_white
-            )
         }
     }
-
 }
 
 
+private fun prepareParamForApi(
+    context: Context,
+    viewModel: RetrieveJobsViewModel,
+    startDate: String,
+    endDate: String,
+    locationIds: java.util.ArrayList<String>,
+    jobType: java.util.ArrayList<Int>
+) {
+    try {
+        //     (activity as BookingListAct).showLoader()
+        jobType.clear()
+        jobType.add(1)
+        jobType.add(6)
+        viewModel.retrieveJobs(
+            context.urlForAcceptance() + AppConstants.RETRIEVE_JOBS,
+            RetrieveJobsParams(
+                user.userId!!,
+                endDate,
+                // getCurrentTimeStampIntoFormat(),
+                locationIds,
+                jobType,
+                startDate
+                // getCurrentTimeStampIntoFormat()
+            )
+        )
+    } catch (e: Exception) {
+        Log.d("CallingException:", e.toString())
 
-
+    }
+}
 
 
 

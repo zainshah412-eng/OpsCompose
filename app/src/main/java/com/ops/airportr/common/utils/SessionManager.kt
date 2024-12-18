@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.content.res.Resources
 import com.google.gson.Gson
 import com.ops.airportr.domain.model.BaseUrl
+import com.ops.airportr.domain.model.bookingdetails.BookingDetails
 import com.ops.airportr.domain.model.login.AuthTokenResp
 import com.ops.airportr.domain.model.login.logincred.LoginCred
 import com.ops.airportr.domain.model.user.User
@@ -599,26 +600,26 @@ class SessionManager(
 //            }
 //        }
 
-//    val bookingDetails: BookingDetails?
-//        get() {
-//            val json: String? = pref.getString(KEY_BOOKING_DETAILS, "")
-//            return if (!json.isNullOrEmpty()) {
-//                Gson().fromJson(json, BookingDetails::class.java)
-//            } else {
-//                null
-//            }
-//        }
-//
-//
-//    val activeBookingDetails: BookingDetails?
-//        get() {
-//            if (!pref.getString(KEY_ACTIVE_BOOKING_DETAILS, "").isNullOrEmpty()) {
-//                val json: String? = pref.getString(KEY_ACTIVE_BOOKING_DETAILS, "")
-//                return Gson().fromJson(json, BookingDetails::class.java)
-//            } else {
-//             return null
-//            }
-//        }
+    val bookingDetails: BookingDetails?
+        get() {
+            val json: String? = pref.getString(KEY_BOOKING_DETAILS, "")
+            return if (!json.isNullOrEmpty()) {
+                Gson().fromJson(json, BookingDetails::class.java)
+            } else {
+                null
+            }
+        }
+
+
+    val activeBookingDetails: BookingDetails?
+        get() {
+            if (!pref.getString(KEY_ACTIVE_BOOKING_DETAILS, "").isNullOrEmpty()) {
+                val json: String? = pref.getString(KEY_ACTIVE_BOOKING_DETAILS, "")
+                return Gson().fromJson(json, BookingDetails::class.java)
+            } else {
+             return null
+            }
+        }
 
     val duration: Long
         get() {

@@ -13,5 +13,9 @@ object Graph {
     const val SAVED  = "saved_screen"
     const val PROFILE  = "profile_screen"
     const val LOGOUT  = "logout"
+    const val PORTR_CODE = "portr_code"
+    const val PROFILE_DETAIL = "profile_details"
+    const val WHATS_NEW = "whatsnew"
+    const val GIVE_FEEDBACK = "give_feedback"
 
 }
