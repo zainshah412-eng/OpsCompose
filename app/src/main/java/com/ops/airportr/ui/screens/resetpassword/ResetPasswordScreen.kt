@@ -75,7 +75,7 @@ import androidx.navigation.compose.rememberNavController
 import com.ops.airportr.AppApplication
 import com.ops.airportr.BuildConfig
 import com.ops.airportr.R
-import com.ops.airportr.common.Constants
+import com.ops.airportr.common.AppConstants
 import com.ops.airportr.common.theme.air_awesome_purple_200
 import com.ops.airportr.common.theme.air_orange_dark
 import com.ops.airportr.common.theme.air_purple
@@ -288,7 +288,7 @@ fun ResetPasswordScreen(
                             var baseUrlEnv = ""
                             var flag = false
                             callForApiResetPassword(
-                                baseUrl + Constants.RESET_PASSWORD,
+                                baseUrl + AppConstants.RESET_PASSWORD,
                                 email,
                                 viewModel,
                                 context
