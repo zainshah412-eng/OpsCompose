@@ -4,9 +4,13 @@ import com.google.gson.Gson
 import com.ops.airportr.common.network.Either
 import com.ops.airportr.data.remote.ApiService
 import com.ops.airportr.domain.model.apierror.ApiError
+import com.ops.airportr.domain.model.joblist.retrievejobs.params.RetrieveJobsParams
+import com.ops.airportr.domain.model.joblist.retrievejobs.response.RetrieveJobsResponse
 import com.ops.airportr.domain.model.login.AuthTokenResp
 import com.ops.airportr.domain.model.resetpassword.ResetPasswordParam
 import com.ops.airportr.domain.model.resetpassword.ResetPasswordResponse
+import com.ops.airportr.domain.model.registerdevice.RegisterDeviceParams
+import com.ops.airportr.domain.model.registerdevice.response.RegisterDeviceResponse
 import com.ops.airportr.domain.model.user.UserDetails
 import com.ops.airportr.domain.repository.CoinRepository
 import retrofit2.HttpException
@@ -87,6 +91,7 @@ class CoinRepositoryImpl @Inject constructor(
         }
     }
 
+
     override suspend fun resetPassword(url: String,
                                        emailAddress: String): Either<ResetPasswordResponse, ApiError> {
         return try {
@@ -95,6 +100,65 @@ class CoinRepositoryImpl @Inject constructor(
                 val resetPassword = response.body()
                 if (resetPassword != null) {
                     Either.Success(resetPassword)
+                } else {
+                    Either.Error(ApiError("null_body", "Response body is null", null, null))
+                }
+            } else {
+                val errorBody = response.errorBody()?.string()
+                val errorResponse = errorBody?.let {
+                    Gson().fromJson(it, ApiError::class.java)
+                }
+                Either.Error(errorResponse ?: ApiError("unknown_error", response.message(), null, null))
+            }
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val errorResponse = errorBody?.let {
+                Gson().fromJson(it, ApiError::class.java)
+            }
+            Either.Error(errorResponse ?: ApiError("unknown_error", e.message(), null, null))
+        }
+    }
+
+    override suspend fun retrieveJobs(
+        url: String,
+        params: RetrieveJobsParams
+    ): Either<RetrieveJobsResponse, ApiError> {
+        return try {
+            val response = api.retrieveJobs(url,params)
+            if (response.isSuccessful) {
+                val retrieveJobs = response.body()
+                if (retrieveJobs != null) {
+                    Either.Success(retrieveJobs)
+                } else {
+                    Either.Error(ApiError("null_body", "Response body is null", null, null))
+                }
+            } else {
+                val errorBody = response.errorBody()?.string()
+                val errorResponse = errorBody?.let {
+                    Gson().fromJson(it, ApiError::class.java)
+                }
+                Either.Error(errorResponse ?: ApiError("unknown_error", response.message(), null, null))
+            }
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val errorResponse = errorBody?.let {
+                Gson().fromJson(it, ApiError::class.java)
+            }
+            Either.Error(errorResponse ?: ApiError("unknown_error", e.message(), null, null))
+        }
+    }
+
+    override suspend fun registerDevice(
+        url: String,
+        params: RegisterDeviceParams
+    ): Either<RegisterDeviceResponse, ApiError> {
+        return try {
+            val response = api.registerDevice(url,params)
+            if (response.isSuccessful) {
+                val registerDeviceResponse = response.body()
+                if (registerDeviceResponse != null) {
+                    Either.Success(registerDeviceResponse)
+
                 } else {
                     Either.Error(ApiError("null_body", "Response body is null", null, null))
                 }

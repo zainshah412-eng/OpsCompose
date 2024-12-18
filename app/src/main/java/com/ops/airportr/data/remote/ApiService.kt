@@ -1,11 +1,16 @@
 package com.ops.airportr.data.remote
 
 
+import com.ops.airportr.domain.model.joblist.retrievejobs.params.RetrieveJobsParams
+import com.ops.airportr.domain.model.joblist.retrievejobs.response.RetrieveJobsResponse
 import com.ops.airportr.domain.model.login.AuthTokenResp
 import com.ops.airportr.domain.model.resetpassword.ResetPasswordParam
 import com.ops.airportr.domain.model.resetpassword.ResetPasswordResponse
+import com.ops.airportr.domain.model.registerdevice.RegisterDeviceParams
+import com.ops.airportr.domain.model.registerdevice.response.RegisterDeviceResponse
 import com.ops.airportr.domain.model.user.UserDetails
 import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
@@ -44,4 +49,16 @@ interface ApiService {
         @Url url: String,
         @Field("emailAddress") emailAddress: String,
     ): Response<ResetPasswordResponse>
+   
+    @POST
+    suspend fun retrieveJobs(
+        @Url url: String,
+        @Body body: RetrieveJobsParams,
+    ): Response<RetrieveJobsResponse>
+
+    @POST
+    suspend fun registerDevice(
+        @Url url: String,
+        @Body registerDeviceParams: RegisterDeviceParams,
+    ): Response<RegisterDeviceResponse>
 }

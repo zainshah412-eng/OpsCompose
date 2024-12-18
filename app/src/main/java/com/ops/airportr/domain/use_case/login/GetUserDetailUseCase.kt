@@ -14,7 +14,7 @@ import javax.inject.Inject
 class GetUserDetailUseCase  @Inject constructor(
     private val repository: CoinRepository
 ){
-    operator fun invoke( url: String): Flow<Resource<Either<UserDetails, ApiError>>> = flow {
+    operator fun invoke(url: String): Flow<Resource<Either<UserDetails, ApiError>>> = flow {
         try {
             emit(Resource.Loading())
             val result = repository.getUserDetails(

@@ -1,5 +1,6 @@
 package com.ops.airportr.ui.screens.splashscreen
 
+import android.content.Intent
 import androidx.compose.animation.core.EaseInOutElastic
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -24,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.ops.airportr.AppApplication
 import com.ops.airportr.R
 import com.ops.airportr.common.theme.air_purple
 import com.ops.airportr.common.theme.white
@@ -47,7 +49,18 @@ fun SplashScreen(
     )
     LaunchedEffect(key1 = true) {
         delay(3000L)
-        navHostController.moveOnNewScreen(Screen.LoginScreen.route, true)
+
+        if (AppApplication.sessionManager.isLoggedIn) {
+            if (!AppApplication.sessionManager.isFlowSelected) {
+                navHostController.moveOnNewScreen(Screen.HomeScreen.route, true)
+            } else {
+                navHostController.moveOnNewScreen(Screen.WelcomeScreen.route, true)
+            }
+        } else {
+            navHostController.moveOnNewScreen(Screen.LoginScreen.route, true)
+        }
+
+
 //        if (AppApplication.sessionManager.isLoggedIn) {
 //            navHostController.moveOnNewScreen(Screen.HomeScreen.route, true)
 //        } else {

@@ -14,25 +14,25 @@ sealed class BottomScreens(val route: String, val title: String) {
         route,
         title
     ) {
-        object Favorite : BottomNavigationScreens(
-            Graph.FAVORITE, "Favorite",
-            icon = R.drawable.ic_records,
-            icon_focused = R.drawable.ic_record_dark
+        object Jobs : BottomNavigationScreens(
+            Graph.FAVORITE, "Jobs",
+            icon = R.drawable.check_circle_outline,
+            icon_focused = R.drawable.check_circle_fill
         )
 
-        object NearBy : BottomNavigationScreens(
-            Graph.NEAR_BY, "Nearby", icon = R.drawable.ic_records,
-            icon_focused = R.drawable.ic_record_dark
+        object Scanner : BottomNavigationScreens(
+            Graph.NEAR_BY, "Scanner", icon = R.drawable.barcode_outline,
+            icon_focused = R.drawable.barcode_fill
         )
 
-        object Reserved : BottomNavigationScreens(
-            Graph.RESERVED, "Reserved", icon = R.drawable.ic_profile,
-            icon_focused = R.drawable.ic_profile_dark
+        object Airports : BottomNavigationScreens(
+            Graph.RESERVED, "Airports", icon = R.drawable.airplane_outline,
+            icon_focused = R.drawable.airplane_fill
         )
 
-        object Saved : BottomNavigationScreens(
-            Graph.SAVED, "Saved", icon = R.drawable.ic_profile,
-            icon_focused = R.drawable.ic_profile_dark
+        object Profile : BottomNavigationScreens(
+            Graph.SAVED, "Profile", icon = R.drawable.user_outline,
+            icon_focused = R.drawable.user_fill
         )
 
     }
@@ -41,8 +41,8 @@ sealed class BottomScreens(val route: String, val title: String) {
 }
 
 val screensInHomeFromBottomNav = listOf(
-    BottomScreens.BottomNavigationScreens.Favorite,
-    BottomScreens.BottomNavigationScreens.NearBy,
-    BottomScreens.BottomNavigationScreens.Reserved,
-    BottomScreens.BottomNavigationScreens.Saved
+    BottomScreens.BottomNavigationScreens.Jobs,
+    BottomScreens.BottomNavigationScreens.Scanner,
+    BottomScreens.BottomNavigationScreens.Airports,
+    BottomScreens.BottomNavigationScreens.Profile
 )

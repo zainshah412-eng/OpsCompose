@@ -8,7 +8,7 @@
 
     <application
         android:name="com.ops.airportr.AppApplication"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/logo"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"

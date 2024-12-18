@@ -20,11 +20,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Scaffold
-import androidx.compose.material.SnackbarHost
-import androidx.compose.material.SnackbarHostState
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
@@ -77,7 +77,10 @@ fun CustomButton(
     fontSize: TextUnit = 16.sp,
     containerColor: Color = air_purple_awesome_light,
     textColor:Color = air_awesome_purple_200,
-    isEnabled: Boolean = false // Default to true
+    isEnabled: Boolean = false, // Default to true
+    defaultElevation:Int = 8,
+    pressedElevation :Int = 20,
+    focusedElevation :Int = 20
 ) {
     Button(
         modifier = modifier
@@ -88,7 +91,9 @@ fun CustomButton(
                 top = paddingTop.dp
             ),
         elevation = ButtonDefaults.elevatedButtonElevation(
-            defaultElevation = 8.dp, pressedElevation = 20.dp, focusedElevation = 20.dp
+            defaultElevation = defaultElevation.dp,
+            pressedElevation = pressedElevation.dp,
+            focusedElevation = focusedElevation.dp
         ),
         shape = RoundedCornerShape(50),
         colors = ButtonDefaults.buttonColors(containerColor = containerColor),
@@ -176,7 +181,7 @@ fun Space(height: Int, width: Int) {
 fun MyFloatingActionButton(onClick: () -> Unit) {
     FloatingActionButton(
         onClick = onClick,
-        backgroundColor = Color.Black,
+        containerColor = Color.Black,
         contentColor = Color.White,
         modifier = Modifier.size(56.dp)
     ) {

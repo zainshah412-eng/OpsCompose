@@ -1,22 +1,22 @@
 package com.ops.airportr.common.theme
 
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.SnackbarDefaults
-import androidx.compose.material.darkColors
-import androidx.compose.material.lightColors
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarDefaults
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
-private val DarkColorPalette = darkColors(
+private val DarkColorPalette = darkColorScheme(
     primary = colorPrimaryDarkTheme,
     background = colorPrimaryDarkTheme,
     onBackground = colorPrimaryDarkTheme,
     onPrimary = colorPrimaryDarkTheme
 )
 
-private val LightColorPalette = lightColors(
+private val LightColorPalette = lightColorScheme(
 
     primary = air_purple,
     background = air_purple,
@@ -33,23 +33,10 @@ fun OpsAirportrTheme(darkTheme: Boolean = true, content: @Composable() () -> Uni
     }
 
     MaterialTheme(
-        colors = colors,
+        colorScheme = colors,
         typography = Typo,
         shapes = Shapes,
         content = content
     )
 }
 
-@Composable
-fun updateStatusBarColor(
-    color: Color = SnackbarDefaults.backgroundColor,
-    iconDark: Boolean = false
-) {
-    val systemUiController = rememberSystemUiController()
-    SideEffect {
-        systemUiController.setStatusBarColor(
-            color = color,
-            darkIcons = iconDark
-        )
-    }
-}

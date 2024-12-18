@@ -1,8 +1,8 @@
 package com.ops.airportr.ui.componts.dialog
 
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,8 +50,8 @@ fun LogoutDialog(
                     Text(stringResource(id = R.string.cancel), color = grey_trans)
                 }
             },
-            backgroundColor = grey_trans,
-            contentColor = grey_trans
+            containerColor = grey_trans,
+            iconContentColor = grey_trans
         )
     }
 }

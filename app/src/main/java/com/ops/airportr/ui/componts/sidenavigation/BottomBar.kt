@@ -11,12 +11,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -31,10 +29,12 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.ops.airportr.common.theme.air_awesome_light_white
+import com.ops.airportr.common.theme.air_awesome_purple_100
+import com.ops.airportr.common.theme.air_purple
+import com.ops.airportr.common.theme.custom_white
 import com.ops.airportr.common.theme.fonts
 import com.ops.airportr.route.sidenavigationscreens.BottomScreens
-import com.bks.circularporgressview.ui.theme.Purple700
-import com.ops.airportr.common.theme.air_awesome_light_white
 
 
 @Composable
@@ -43,26 +43,36 @@ fun BottomBar(
     screens: List<BottomScreens.BottomNavigationScreens>,
     navController: NavController
 ) {
-    BottomNavigation(
+    NavigationBar(
         modifier = modifier,
-        backgroundColor = Purple700
+        containerColor = custom_white // Background color of the Bottom Bar
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
+
         screens.forEach { screen ->
-            BottomNavigationItem(
+            // Check if the current route matches the screen's route
+            val selected = currentRoute == screen.route
+
+            NavigationBarItem(
                 icon = {
                     Icon(
-                        imageVector = Icons.Filled.Home,
-                        contentDescription = "Home Icon",
-                        tint = Color.Blue // Optional: Set icon color
+                        painter = painterResource(id = if (selected) screen.icon_focused else screen.icon),
+                        contentDescription = "icon",
+                        tint = if (selected) air_purple else air_awesome_purple_100
                     )
                 },
-                label = { Text(screen.title) },
-                selected = currentRoute == screen.route,
+                label = {
+                    Text(
+                        screen.title,
+                        color = if (selected) air_purple else air_awesome_purple_100
+                    )
+                },
+                selected = selected,
                 onClick = {
                     navController.navigate(screen.route) {
-                        popUpTo = navController.graph.startDestinationId
+                        // Ensure the selected screen is always pushed on top
+//                        popUpTo = navController.graph.startDestinationId
                         launchSingleTop = true
                     }
                 }
@@ -71,42 +81,9 @@ fun BottomBar(
     }
 }
 
-@Composable
-fun BottomBarNewDesign(
-    modifier: Modifier = Modifier,
-    screens: List<BottomScreens.BottomNavigationScreens>,
-    navController: NavController
-) {
 
-    BottomNavigation(
-        modifier = modifier
-    ) {
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentRoute = navBackStackEntry?.destination
 
-        Row(
-            modifier = Modifier
-                .padding(start = 15.dp, end = 15.dp, top = 8.dp, bottom = 15.dp)
-                .background(
-                    air_awesome_light_white,
-                    shape = RoundedCornerShape(35.dp)
-                )
-                .fillMaxWidth()
-                .padding(horizontal = 10.dp)
-                .height(100.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            screens.forEach { screen ->
-                AddItem_(
-                    screen = screen,
-                    currentDestination = currentRoute,
-                    navController = navController
-                )
-            }
-        }
-    }
-}
+
 
 @Composable
 fun AddItem_(
@@ -145,7 +122,8 @@ fun AddItem_(
             androidx.compose.material3.Icon(
                 painter = painterResource(id = if (selected) screen.icon_focused else screen.icon),
                 contentDescription = "icon",
-                tint = Color.White)
+                tint = Color.White
+            )
 
             AnimatedVisibility(visible = selected) {
                 androidx.compose.material3.Text(

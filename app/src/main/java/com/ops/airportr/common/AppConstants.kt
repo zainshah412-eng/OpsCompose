@@ -3,7 +3,7 @@ import java.util.regex.Pattern
 import android.text.InputFilter
 
 import com.ops.airportr.BuildConfig
-object Constants {
+object AppConstants {
 
     const val UAT_SUBSCRIPTION_KEY = BuildConfig.UAT_SUBSCRIPTION_KEY
     const val DEV_SUBSCRIPTION_KEY = BuildConfig.DEV_SUBSCRIPTION_KEY
@@ -131,7 +131,7 @@ object Constants {
      * Base and staging URLS
      */
     const val PRODUCTION_URL_LIVE = BuildConfig.PRODUCTION_URL_ABC_LIVE
-    const val PRODUCTION_URL = BuildConfig.PRODUCTION_URL_ABC_UAT
+    const val PRODUCTION_URL_UAT = BuildConfig.PRODUCTION_URL_ABC_UAT
     const val PRODUCTION_URL_DEV = BuildConfig.PRODUCTION_URL_ABC_DEV
     const val IMAGE_URL_DEV = "https://portrdevimagestorage.blob.core.windows.net/app-images/"
     const val IMAGE_URL_UAT = "https://portruatimagestorage.blob.core.windows.net/app-images/"
@@ -144,13 +144,13 @@ object Constants {
     const val API_END_POINT = "api/"
     const val USER_END_POINT = "User/"
     const val TOKEN_ENDPOINT = "token"
-    const val BOOKING_LIST_API = PRODUCTION_URL + "login"
+    const val BOOKING_LIST_API = PRODUCTION_URL_UAT + "login"
     const val GET_CURRENT_USER_API =
         API_END_POINT + USER_END_POINT + "GetCurrentUser"
     const val GET_CURRENT_USER_API_CCD =
         API_END_POINT + "/" + USER_END_POINT + "GetCurrentUser"
     const val REGISTER_DEVICE = API_END_POINT + "NotificationHub/RegisterFCMV1Device"
-    const val GET_USERS_LIST = PRODUCTION_URL + API_END_POINT + USER_END_POINT + "GetUsers"
+    const val GET_USERS_LIST = PRODUCTION_URL_UAT + API_END_POINT + USER_END_POINT + "GetUsers"
     const val BOOKINGS_LIST_DATA =
         API_END_POINT + "BookingData/GetBookingSummariesMobile"
     const val UPDATE_USER_CURRENT_LOCATION =

@@ -18,18 +18,20 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
-import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
+
 import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -63,8 +65,8 @@ import androidx.navigation.compose.rememberNavController
 import com.ops.airportr.AppApplication
 import com.ops.airportr.BuildConfig
 import com.ops.airportr.R
-import com.ops.airportr.common.Constants
-import com.ops.airportr.common.Constants.GET_CURRENT_USER_API
+import com.ops.airportr.common.AppConstants
+import com.ops.airportr.common.AppConstants.GET_CURRENT_USER_API
 import com.ops.airportr.common.theme.air_awesome_purple_200
 import com.ops.airportr.common.theme.air_orange_dark
 import com.ops.airportr.common.theme.air_purple
@@ -95,6 +97,7 @@ import com.ops.airportr.ui.componts.SnackbarDemo
 import com.ops.airportr.ui.componts.Space
 import kotlinx.coroutines.delay
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
     navHostController: NavHostController,
@@ -173,7 +176,7 @@ fun LoginScreen(
     var showLoader by remember { mutableStateOf(false) }
     val state = viewModel.state.value
     val stateUserDetail = viewModel.stateUserDetail.value
-
+  //  val stateRegisterDevice = viewModel.stateRegisterDevice.value
     if (state.loginResponse?.accessToken != "" && state.loginResponse?.accessToken != null) {
         if (!AppApplication.sessionManager.getBiometricStatus) {
             var loginCredModal = LoginCred(loginCredEmail, loginCredPassword)
@@ -187,20 +190,6 @@ fun LoginScreen(
         viewModel.getUserDetail(
             AppApplication.sessionManager.baseUrl?.url + GET_CURRENT_USER_API
         )
-
-//       navHostController.moveOnNewScreen(Screen.HomeScreen.route, true)
-
-//            viewModel.getUserDetail(
-//                AppApplication.sessionManager.baseUrl?.url + GET_CURRENT_USER_API
-//            )
-//                navHostController.navigate(Screen.HomeScreen.route) {
-//                    launchSingleTop =
-//                        true  // Ensures that if you are already on the HomeScreen, it won't add it again to the stack
-//                }
-//            AppApplication.sessionManager.saveIsLogIn(true)
-//            navHostController.navigate(Screen.HomeScreen.route) {
-//                popUpTo(0) { inclusive = true }
-//            }
     }
 
     if (stateUserDetail.userDetailResponse != null) {
@@ -209,12 +198,34 @@ fun LoginScreen(
                 it1
             )
         }
+        AppApplication.sessionManager.saveIsLogIn(true)
         stateUserDetail.userDetailResponse = null
         stateUserDetail.error = null
         stateUserDetail.isLoading = false
         showLoader = false
         navHostController.moveOnNewScreen(Screen.WelcomeScreen.route, true)
+//        viewModel.registerDevice(
+//            AppApplication.sessionManager.baseUrl?.url + REGISTER_DEVICE,
+//            RegisterDeviceParams(
+//                fcmToken,
+//                AppActionValues.FCM_V1,
+//                AppApplication.sessionManager.userDetails.userId
+//            )
+//        )
     }
+
+//    if (stateRegisterDevice.registerDeviceResponse != null) {
+//        stateUserDetail.userDetailResponse?.user?.let { it1 ->
+//            AppApplication.sessionManager.saveUserDetails(
+//                it1
+//            )
+//        }
+//        stateUserDetail.userDetailResponse = null
+//        stateUserDetail.error = null
+//        stateUserDetail.isLoading = false
+//        showLoader = false
+//        navHostController.moveOnNewScreen(Screen.WelcomeScreen.route, true)
+//    }
 
     ConstraintLayout(
         modifier = Modifier
@@ -451,25 +462,25 @@ fun LoginScreen(
                             var flag = false
                             if (BuildConfig.ENVIRONMENT == "live") {
                                 email = emailId.text
-                                baseUrl = Constants.PRODUCTION_URL_LIVE
+                                baseUrl = AppConstants.PRODUCTION_URL_LIVE
                                 baseUrlEnv = "-live"
-                                subscriptionKey = Constants.LIVE_SUBSCRIPTION_KEY
+                                subscriptionKey = AppConstants.LIVE_SUBSCRIPTION_KEY
                                 flag = true
                             } else {
                                 when {
                                     (emailId.text.trim().contains("-uat")) -> {
                                         email = emailId.text.replace("-uat", "")
-                                        baseUrl = Constants.PRODUCTION_URL
+                                        baseUrl = AppConstants.PRODUCTION_URL_UAT
                                         baseUrlEnv = "-uat"
-                                        subscriptionKey = Constants.UAT_SUBSCRIPTION_KEY
+                                        subscriptionKey = AppConstants.UAT_SUBSCRIPTION_KEY
                                         flag = true
                                     }
 
                                     (emailId.text.trim().contains("-dev")) -> {
                                         email = emailId.text.replace("-dev", "")
-                                        baseUrl = Constants.PRODUCTION_URL
-                                        baseUrlEnv = "-uat"
-                                        subscriptionKey = Constants.UAT_SUBSCRIPTION_KEY
+                                        baseUrl = AppConstants.PRODUCTION_URL_DEV
+                                        baseUrlEnv = "-dev"
+                                        subscriptionKey = AppConstants.DEV_SUBSCRIPTION_KEY
                                         flag = true
                                     }
 
@@ -494,7 +505,7 @@ fun LoginScreen(
                                 loginCredEmail = email
                                 loginCredPassword = password.text
                                 callForApiToken(
-                                    baseUrl + Constants.TOKEN_ENDPOINT,
+                                    baseUrl + AppConstants.TOKEN_ENDPOINT,
                                     email,
                                     password.text,
                                     viewModel,
@@ -510,7 +521,6 @@ fun LoginScreen(
                 containerColor = if (emailId.text.isNotEmpty() && password.text.isNotEmpty()) air_purple else air_purple_awesome_light,
                 textColor = if (emailId.text.isNotEmpty() && password.text.isNotEmpty()) white else air_awesome_purple_200,
                 isEnabled = emailId.text.isNotEmpty() && password.text.isNotEmpty()
-
             )
             Space(height = 20, width = 0)
 
@@ -585,6 +595,16 @@ fun LoginScreen(
         showLoader = true
         LoaderDialog(showDialog = showLoader)
     }
+//
+//    if (stateRegisterDevice.error != null) {
+//        errorMessage = state.error ?: context.getString(R.string.no_internet)
+//        snackBarShowFlag = true
+//    }
+//    if (stateRegisterDevice.isLoading) {
+//        Log.wtf("StateLoadingDetail", "Called")
+//        showLoader = true
+//        LoaderDialog(showDialog = showLoader)
+//    }
 
 }
 
@@ -710,28 +730,35 @@ fun CustomDropdownMenuForLanguageChange(
                     onClick = {
                         selectedIndex = index
                         expand = false
-                        stroke = if (expand) 2 else 1
-                        onSelected(selectedIndex)
-                        changeLanguage(item, context)
+                        stroke = if (expand) 2 else 1 // Ensure `stroke` logic is meaningful
+                        onSelected(selectedIndex) // Notify about the selected index
+                        changeLanguage(item, context) // Update language
+                    },
+                    text = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            // Flag Image
+                            Image(
+                                painter = painterResource(id = item.flag),
+                                contentDescription = "language",
+                                modifier = Modifier
+                                    .size(41.dp) // Use fixed size for consistency
+                                    .padding(end = 8.dp) // Space between image and text
+                            )
+
+                            // Language Text
+                            Text(
+                                text = item.languageName,
+                                fontFamily = fonts,
+                                style = customTextLabelStyle,
+                                fontSize = 16.sp
+                            )
+                        }
                     }
-                ) {
-                    Row {
-                        Image(
-                            painter = painterResource(id = item.flag), // Replace with your image resource
-                            contentDescription = "language",
-                            modifier = Modifier
-                                .size(width = 41.dp, height = 41.dp)
-                                .padding(vertical = 10.dp),
-                        )
-                        Text(
-                            text = item.languageName,
-                            fontFamily = fonts,
-                            style = customTextLabelStyle,
-                            fontSize = 16.sp,
-                            modifier = Modifier.padding(vertical = 10.dp)
-                        )
-                    }
-                }
+                )
+
             }
         }
 
