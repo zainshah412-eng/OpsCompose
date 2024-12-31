@@ -17,5 +17,7 @@ object Graph {
     const val PROFILE_DETAIL = "profile_details"
     const val WHATS_NEW = "whatsnew"
     const val GIVE_FEEDBACK = "give_feedback"
+    const val SEARCH_BOOKING = "search_booking"
+    const val BOOKING_DETAIL = "booking_detail"
 
 }

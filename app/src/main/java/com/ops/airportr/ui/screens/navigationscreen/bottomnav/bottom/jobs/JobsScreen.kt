@@ -1,5 +1,6 @@
 package com.ops.airportr.ui.screens.navigationscreen.bottomnav.bottom.jobs
 
+import android.app.Activity
 import android.app.DatePickerDialog
 import android.content.Context
 import android.util.Log
@@ -8,6 +9,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -84,13 +86,19 @@ import com.ops.airportr.common.theme.dark_blue
 import com.ops.airportr.common.theme.navigationBarColor
 import com.ops.airportr.common.theme.white
 import com.ops.airportr.common.utils.changeDateFormat
+import com.ops.airportr.common.utils.moveOnNewScreen
+import com.ops.airportr.common.utils.returnBackGroundColor
+import com.ops.airportr.common.utils.returnLabelAirPurple100Color
+import com.ops.airportr.common.utils.returnLabelAirPurpleColor
+import com.ops.airportr.common.utils.returnLabelDarkBlueColor
 import com.ops.airportr.common.utils.urlForAcceptance
 import com.ops.airportr.domain.model.joblist.retrievejobs.params.RetrieveJobsParams
 import com.ops.airportr.domain.model.joblist.retrievejobs.response.RetrieveJob
 import com.ops.airportr.domain.model.user.User
+import com.ops.airportr.route.Screen
 import com.ops.airportr.ui.componts.CustomButton
 import com.ops.airportr.ui.componts.LoaderDialog
-import com.ops.airportr.ui.screens.navigationscreen.bottomnav.bottom.jobs.item.jobsList
+import com.ops.airportr.ui.screens.navigationscreen.bottomnav.bottom.jobs.item.UpComingAndCompletedJobItem
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -106,7 +114,10 @@ fun JobsScreen(
     navController: NavController,
     navHostController: NavHostController,
 ) {
+    val activity = LocalContext.current as? Activity
     val context = LocalContext.current
+    val isDarkTheme = isSystemInDarkTheme()
+
     var sdf: SimpleDateFormat? = SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH)
 
     var upComingShowFlag by remember { mutableStateOf(true) }
@@ -296,24 +307,25 @@ fun JobsScreen(
                 topEnd = CornerSize(20.dp),
                 topStart = CornerSize(20.dp)
             ), // Rounded top corners only
-            sheetBackgroundColor = white // Optional: custom background color
+            sheetBackgroundColor = returnBackGroundColor(isDarkTheme) // Optional: custom background color
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(navigationBarColor)
+                    .background(returnBackGroundColor(isDarkTheme))
                     .padding(paddingValues)
             ) {
                 ConstraintLayout(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(white)
+                        .background(returnBackGroundColor(isDarkTheme))
                 ) {
                     val (title, scannerImg, searchImg, filterImg, selectorBox,
                         upComingText, upComingCount, completedText, completedCount, jobListBox) = createRefs()
                     Text(
                         text = stringResource(id = R.string.jobs),
-                        style = customTextHeadingStyle,
+                        style = androidx.compose.material3.MaterialTheme.typography.labelLarge,
+                        color = returnLabelDarkBlueColor(isDarkTheme),
                         fontSize = 35.sp,
                         modifier = Modifier
                             .constrainAs(title) {
@@ -355,7 +367,11 @@ fun JobsScreen(
                             }
                             .padding(top = 14.dp)
                             .height(40.dp)
-                            .width(40.dp), // make the image background transparent
+                            .width(40.dp)
+                            .clickable {
+                                navHostController.moveOnNewScreen(Screen.SearchBooking.route, false)
+
+                            }, // make the image background transparent
                         contentScale = ContentScale.Inside // scale the image to fill the Box
                     )
 
@@ -381,7 +397,7 @@ fun JobsScreen(
                                 end.linkTo(parent.end)
                             }
                             .fillMaxWidth()
-                            .background(white)
+                            .background(returnBackGroundColor(isDarkTheme))
                             .height(70.dp)
                     )
                     {
@@ -417,7 +433,8 @@ fun JobsScreen(
                                         text = stringResource(id = R.string.upcoming),
                                         style = customTextLabelSmallStyle, // Use your custom text style here
                                         fontSize = 10.sp,
-                                        color = if (upComingShowFlag) air_purple else air_awesome_purple_100, // Replace with your desired color
+                                        color = if (upComingShowFlag) returnLabelAirPurpleColor(isDarkTheme)
+                                        else returnLabelAirPurple100Color(isDarkTheme), // Replace with your desired color
                                     )
 
 
@@ -431,7 +448,8 @@ fun JobsScreen(
                                                 }
                                                 .offset(x = 4.dp) // Equivalent to layout_marginStart
                                                 .background(
-                                                    color = air_purple, // Replace with your badge background color
+                                                    color = if (upComingShowFlag) returnLabelAirPurpleColor(isDarkTheme)
+                                                    else returnLabelAirPurple100Color(isDarkTheme), // Replace with your badge background color
                                                     shape = RoundedCornerShape(8.dp) // Adjust radius as needed
                                                 )
                                                 .padding(
@@ -492,7 +510,8 @@ fun JobsScreen(
                                         text = stringResource(id = R.string.completed),
                                         style = customTextLabelSmallStyle, // Use your custom text style here
                                         fontSize = 10.sp,
-                                        color = if (!upComingShowFlag) air_purple else air_awesome_purple_100, // Replace with your desired color
+                                        color = if (!upComingShowFlag) returnLabelAirPurpleColor(isDarkTheme)
+                                        else returnLabelAirPurple100Color(isDarkTheme), // Replace with your desired color
                                     )
 
 
@@ -506,7 +525,8 @@ fun JobsScreen(
                                                 }
                                                 .offset(x = 4.dp) // Equivalent to layout_marginStart
                                                 .background(
-                                                    color = air_purple, // Replace with your badge background color
+                                                    color = if (!upComingShowFlag) returnLabelAirPurpleColor(isDarkTheme)
+                                                    else returnLabelAirPurple100Color(isDarkTheme), // Replace with your badge background color
                                                     shape = RoundedCornerShape(8.dp) // Adjust radius as needed
                                                 )
                                                 .padding(
@@ -563,10 +583,10 @@ fun JobsScreen(
                             upCompletedBookingCount = retrieveJobsArrayCompleted.value.size
 
                             if (upComingShowFlag) {
-                                jobsList(context, onClick = {
+                                UpComingAndCompletedJobItem(context, onClick = {
                                 }, itemAtPos = retrieveJobsArrayUpcoming)
                             } else {
-                                jobsList(context, onClick = {
+                                UpComingAndCompletedJobItem(context, onClick = {
                                 }, itemAtPos = retrieveJobsArrayCompleted)
                             }
                         } else {
@@ -597,7 +617,7 @@ fun JobsScreen(
                                     style = customTextHeadingStyle, // Use your custom text style here
                                     fontWeight = FontWeight.ExtraBold,
                                     fontSize = 18.sp,
-                                    color = dark_blue// Replace with your desired color
+                                    color = returnLabelDarkBlueColor(isDarkTheme)// Replace with your desired color
                                 )
                                 Text(
                                     modifier = Modifier
@@ -874,6 +894,7 @@ fun OnFilterSheet(
     startDate: String = "",
     endDate: String = ""
 ) {
+    val isDarkTheme = isSystemInDarkTheme()
 
     val scrollState = rememberScrollState()
 
@@ -885,9 +906,9 @@ fun OnFilterSheet(
     ) {
         Text(
             text = stringResource(id = R.string.filter),
-            style = MaterialTheme.typography.h6,
-            fontFamily = FontFamily(Font(R.font.objective_bold)),
-            fontSize = 24.sp
+            style = androidx.compose.material3.MaterialTheme.typography.labelLarge,
+            fontSize = 24.sp,
+            color = returnLabelDarkBlueColor(isDarkTheme)
         )
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -899,10 +920,9 @@ fun OnFilterSheet(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = stringResource(id = R.string.start_date),
-                    style = MaterialTheme.typography.body2,
-                    fontFamily = FontFamily(Font(R.font.objective_regular)),
-                    fontSize = 12.sp,
-                    color = dark_blue
+                    style = androidx.compose.material3.MaterialTheme.typography.labelSmall,
+                    fontSize = 14.sp,
+                    color = returnLabelDarkBlueColor(isDarkTheme)
                 )
 
                 // Start Date Picker
@@ -926,16 +946,15 @@ fun OnFilterSheet(
                             imageVector = Icons.Default.DateRange,
                             contentDescription = "Start Date",
                             modifier = Modifier.size(18.dp),
-                            tint = dark_blue
+                            tint = returnLabelDarkBlueColor(isDarkTheme)
                         )
                         Text(
                             text = if (startDate.equals("")) stringResource(id = R.string.start_date) else startDate,
                             modifier = Modifier
                                 .padding(start = 8.dp),
-                            style = MaterialTheme.typography.body2,
-                            fontFamily = FontFamily(Font(R.font.objective_regular)),
-                            fontSize = 12.sp,
-                            color = dark_blue
+                            style = androidx.compose.material3.MaterialTheme.typography.labelSmall,
+                            fontSize = 14.sp,
+                            color = returnLabelDarkBlueColor(isDarkTheme)
                         )
                     }
                 }
@@ -947,10 +966,9 @@ fun OnFilterSheet(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = stringResource(id = R.string.end_date),
-                    style = MaterialTheme.typography.body2,
-                    fontFamily = FontFamily(Font(R.font.objective_regular)),
-                    fontSize = 12.sp,
-                    color = dark_blue
+                    style = androidx.compose.material3.MaterialTheme.typography.labelSmall,
+                    fontSize = 14.sp,
+                    color = returnLabelDarkBlueColor(isDarkTheme)
                 )
 
                 // End Date Picker
@@ -974,16 +992,15 @@ fun OnFilterSheet(
                             imageVector = Icons.Default.DateRange,
                             contentDescription = "End Date",
                             modifier = Modifier.size(18.dp),
-                            tint = dark_blue
+                            tint = returnLabelDarkBlueColor(isDarkTheme)
                         )
                         Text(
                             text = if (endDate.equals("")) stringResource(id = R.string.end_date) else endDate,
                             modifier = Modifier
                                 .padding(start = 8.dp),
-                            style = MaterialTheme.typography.body2,
-                            fontFamily = FontFamily(Font(R.font.objective_regular)),
-                            fontSize = 12.sp,
-                            color = dark_blue
+                            style = androidx.compose.material3.MaterialTheme.typography.labelSmall,
+                            fontSize = 14.sp,
+                            color = returnLabelDarkBlueColor(isDarkTheme)
                         )
                     }
                 }
@@ -1001,17 +1018,15 @@ fun OnFilterSheet(
             // Airport Section
             Text(
                 text = stringResource(id = R.string.air_port),
-                style = MaterialTheme.typography.body2,
-                fontFamily = FontFamily(Font(R.font.objective_regular)),
-                fontSize = 12.sp,
-                color = dark_blue
+                style = androidx.compose.material3.MaterialTheme.typography.labelSmall,
+                fontSize = 14.sp,
+                color = returnLabelDarkBlueColor(isDarkTheme)
             )
             Text(
                 text = "0 Selected",
-                style = MaterialTheme.typography.body2,
-                fontFamily = FontFamily(Font(R.font.objective_bold)),
-                fontSize = 12.sp,
-                color = air_purple
+                style = androidx.compose.material3.MaterialTheme.typography.labelSmall,
+                fontSize = 14.sp,
+                color = returnLabelAirPurpleColor(isDarkTheme)
             )
         }
 
@@ -1025,10 +1040,9 @@ fun OnFilterSheet(
         ) {
             Text(
                 text = stringResource(id = R.string.show_cancelled_booking),
-                style = MaterialTheme.typography.body2,
-                fontFamily = FontFamily(Font(R.font.objective_regular)),
-                fontSize = 12.sp,
-                color = dark_blue
+                style = androidx.compose.material3.MaterialTheme.typography.labelSmall,
+                fontSize = 16.sp,
+                color = returnLabelDarkBlueColor(isDarkTheme)
             )
 
             Switch(
@@ -1099,7 +1113,7 @@ fun OnFilterSheet(
                     paddingTop = 10,
                     paddingHorizontal = 0,
                     modifier = Modifier.height(60.dp),
-                    containerColor = dark_blue,
+                    containerColor = returnLabelDarkBlueColor(isDarkTheme),
                     textColor = white,
                     isEnabled = true
                 )

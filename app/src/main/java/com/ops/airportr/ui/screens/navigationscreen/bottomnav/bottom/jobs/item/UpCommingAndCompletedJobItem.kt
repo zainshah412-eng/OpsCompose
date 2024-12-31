@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -17,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -36,32 +38,34 @@ import androidx.constraintlayout.compose.Dimension
 import com.ops.airportr.AppApplication
 import com.ops.airportr.R
 import com.ops.airportr.common.AppActionValues
-import com.ops.airportr.common.theme.air_awesome_purple_100
-import com.ops.airportr.common.theme.air_green_low_light
-import com.ops.airportr.common.theme.air_orange_lite
 import com.ops.airportr.common.theme.air_purple
 import com.ops.airportr.common.theme.air_red
 import com.ops.airportr.common.theme.air_yellow
+import com.ops.airportr.common.theme.badgeTextColor
 import com.ops.airportr.common.theme.customEditTextColorDarkTheme
-import com.ops.airportr.common.theme.customTextDescriptionStyle
-import com.ops.airportr.common.theme.customTextHeadingStyle
 import com.ops.airportr.common.theme.customTextLabelSmallStyle
-import com.ops.airportr.common.theme.dark_blue
+import com.ops.airportr.common.theme.editTextBorderStrockColor
 import com.ops.airportr.common.theme.light_white
 import com.ops.airportr.common.theme.white
+import com.ops.airportr.common.utils.abcTagBackGroundColor
 import com.ops.airportr.common.utils.convertIntoDateTimeFormat
 import com.ops.airportr.common.utils.convertIntoRelativeDateWithTimeSlot
+import com.ops.airportr.common.utils.overSizeBagTagBackGroundColor
+import com.ops.airportr.common.utils.returnBackGroundColor
+import com.ops.airportr.common.utils.returnLabelAirPurple100Color
+import com.ops.airportr.common.utils.returnLabelDarkBlueColor
 import com.ops.airportr.domain.model.joblist.retrievejobs.response.FlightStatusInformation
 import com.ops.airportr.domain.model.joblist.retrievejobs.response.Passenger
 import com.ops.airportr.domain.model.joblist.retrievejobs.response.RetrieveJob
 import com.ops.airportr.ui.componts.Space
 
 @Composable
-fun jobsList(
+fun UpComingAndCompletedJobItem(
     context: Context,
     onClick: (item: RetrieveJob) -> kotlin.Unit,
     itemAtPos: MutableState<ArrayList<RetrieveJob>>
 ) {
+    val isDarkTheme = isSystemInDarkTheme()
     LazyColumn {
         items(itemAtPos.value) { itemAtPos ->
             Box(
@@ -72,7 +76,7 @@ fun jobsList(
                 ConstraintLayout(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(white)
+                        .background(returnBackGroundColor(isDarkTheme))
                         .padding(10.dp)
                         .clickable {
                             onClick(itemAtPos)
@@ -98,15 +102,19 @@ fun jobsList(
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(5.dp)) // Apply rounded corners
-                                    .background(air_green_low_light) // Set background color
-                                    .border(0.dp, air_green_low_light, RoundedCornerShape(5.dp))
-                                    .padding(6.dp)
+                                    .background(abcTagBackGroundColor(isDarkTheme)) // Set background color
+                                    .border(
+                                        0.dp,
+                                        abcTagBackGroundColor(isDarkTheme),
+                                        RoundedCornerShape(5.dp)
+                                    )
+                                    .padding(top = 6.dp, bottom = 6.dp, start = 10.dp, end = 10.dp)
 
                             ) {
                                 Text(
                                     text = "ABC",
-                                    color = customEditTextColorDarkTheme, // Text color
-                                    style = customTextLabelSmallStyle, // Use your custom text style
+                                    color = if (isDarkTheme) badgeTextColor else customEditTextColorDarkTheme, // Text color
+                                    style = MaterialTheme.typography.labelSmall, // Use your custom text style
                                     fontSize = 10.sp,
                                     modifier = Modifier.align(Alignment.Center)
                                 )
@@ -114,6 +122,7 @@ fun jobsList(
                             Space(height = 0, width = 5)
                         }
                         if (itemAtPos.bookingInformation?.isCancelled == true) {
+
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(5.dp)) // Apply rounded corners
@@ -133,6 +142,7 @@ fun jobsList(
                             Space(height = 0, width = 5)
                         }
                         if (itemAtPos.jobs?.get(0)?.jobType == AppActionValues.REPATRAITION_ACTION_VALUE) {
+
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(5.dp)) // Apply rounded corners
@@ -162,15 +172,19 @@ fun jobsList(
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(5.dp)) // Apply rounded corners
-                                    .background(air_orange_lite) // Set background color
-                                    .border(0.dp, air_orange_lite, RoundedCornerShape(5.dp))
+                                    .background(overSizeBagTagBackGroundColor(isDarkTheme)) // Set background color
+                                    .border(
+                                        0.dp,
+                                        overSizeBagTagBackGroundColor(isDarkTheme),
+                                        RoundedCornerShape(5.dp)
+                                    )
                                     .padding(6.dp)
 
                             ) {
                                 Text(
                                     text = stringResource(id = R.string.oversize),
-                                    color = customEditTextColorDarkTheme, // Text color
-                                    style = customTextLabelSmallStyle, // Use your custom text style
+                                    color = if (isDarkTheme) badgeTextColor else customEditTextColorDarkTheme, // Text color
+                                    style = MaterialTheme.typography.labelSmall, // Use your custom text style
                                     fontSize = 10.sp,
                                     modifier = Modifier.align(Alignment.Center)
                                 )
@@ -233,7 +247,7 @@ fun jobsList(
                         ConstraintLayout(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(white)
+                                .background(returnBackGroundColor(isDarkTheme))
                         ) {
                             if (itemAtPos.bookingInformation?.passengers?.size!! > 0) {
                                 Text(
@@ -252,9 +266,9 @@ fun jobsList(
                                         itemAtPos.bookingInformation!!.passengers!![0].lastName
                                             ?: ""
                                     ),
-                                    style = customTextLabelSmallStyle, // Use your custom text style here
-                                    fontSize = 14.sp,
-                                    color = dark_blue, // Replace with your desired color
+                                    style = MaterialTheme.typography.labelMedium, // Use your custom text style here
+                                    fontSize = 18.sp,
+                                    color = returnLabelDarkBlueColor(isDarkTheme), // Replace with your desired color
                                 )
                             } else {
                                 Text(
@@ -273,9 +287,9 @@ fun jobsList(
                                         itemAtPos.bookingInformation!!.bookingCreatorUser?.lastName
                                             ?: ""
                                     ),
-                                    style = customTextLabelSmallStyle, // Use your custom text style here
-                                    fontSize = 14.sp,
-                                    color = dark_blue, // Replace with your desired color
+                                    style = MaterialTheme.typography.labelMedium, // Use your custom text style here
+                                    fontSize = 18.sp,
+                                    color = returnLabelDarkBlueColor(isDarkTheme), // Replace with your desired color
                                 )
                             }
 
@@ -298,12 +312,12 @@ fun jobsList(
                                                 top.linkTo(tvPassengerTitle.bottom)
                                                 end.linkTo(parent.end)
                                             }
-                                            .padding(top = 5.dp, start = 10.dp),
+                                            .padding(top = 2.dp, start = 10.dp),
                                         textAlign = TextAlign.Start,
                                         text = noOBagsRepatriate.toString(),
-                                        style = customTextLabelSmallStyle, // Use your custom text style here
-                                        fontSize = 18.sp,
-                                        color = dark_blue, // Replace with your desired color
+                                        style = MaterialTheme.typography.labelLarge, // Use your custom text style here
+                                        fontSize = 22.sp,
+                                        color = returnLabelDarkBlueColor(isDarkTheme), // Replace with your desired color
                                     )
                                 } else {
                                     Text(
@@ -315,9 +329,9 @@ fun jobsList(
                                             .padding(top = 5.dp, start = 10.dp),
                                         textAlign = TextAlign.Start,
                                         text = noOBagsRepatriate.toString(),
-                                        style = customTextLabelSmallStyle, // Use your custom text style here
-                                        fontSize = 18.sp,
-                                        color = dark_blue, // Replace with your desired color
+                                        style = MaterialTheme.typography.labelLarge, // Use your custom text style here
+                                        fontSize = 22.sp,
+                                        color = returnLabelDarkBlueColor(isDarkTheme), // Replace with your desired color
                                     )
                                 }
                             } else {
@@ -330,9 +344,9 @@ fun jobsList(
                                         .padding(top = 5.dp, start = 10.dp),
                                     textAlign = TextAlign.Start,
                                     text = itemAtPos.bookingInformation!!.totalBookedBags.toString(),
-                                    style = customTextLabelSmallStyle, // Use your custom text style here
-                                    fontSize = 18.sp,
-                                    color = dark_blue, // Replace with your desired color
+                                    style = MaterialTheme.typography.labelLarge, // Use your custom text style here
+                                    fontSize = 22.sp,
+                                    color = returnLabelDarkBlueColor(isDarkTheme), // Replace with your desired color
                                 )
 
                             }
@@ -348,7 +362,7 @@ fun jobsList(
                                     }
                                     .height(dimensionResource(id = R.dimen._35sdp))
                                     .width(dimensionResource(id = R.dimen._35sdp)), // make the image background transparent
-                                contentScale = ContentScale.Inside // scale the image to fill the Box
+                                contentScale = ContentScale.FillWidth // scale the image to fill the Box
                             )
                             Text(
                                 modifier = Modifier
@@ -362,9 +376,9 @@ fun jobsList(
                                     .padding(top = 5.dp),
                                 textAlign = TextAlign.Start,
                                 text = itemAtPos.bookingInformation!!.bookingReference ?: "",
-                                style = customTextDescriptionStyle, // Use your custom text style here
-                                fontSize = 18.sp,
-                                color = air_awesome_purple_100, // Replace with your desired color
+                                style = MaterialTheme.typography.labelSmall, // Use your custom text style here
+                                fontSize = 22.sp,
+                                color = returnLabelAirPurple100Color(isDarkTheme), // Replace with your desired color
                             )
 
                             if (itemAtPos.jobs?.get(0)?.jobType == 6) {
@@ -393,10 +407,9 @@ fun jobsList(
                                                         )
                                                     }
                                             },
-                                        style = customTextHeadingStyle, // Use your custom text style here
-                                        fontWeight = FontWeight.ExtraBold,
-                                        fontSize = 18.sp,
-                                        color = dark_blue// Replace with your desired color
+                                        style = MaterialTheme.typography.displayLarge, // Use your custom text style here
+                                        fontSize = 22.sp,
+                                        color = returnLabelDarkBlueColor(isDarkTheme)// Replace with your desired color
                                     )
                                 } else {
                                     val time =
@@ -423,10 +436,10 @@ fun jobsList(
                                             .fillMaxWidth(),
                                         textAlign = TextAlign.Start,
                                         text = time ?: "",
-                                        style = customTextHeadingStyle, // Use your custom text style here
+                                        style = MaterialTheme.typography.displayLarge, // Use your custom text style here
                                         fontWeight = FontWeight.ExtraBold,
-                                        fontSize = 18.sp,
-                                        color = dark_blue// Replace with your desired color
+                                        fontSize = 22.sp,
+                                        color = returnLabelDarkBlueColor(isDarkTheme)// Replace with your desired color
                                     )
                                 }
                             } else {
@@ -446,35 +459,17 @@ fun jobsList(
                                         .fillMaxWidth(),
                                     textAlign = TextAlign.Start,
                                     text = time ?: "",
-                                    style = customTextHeadingStyle, // Use your custom text style here
+                                    style = MaterialTheme.typography.displayLarge, // Use your custom text style here
                                     fontWeight = FontWeight.ExtraBold,
-                                    fontSize = 18.sp,
-                                    color = dark_blue// Replace with your desired color
+                                    fontSize = 22.sp,
+                                    color = returnLabelDarkBlueColor(isDarkTheme)// Replace with your desired color
                                 )
                             }
 
-
-
-                            Text(
-                                modifier = Modifier
-                                    .constrainAs(tvAddress) {
-                                        top.linkTo(tvDateTime.bottom)
-                                        start.linkTo(parent.start)
-                                        end.linkTo(parent.end)
-                                    }
-                                    .padding(top = 5.dp)
-                                    .fillMaxWidth(),
-                                textAlign = TextAlign.Start,
-                                text = itemAtPos.bookingInformation!!.collectionLocation?.addressPostCode
-                                    ?: "",
-                                style = customTextLabelSmallStyle, // Use your custom text style here
-                                fontSize = 12.sp,
-                                color = air_awesome_purple_100, // Replace with your desired color
-                            )
                             Text(
                                 modifier = Modifier
                                     .constrainAs(tvAddressNumber) {
-                                        top.linkTo(tvAddress.bottom)
+                                        top.linkTo(tvDateTime.bottom)
                                         start.linkTo(parent.start)
                                         end.linkTo(parent.end)
                                     }
@@ -489,10 +484,28 @@ fun jobsList(
                                     itemAtPos.bookingInformation!!.collectionLocation?.addressLine2
                                         ?: ""
                                 ),
-                                style = customTextLabelSmallStyle, // Use your custom text style here
-                                fontSize = 12.sp,
-                                color = air_awesome_purple_100, // Replace with your desired color
+                                style = MaterialTheme.typography.labelMedium, // Use your custom text style here
+                                fontSize = 16.sp,
+                                color = returnLabelAirPurple100Color(isDarkTheme), // Replace with your desired color
                             )
+
+                            Text(
+                                modifier = Modifier
+                                    .constrainAs(tvAddress) {
+                                        top.linkTo(tvAddressNumber.bottom)
+                                        start.linkTo(parent.start)
+                                        end.linkTo(parent.end)
+                                    }
+                                    .padding(top = 5.dp)
+                                    .fillMaxWidth(),
+                                textAlign = TextAlign.Start,
+                                text = itemAtPos.bookingInformation!!.collectionLocation?.addressPostCode
+                                    ?: "",
+                                style = MaterialTheme.typography.labelMedium, // Use your custom text style here
+                                fontSize = 16.sp,
+                                color = returnLabelAirPurple100Color(isDarkTheme), // Replace with your desired color
+                            )
+
                         }
 
                     }
@@ -501,7 +514,9 @@ fun jobsList(
 
             }
             Divider(
-                color = light_white
+                thickness = 0.5.dp, // Adjust this value for thickness
+                modifier = Modifier.fillMaxWidth(),
+                color = if(isDarkTheme)editTextBorderStrockColor  else light_white
             )
         }
     }
@@ -513,7 +528,7 @@ fun onReturnCheckedInFlag(
     itemAtPos: ArrayList<Passenger>,
     flightStatusInformation: FlightStatusInformation,
     jobActivityStatus: Int, jobType: Int
-): Boolean{
+): Boolean {
     var passengerCheckedInFlag = false
     if (jobType == AppActionValues.ACCEPTANCE_ACTION_VALUE) {
         for (obj in itemAtPos) {

@@ -84,7 +84,7 @@ import com.ops.airportr.common.theme.customTextDescriptionStyle
 import com.ops.airportr.common.theme.customTextHeadingStyle
 import com.ops.airportr.common.theme.customTextLabelStyle
 import com.ops.airportr.common.theme.dark_blue
-import com.ops.airportr.common.theme.fonts
+import com.ops.airportr.common.theme.fontsRegular
 import com.ops.airportr.common.theme.grey
 import com.ops.airportr.common.theme.light_orange_new
 import com.ops.airportr.common.theme.purple_100
@@ -177,7 +177,6 @@ fun ResetPasswordScreen(
             Space(height = 70, width = 0)
             Text(
                 text = stringResource(id = R.string.password_reset),
-                fontFamily = fonts,
                 style = customTextHeadingStyle,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
@@ -186,7 +185,6 @@ fun ResetPasswordScreen(
             Space(height = 10, width = 0)
             Text(
                 text = stringResource(id = R.string.reset_password_msg),
-                fontFamily = fonts,
                 style = customTextDescriptionStyle,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
@@ -231,7 +229,6 @@ fun ResetPasswordScreen(
             Space(height = 50, width = 0)
             Text(
                 text = stringResource(id = R.string.email),
-                fontFamily = fonts,
                 style = customTextLabelStyle,
                 fontSize = 16.sp,
                 modifier = Modifier
@@ -253,7 +250,6 @@ fun ResetPasswordScreen(
                 label = {
                     Text(
                         text = stringResource(id = R.string.enter_email),
-                        fontFamily = fonts
                     )
                 },
 
@@ -261,11 +257,10 @@ fun ResetPasswordScreen(
                 placeholder = {
                     Text(
                         text = stringResource(id = R.string.enter_email),
-                        fontFamily = fonts
                     )
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                textStyle = androidx.compose.ui.text.TextStyle(fontFamily = fonts),
+                textStyle = androidx.compose.ui.text.TextStyle(fontFamily = fontsRegular),
                 colors = outlinedTextFieldColors
             )
             Space(height = 16, width = 0)

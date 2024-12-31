@@ -1,9 +1,11 @@
 package com.ops.airportr.ui.screens.profile
 
+import android.app.Activity
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,12 +14,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -29,7 +31,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
 import androidx.navigation.NavHostController
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.WriterException
@@ -37,11 +38,12 @@ import com.google.zxing.common.BitMatrix
 import com.google.zxing.qrcode.QRCodeWriter
 import com.ops.airportr.AppApplication
 import com.ops.airportr.R
-import com.ops.airportr.common.theme.air_awesome_purple_100
 import com.ops.airportr.common.theme.air_purple
-import com.ops.airportr.common.theme.customTextHeadingStyle
 import com.ops.airportr.common.theme.dark_blue
-import com.ops.airportr.common.theme.white
+import com.ops.airportr.common.utils.getCurrentTimeStampIntoFormat
+import com.ops.airportr.common.utils.returnBackGroundColor
+import com.ops.airportr.common.utils.returnLabelAirPurple100Color
+import com.ops.airportr.common.utils.returnLabelDarkBlueColor
 import com.ops.airportr.domain.model.user.User
 
 private lateinit var user: User
@@ -51,7 +53,9 @@ fun PortrCodeScreen(
     navHostController: NavHostController,
     modifier: Modifier = Modifier
 ) {
+    val activity = LocalContext.current as? Activity
     val context = LocalContext.current
+    val isDarkTheme = isSystemInDarkTheme()
 
 
     try {
@@ -66,7 +70,7 @@ fun PortrCodeScreen(
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
-            .background(white)
+            .background(returnBackGroundColor(isDarkTheme))
     ) {
         val (topBar, userName, userType, qrCode, refresh) = createRefs()
         Row(modifier = Modifier
@@ -78,7 +82,7 @@ fun PortrCodeScreen(
             .height(dimensionResource(id = R.dimen._60sdp))
             .fillMaxSize()
             .shadow(elevation = 12.dp)
-            .background(Color.White),
+            .background(returnBackGroundColor(isDarkTheme)),
             verticalAlignment = Alignment.CenterVertically) {
             Image(
                 painter = painterResource(id = R.drawable.back_arrow),
@@ -88,15 +92,16 @@ fun PortrCodeScreen(
                     .height(30.dp)
                     .width(30.dp)
                     .clickable {
-
+                        navHostController.popBackStack()
                     }, // make the image background transparent
                 contentScale = ContentScale.Inside, // scale the image to fill the Box
-                colorFilter = ColorFilter.tint(dark_blue)
+                colorFilter = ColorFilter.tint(returnLabelDarkBlueColor(isDarkTheme))
             )
 
             Text(
                 text = stringResource(id = R.string.PortrCode),
-                style = customTextHeadingStyle,
+                style = MaterialTheme.typography.labelSmall,
+                color = returnLabelDarkBlueColor(isDarkTheme),
                 fontSize = 18.sp,
                 modifier = Modifier
                     .padding(14.dp),
@@ -109,7 +114,8 @@ fun PortrCodeScreen(
                 user.firstName ?: "",
                 user.lastName ?: ""
             ),
-            style = customTextHeadingStyle,
+            style = MaterialTheme.typography.labelLarge,
+            color = returnLabelDarkBlueColor(isDarkTheme),
             textAlign = TextAlign.Center,
             fontSize = 25.sp,
             modifier = Modifier
@@ -126,9 +132,9 @@ fun PortrCodeScreen(
                 user.userRoles[0].description ?: "",
                 ""
             ),
-            style = customTextHeadingStyle,
+            style = MaterialTheme.typography.labelLarge,
+            color = returnLabelAirPurple100Color(isDarkTheme),
             fontSize = 15.sp,
-            color = air_awesome_purple_100,
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .constrainAs(userType) {
@@ -148,7 +154,13 @@ fun PortrCodeScreen(
                 .fillMaxWidth(), // Replace with dimension resource if needed
             contentAlignment = Alignment.Center
         ) {
-            QRCodeGenerator("Airportr",300)
+            QRCodeGenerator(
+                stringResource(
+                    id = R.string.portr_code_generator,
+                    user.userId ?: "",
+                    getCurrentTimeStampIntoFormat()
+                ), 300
+            )
         }
 
         Image(

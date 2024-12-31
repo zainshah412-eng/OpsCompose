@@ -6,9 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ops.airportr.common.network.Either
 import com.ops.airportr.common.network.Resource
-import com.ops.airportr.domain.model.joblist.retrievejobs.params.RetrieveJobsParams
 import com.ops.airportr.domain.model.registerdevice.RegisterDeviceParams
-import com.ops.airportr.domain.use_case.RegisterDeviceUseCase
+import com.ops.airportr.domain.use_case.login.RegisterDeviceUseCase
 import com.ops.airportr.domain.use_case.login.GetAuthUseCase
 import com.ops.airportr.domain.use_case.login.GetUserDetailUseCase
 import com.ops.airportr.ui.screens.loginscreen.states.LoginState

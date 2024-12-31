@@ -11,7 +11,9 @@ import com.ops.airportr.domain.model.resetpassword.ResetPasswordParam
 import com.ops.airportr.domain.model.resetpassword.ResetPasswordResponse
 import com.ops.airportr.domain.model.registerdevice.RegisterDeviceParams
 import com.ops.airportr.domain.model.registerdevice.response.RegisterDeviceResponse
+import com.ops.airportr.domain.model.searchbooking.BookingDetail
 import com.ops.airportr.domain.model.user.UserDetails
+import com.ops.airportr.domain.model.whatsnew.WhatsNewResponse
 import com.ops.airportr.domain.repository.CoinRepository
 import retrofit2.HttpException
 import javax.inject.Inject
@@ -177,6 +179,66 @@ class CoinRepositoryImpl @Inject constructor(
             Either.Error(errorResponse ?: ApiError("unknown_error", e.message(), null, null))
         }
 
+    }
+
+    override suspend fun getAppVersionsApi(
+        url: String,
+        populate: String
+    ): Either<WhatsNewResponse, ApiError> {
+        return try {
+            val response = api.getAppVersionsApi(url,populate)
+            if (response.isSuccessful) {
+                val registerDeviceResponse = response.body()
+                if (registerDeviceResponse != null) {
+                    Either.Success(registerDeviceResponse)
+
+                } else {
+                    Either.Error(ApiError("null_body", "Response body is null", null, null))
+                }
+            } else {
+                val errorBody = response.errorBody()?.string()
+                val errorResponse = errorBody?.let {
+                    Gson().fromJson(it, ApiError::class.java)
+                }
+                Either.Error(errorResponse ?: ApiError("unknown_error", response.message(), null, null))
+            }
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val errorResponse = errorBody?.let {
+                Gson().fromJson(it, ApiError::class.java)
+            }
+            Either.Error(errorResponse ?: ApiError("unknown_error", e.message(), null, null))
+        }
+    }
+
+    override suspend fun getSpecificBookingDetails(
+        url: String,
+        bookingReference: String
+    ): Either<BookingDetail, ApiError> {
+        return try {
+            val response = api.getSpecificBookingDetails(url,bookingReference)
+            if (response.isSuccessful) {
+                val resp = response.body()
+                if (resp != null) {
+                    Either.Success(resp)
+
+                } else {
+                    Either.Error(ApiError("null_body", "Response body is null", null, null))
+                }
+            } else {
+                val errorBody = response.errorBody()?.string()
+                val errorResponse = errorBody?.let {
+                    Gson().fromJson(it, ApiError::class.java)
+                }
+                Either.Error(errorResponse ?: ApiError("unknown_error", response.message(), null, null))
+            }
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val errorResponse = errorBody?.let {
+                Gson().fromJson(it, ApiError::class.java)
+            }
+            Either.Error(errorResponse ?: ApiError("unknown_error", e.message(), null, null))
+        }
     }
 
 }

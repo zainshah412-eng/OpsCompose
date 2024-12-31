@@ -8,6 +8,7 @@ import android.widget.ImageView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -56,14 +57,15 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.PopupProperties
 import com.bumptech.glide.Glide
 import com.ops.airportr.R
-import com.ops.airportr.common.theme.fonts
 import com.ops.airportr.common.theme.red
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import com.ops.airportr.common.theme.air_awesome_purple_200
 import com.ops.airportr.common.theme.air_purple_awesome_light
+import com.ops.airportr.common.theme.dark_blue
 import com.ops.airportr.common.theme.white
 import com.ops.airportr.common.utils.changeLanguage
+import com.ops.airportr.common.utils.returnBackGroundColor
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -105,7 +107,6 @@ fun CustomButton(
             style = TextStyle(
                 fontSize = fontSize,
                 color = textColor,
-                fontFamily = fonts,
                 fontWeight = FontWeight.W500
             )
         )
@@ -195,13 +196,14 @@ fun MyFloatingActionButton(onClick: () -> Unit) {
 
 @Composable
 fun LoaderDialog(showDialog: Boolean, onDismiss: () -> Unit = {}) {
+    val isDarkTheme = isSystemInDarkTheme()
     if (showDialog) {
       //  Dialog(onDismissRequest = onDismiss) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight()
-                    .background(white)
+                    .background(returnBackGroundColor(isDarkTheme))
                     .wrapContentSize(Alignment.Center)
             ) {
                 AndroidView(

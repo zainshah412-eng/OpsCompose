@@ -6,11 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ops.airportr.common.network.Either
 import com.ops.airportr.common.network.Resource
-import com.ops.airportr.domain.use_case.login.GetAuthUseCase
-import com.ops.airportr.domain.use_case.login.GetUserDetailUseCase
-import com.ops.airportr.domain.use_case_reset_password.ResetPasswordUseCase
-import com.ops.airportr.ui.screens.loginscreen.states.LoginState
-import com.ops.airportr.ui.screens.loginscreen.states.UserDetailState
+import com.ops.airportr.domain.use_case.resetpassword.ResetPasswordUseCase
 import com.ops.airportr.ui.screens.resetpassword.states.ResetPasswordState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn

@@ -8,13 +8,16 @@ import com.ops.airportr.domain.model.resetpassword.ResetPasswordParam
 import com.ops.airportr.domain.model.resetpassword.ResetPasswordResponse
 import com.ops.airportr.domain.model.registerdevice.RegisterDeviceParams
 import com.ops.airportr.domain.model.registerdevice.response.RegisterDeviceResponse
+import com.ops.airportr.domain.model.searchbooking.BookingDetail
 import com.ops.airportr.domain.model.user.UserDetails
+import com.ops.airportr.domain.model.whatsnew.WhatsNewResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Query
 import retrofit2.http.Url
 
 interface ApiService {
@@ -61,4 +64,16 @@ interface ApiService {
         @Url url: String,
         @Body registerDeviceParams: RegisterDeviceParams,
     ): Response<RegisterDeviceResponse>
+
+    @GET
+    suspend fun getAppVersionsApi(
+        @Url url: String,
+        @Query("populate") populate: String,
+    ): Response<WhatsNewResponse>
+
+    @GET
+    suspend fun getSpecificBookingDetails(
+        @Url url: String,
+        @Query("bookingReference") bookingReference: String,
+    ): Response<BookingDetail>
 }

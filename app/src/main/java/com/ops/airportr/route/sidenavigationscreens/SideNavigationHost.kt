@@ -7,7 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.ops.airportr.data.viewmodel.MainViewModel
 import com.ops.airportr.ui.screens.navigationscreen.bottomnav.bottom.AirportsScreen
-import com.ops.airportr.ui.screens.navigationscreen.bottomnav.bottom.ScannerScreen
+import com.ops.airportr.ui.screens.navigationscreen.bottomnav.bottom.scanner.ScannerScreen
 import com.ops.airportr.ui.screens.navigationscreen.bottomnav.bottom.jobs.JobsScreen
 import com.ops.airportr.ui.screens.navigationscreen.bottomnav.bottom.profile.ProfileScreen
 
@@ -27,7 +27,7 @@ fun SideNavigationHost(
                 navHostController = navHostController
             )
         }
-        composable(BottomScreens.BottomNavigationScreens.Scanner.route) { ScannerScreen(viewModel = viewModel) }
+        composable(BottomScreens.BottomNavigationScreens.Scanner.route) { ScannerScreen(navController) }
         composable(BottomScreens.BottomNavigationScreens.Airports.route) { AirportsScreen(viewModel = viewModel) }
         composable(BottomScreens.BottomNavigationScreens.Profile.route) {
             ProfileScreen(

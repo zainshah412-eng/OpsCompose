@@ -18,12 +18,15 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.ui.graphics.Color
 import androidx.core.content.ContextCompat
 import androidx.core.os.LocaleListCompat
 import androidx.navigation.NavController
 import com.ops.airportr.AppApplication
 import com.ops.airportr.R
 import com.ops.airportr.common.AppConstants
+import com.ops.airportr.common.theme.dark_blue
+import com.ops.airportr.common.theme.white
 import com.ops.airportr.domain.model.language.LanguageListItemModel
 import org.jsoup.Jsoup
 import java.text.SimpleDateFormat
@@ -486,4 +489,21 @@ fun getJulianToSimpleDate(julianDate: String): String {
 fun String.changeDateFormat(): String {
     val date = SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH).parse(this)
     return SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).format(date!!)
+}
+
+fun String.convertDateWithoutZoneTime(): String {
+    val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH)
+    val outputFormat = SimpleDateFormat("HH:mm", Locale.ENGLISH)
+
+    val date = inputFormat.parse(this)
+    val formattedDate = outputFormat.format(date!!)
+    return formattedDate
+}
+
+fun String.convertDateForBagCheckIn(): String {
+    val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
+    val outputFormat = SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH)
+
+    val date = inputFormat.parse(this)
+    return outputFormat.format(date!!)
 }

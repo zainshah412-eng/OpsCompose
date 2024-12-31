@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -23,15 +25,16 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
-
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -49,7 +52,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
@@ -67,18 +69,19 @@ import com.ops.airportr.BuildConfig
 import com.ops.airportr.R
 import com.ops.airportr.common.AppConstants
 import com.ops.airportr.common.AppConstants.GET_CURRENT_USER_API
+import com.ops.airportr.common.theme.OpsAirportrTheme
 import com.ops.airportr.common.theme.air_awesome_purple_200
 import com.ops.airportr.common.theme.air_orange_dark
 import com.ops.airportr.common.theme.air_purple
-import com.ops.airportr.common.theme.air_purple_awesome_light
-import com.ops.airportr.common.theme.customTextLabelBoldStyle
+import com.ops.airportr.common.theme.air_purple_light
+import com.ops.airportr.common.theme.buttonBackgroundColorDarkTheme
+import com.ops.airportr.common.theme.buttonTextColorDarkTheme
 import com.ops.airportr.common.theme.customTextLabelStyle
-import com.ops.airportr.common.theme.dark_blue
-import com.ops.airportr.common.theme.fonts
+import com.ops.airportr.common.theme.fontsRegular
 import com.ops.airportr.common.theme.grey
 import com.ops.airportr.common.theme.light_orange_new
-import com.ops.airportr.common.theme.purple_100
 import com.ops.airportr.common.theme.white
+import com.ops.airportr.common.utils.bottomNavBackGroundColor
 import com.ops.airportr.common.utils.changeLanguage
 import com.ops.airportr.common.utils.getDeviceUUID
 import com.ops.airportr.common.utils.getNetworkType
@@ -86,6 +89,10 @@ import com.ops.airportr.common.utils.isCameraPermissionAllowed
 import com.ops.airportr.common.utils.isLocationPermissionAllowed
 import com.ops.airportr.common.utils.isValidEmail
 import com.ops.airportr.common.utils.moveOnNewScreen
+import com.ops.airportr.common.utils.returnBackGroundColor
+import com.ops.airportr.common.utils.returnLabelAirPurple100Color
+import com.ops.airportr.common.utils.returnLabelAirPurpleColor
+import com.ops.airportr.common.utils.returnLabelDarkBlueColor
 import com.ops.airportr.domain.model.BaseUrl
 import com.ops.airportr.domain.model.language.LanguageListItemModel
 import com.ops.airportr.domain.model.login.logincred.LoginCred
@@ -103,16 +110,21 @@ fun LoginScreen(
     navHostController: NavHostController,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
-    LaunchedEffect(Unit) {
-        viewModel.resetAuthError()
-    }
+
     val activity = LocalContext.current as? Activity
+    val context = LocalContext.current
+    val isDarkTheme = isSystemInDarkTheme()
+
     BackPressHandler(activity) {
         if (!navHostController.popBackStack()) {
             // Finish the activity to close the app
             activity?.finish()
         }
     }
+    LaunchedEffect(Unit) {
+        viewModel.resetAuthError()
+    }
+
     var loginCredEmail by remember { mutableStateOf("") }
     var loginCredPassword by remember { mutableStateOf("") }
     var emailId by remember { mutableStateOf(TextFieldValue("")) }
@@ -124,14 +136,13 @@ fun LoginScreen(
     var errorMessage by remember { mutableStateOf("") }
 
 
-    val context = LocalContext.current
     val outlinedTextFieldColors = TextFieldDefaults.outlinedTextFieldColors(
-        focusedBorderColor = purple_100,
-        unfocusedBorderColor = Color.Gray,
-        cursorColor = dark_blue,
-        textColor = dark_blue,
-        focusedLabelColor = dark_blue,
-        unfocusedLabelColor = Color.Gray
+        focusedBorderColor = returnLabelAirPurpleColor(isDarkTheme),
+        unfocusedBorderColor = returnLabelAirPurple100Color(isDarkTheme),
+        cursorColor = returnLabelDarkBlueColor(isDarkTheme),
+        textColor = returnLabelDarkBlueColor(isDarkTheme),
+        focusedLabelColor = returnLabelDarkBlueColor(isDarkTheme),
+        unfocusedLabelColor = returnLabelAirPurple100Color(isDarkTheme)
     )
 
     var selectedLanguage by remember {
@@ -176,7 +187,7 @@ fun LoginScreen(
     var showLoader by remember { mutableStateOf(false) }
     val state = viewModel.state.value
     val stateUserDetail = viewModel.stateUserDetail.value
-  //  val stateRegisterDevice = viewModel.stateRegisterDevice.value
+    //  val stateRegisterDevice = viewModel.stateRegisterDevice.value
     if (state.loginResponse?.accessToken != "" && state.loginResponse?.accessToken != null) {
         if (!AppApplication.sessionManager.getBiometricStatus) {
             var loginCredModal = LoginCred(loginCredEmail, loginCredPassword)
@@ -227,10 +238,22 @@ fun LoginScreen(
 //        navHostController.moveOnNewScreen(Screen.WelcomeScreen.route, true)
 //    }
 
+
+    val isDarkThemeEnabled = remember { mutableStateOf(true) }
+
+    Switch(
+        checked = isDarkThemeEnabled.value,
+        onCheckedChange = { isDarkThemeEnabled.value = it }
+    )
+
+    OpsAirportrTheme(darkTheme = isDarkThemeEnabled.value) {
+        // Your app content
+    }
+
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
-            .background(white)
+            .background(returnBackGroundColor(isDarkTheme))
     ) {
         val (topBox, logoImage, languageSpinner, errorBox, authBox, resetAccount, bottomBox) = createRefs()
 
@@ -252,14 +275,18 @@ fun LoginScreen(
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
+                .clickable {
+                    isDarkThemeEnabled.value = true
+                }
                 .padding(top = 40.dp)
+                .width(200.dp)
                 .height(120.dp), // make the image background transparent
-            contentScale = ContentScale.Inside // scale the image to fill the Box
+            contentScale = ContentScale.FillWidth // scale the image to fill the Box
         )
         CustomDropdownMenuForLanguageChange(
             selectedLanguage,
             listLanguageListItemModel,
-            dark_blue,
+            returnLabelDarkBlueColor(isDarkTheme),
             modifier = Modifier
                 .constrainAs(languageSpinner) {
                     top.linkTo(logoImage.bottom)
@@ -271,7 +298,8 @@ fun LoginScreen(
             onSelected = { selectedIndex ->
                 selectedLanguage = listLanguageListItemModel[selectedIndex]
             },
-            context
+            context,
+            isDarkTheme
         )
         if (state.error != null) {
             Box(
@@ -317,8 +345,8 @@ fun LoginScreen(
             stateUserDetail.error = null
             Text(
                 text = stringResource(id = R.string.email),
-                fontFamily = fonts,
-                style = customTextLabelStyle,
+                style = MaterialTheme.typography.labelMedium,
+                color = returnLabelDarkBlueColor(isDarkTheme),
                 fontSize = 14.sp,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -330,35 +358,30 @@ fun LoginScreen(
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Outlined.Email, "Email",
-                        tint = dark_blue
+                        tint = returnLabelDarkBlueColor(isDarkTheme)
                     )
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 5.dp),
-                label = {
-                    Text(
-                        text = stringResource(id = R.string.enter_email),
-                        fontFamily = fonts
-                    )
-                },
 
                 singleLine = true,
                 placeholder = {
                     Text(
                         text = stringResource(id = R.string.enter_email),
-                        fontFamily = fonts
+                        style = MaterialTheme.typography.labelSmall,
+                        fontSize = 14.sp,
+                        color = returnLabelDarkBlueColor(isDarkTheme),
                     )
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                textStyle = TextStyle(fontFamily = fonts),
+                textStyle = TextStyle(fontFamily = fontsRegular),
                 colors = outlinedTextFieldColors
             )
             if (emailError) {
                 Text(
                     text = stringResource(id = R.string.incorrect_email),
-                    fontFamily = fonts,
-                    style = customTextLabelStyle,
+                    style = MaterialTheme.typography.labelSmall,
                     fontSize = 12.sp,
                     color = air_orange_dark,
                     modifier = Modifier
@@ -370,8 +393,8 @@ fun LoginScreen(
 
             Text(
                 text = stringResource(id = R.string.password),
-                fontFamily = fonts,
-                style = customTextLabelStyle,
+                style = MaterialTheme.typography.labelMedium,
+                color = returnLabelDarkBlueColor(isDarkTheme),
                 fontSize = 14.sp,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -383,29 +406,32 @@ fun LoginScreen(
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Outlined.Lock, "Email",
-                        tint = dark_blue
+                        tint = returnLabelDarkBlueColor(isDarkTheme)
                     )
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 5.dp),
-                label = {
-                    Text(
-                        text = stringResource(id = R.string.password),
-                        fontFamily = fonts
-                    )
-                },
+//                label = {
+//                    Text(
+//                        text = stringResource(id = R.string.password),
+//                        style = MaterialTheme.typography.labelSmall,
+//                        color = returnLabelDarkBlueColor(isDarkTheme)
+//                    )
+//                },
                 singleLine = true,
                 placeholder = {
                     Text(
                         text = stringResource(id = R.string.enter_password),
-                        fontFamily = fonts
+                        style = MaterialTheme.typography.labelSmall,
+                        fontSize = 14.sp,
+                        color = returnLabelDarkBlueColor(isDarkTheme),
                     )
                 },
                 visualTransformation = if (passwordVisible) VisualTransformation.None else
                     PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                textStyle = androidx.compose.ui.text.TextStyle(fontFamily = fonts),
+                textStyle = androidx.compose.ui.text.TextStyle(fontFamily = fontsRegular),
                 trailingIcon = {
                     val image = if (passwordVisible) Icons.Filled.Visibility
                     else Icons.Filled.VisibilityOff
@@ -426,8 +452,7 @@ fun LoginScreen(
             if (passwordError) {
                 Text(
                     text = stringResource(id = R.string.incorrect_password),
-                    fontFamily = fonts,
-                    style = customTextLabelStyle,
+                    style = MaterialTheme.typography.labelSmall,
                     fontSize = 12.sp,
                     color = air_orange_dark,
                     modifier = Modifier
@@ -493,7 +518,6 @@ fun LoginScreen(
                                 }
                             }
                             if (flag) {
-
                                 AppApplication.sessionManager.biometricEnabled(false)
                                 AppApplication.sessionManager.saveBaseUrl(
                                     BaseUrl(
@@ -518,18 +542,25 @@ fun LoginScreen(
                 paddingTop = 10,
                 paddingHorizontal = 0,
                 modifier = Modifier.height(70.dp),
-                containerColor = if (emailId.text.isNotEmpty() && password.text.isNotEmpty()) air_purple else air_purple_awesome_light,
-                textColor = if (emailId.text.isNotEmpty() && password.text.isNotEmpty()) white else air_awesome_purple_200,
+                containerColor = if (emailId.text.isNotEmpty() && password.text.isNotEmpty()) {
+                    if (isDarkTheme) air_purple else air_purple
+                } else {
+                    if (isDarkTheme) buttonBackgroundColorDarkTheme else air_purple_light
+                },
+                textColor = if (emailId.text.isNotEmpty() && password.text.isNotEmpty()) {
+                    if (isDarkTheme) white else white
+                } else {
+                    if (isDarkTheme) buttonTextColorDarkTheme else air_awesome_purple_200
+                },
                 isEnabled = emailId.text.isNotEmpty() && password.text.isNotEmpty()
             )
             Space(height = 20, width = 0)
 
             Text(
                 text = stringResource(id = R.string.login_with_biometrics_text),
-                fontFamily = fonts,
-                style = customTextLabelBoldStyle,
+                style = MaterialTheme.typography.labelLarge,
                 fontSize = 14.sp,
-                color = air_purple,
+                color = returnLabelAirPurpleColor(isDarkTheme),
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentWidth(Alignment.CenterHorizontally)
@@ -539,10 +570,9 @@ fun LoginScreen(
 
         Text(
             text = stringResource(id = R.string.login_trouble_text),
-            fontFamily = fonts,
-            style = customTextLabelBoldStyle,
+            style = MaterialTheme.typography.labelLarge,
             fontSize = 14.sp,
-            color = air_purple,
+            color = returnLabelAirPurpleColor(isDarkTheme),
             modifier = Modifier
                 .constrainAs(resetAccount) {
                     start.linkTo(parent.start)
@@ -553,7 +583,7 @@ fun LoginScreen(
                 .wrapContentWidth(Alignment.CenterHorizontally)
                 .padding(bottom = 20.dp)
                 .clickable {
-                    navHostController.moveOnNewScreen(Screen.ResetPassword.route,false)
+                    navHostController.moveOnNewScreen(Screen.ResetPassword.route, false)
                 }
 
         )
@@ -576,11 +606,11 @@ fun LoginScreen(
         }
     }
 
-    if (state.error != null ) {
+    if (state.error != null) {
         errorMessage = state.error ?: context.getString(R.string.no_internet)
         snackBarShowFlag = true
     }
-    if (state.isLoading ) {
+    if (state.isLoading) {
         Log.wtf("StateLoadingAuth", "Called")
         showLoader = true
         LoaderDialog(showDialog = showLoader)
@@ -676,7 +706,8 @@ fun CustomDropdownMenuForLanguageChange(
     color: Color, // Color
     modifier: Modifier, //
     onSelected: (Int) -> Unit, // Pass the Selected Option
-    context: Context
+    context: Context,
+    isDarkTheme: Boolean
 ) {
     var selectedIndex by remember { mutableIntStateOf(0) }
     var expand by remember { mutableStateOf(false) }
@@ -697,12 +728,11 @@ fun CustomDropdownMenuForLanguageChange(
                     .size(width = 41.dp, height = 41.dp)
                     .padding(vertical = 10.dp),
             )
-            androidx.compose.material3.Text(
+            Text(
                 text = selectedLanguage.languageName,
                 color = color,
+                style = MaterialTheme.typography.labelMedium,
                 fontSize = 14.sp,
-                fontFamily = fonts,
-                fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.padding(vertical = 10.dp)
             )
 
@@ -721,7 +751,7 @@ fun CustomDropdownMenuForLanguageChange(
                 dismissOnClickOutside = true,
             ),
             modifier = Modifier
-                .background(Color.White)
+                .background(bottomNavBackGroundColor(isDarkTheme))
                 .padding(2.dp)
                 .fillMaxWidth(.4f)
         ) {
@@ -734,10 +764,13 @@ fun CustomDropdownMenuForLanguageChange(
                         onSelected(selectedIndex) // Notify about the selected index
                         changeLanguage(item, context) // Update language
                     },
+                    modifier = Modifier.background(bottomNavBackGroundColor(isDarkTheme)),
                     text = {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(bottomNavBackGroundColor(isDarkTheme))
                         ) {
                             // Flag Image
                             Image(
@@ -751,9 +784,9 @@ fun CustomDropdownMenuForLanguageChange(
                             // Language Text
                             Text(
                                 text = item.languageName,
-                                fontFamily = fonts,
-                                style = customTextLabelStyle,
-                                fontSize = 16.sp
+                                fontSize = 14.sp,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = returnLabelDarkBlueColor(isDarkTheme),
                             )
                         }
                     }
@@ -762,23 +795,6 @@ fun CustomDropdownMenuForLanguageChange(
             }
         }
 
-    }
-}
-
-@Composable
-fun BoxWithCustomBackground(message: String) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp) // Apply padding first
-            .clip(RoundedCornerShape(10.dp)) // Then clip the corners
-            .background(light_orange_new) // Background should respect the clipping
-    ) {
-        Text(
-            text = message,
-            color = air_orange_dark,
-            modifier = Modifier.padding(16.dp) // Optional inner padding for Text
-        )
     }
 }
 

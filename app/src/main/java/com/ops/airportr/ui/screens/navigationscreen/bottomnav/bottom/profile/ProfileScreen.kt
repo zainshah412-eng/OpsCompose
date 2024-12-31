@@ -1,8 +1,11 @@
 package com.ops.airportr.ui.screens.navigationscreen.bottomnav.bottom.profile
 
+import android.app.Activity
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,24 +18,31 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.PopupProperties
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.navigation.NavHostController
@@ -44,9 +54,13 @@ import com.ops.airportr.common.theme.customTextDescriptionStyle
 import com.ops.airportr.common.theme.customTextHeadingStyle
 import com.ops.airportr.common.theme.customTextLabelStyle
 import com.ops.airportr.common.theme.dark_blue
+import com.ops.airportr.common.theme.editTextBorderStrockColor
 import com.ops.airportr.common.theme.light_white
 import com.ops.airportr.common.theme.white
+import com.ops.airportr.common.utils.changeLanguage
 import com.ops.airportr.common.utils.moveOnNewScreen
+import com.ops.airportr.common.utils.returnBackGroundColor
+import com.ops.airportr.common.utils.returnLabelDarkBlueColor
 import com.ops.airportr.domain.model.language.LanguageListItemModel
 import com.ops.airportr.domain.model.user.User
 import com.ops.airportr.route.Screen
@@ -59,7 +73,10 @@ fun ProfileScreen(
     navHostController: NavHostController,
     modifier: Modifier = Modifier
 ) {
+    val activity = LocalContext.current as? Activity
     val context = LocalContext.current
+    val isDarkTheme = isSystemInDarkTheme()
+
     try {
         // some code
         user = AppApplication.sessionManager.userDetails
@@ -83,7 +100,23 @@ fun ProfileScreen(
                 }
             )
         )
+
     }
+    var selectedTheme by remember {
+        mutableStateOf(
+            LanguageListItemModel(
+                languageName = when (AppApplication.sessionManager.appTheme) {
+                    true -> context.getString(R.string.night_text)
+                    false -> context.getString(R.string.night_text)
+                },
+                flag = when (AppApplication.sessionManager.appTheme) {
+                    true -> R.drawable.night_mode
+                    false -> R.drawable.sun
+                }
+            )
+        )
+    }
+
     LaunchedEffect(AppApplication.sessionManager.appLanguage) {
         val appLanguage = AppApplication.sessionManager.appLanguage ?: "en"
         when (appLanguage) {
@@ -100,22 +133,47 @@ fun ProfileScreen(
             }
         }
     }
+    LaunchedEffect(AppApplication.sessionManager.appTheme) {
+        val appLanguage = AppApplication.sessionManager.appTheme
+        when (appLanguage) {
+            true -> {
+                selectedTheme = LanguageListItemModel(
+                    context.getString(R.string.night_text),
+                    R.drawable.night_mode
+                )
+            }
+
+            false -> {
+                selectedTheme =
+                    LanguageListItemModel(context.getString(R.string.day_text), R.drawable.sun)
+            }
+        }
+    }
     val listLanguageListItemModel = listOf(
         LanguageListItemModel("English", R.drawable.england),
         LanguageListItemModel("Deutsch", R.drawable.germany),
         LanguageListItemModel("Français", R.drawable.france)
     )
 
+    val listThemeListItemModel = listOf(
+        LanguageListItemModel(context.getString(R.string.day_text), R.drawable.sun),
+        LanguageListItemModel(
+            context.getString(R.string.night_text),
+            R.drawable.night_mode
+        )
+    )
+
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
-            .background(white)
+            .background(returnBackGroundColor(isDarkTheme))
     ) {
         val (title, languageSpinner, logoutImg, profileImg, userName, email, version,
             bottomBox) = createRefs()
         Text(
             text = stringResource(id = R.string.profile),
-            style = customTextHeadingStyle,
+            style = MaterialTheme.typography.labelLarge,
+            color = returnLabelDarkBlueColor(isDarkTheme),
             fontSize = 35.sp,
             modifier = Modifier
                 .constrainAs(title) {
@@ -137,7 +195,7 @@ fun ProfileScreen(
                 .height(30.dp)
                 .width(30.dp)
                 .clickable {
-
+                    AppApplication.sessionManager.logoutUser()
                 }, // make the image background transparent
             contentScale = ContentScale.Inside // scale the image to fill the Box
         )
@@ -145,7 +203,7 @@ fun ProfileScreen(
         CustomDropdownMenuForLanguageChange(
             selectedLanguage,
             listLanguageListItemModel,
-            dark_blue,
+            returnLabelDarkBlueColor(isDarkTheme),
             modifier = Modifier
                 .constrainAs(languageSpinner) {
                     top.linkTo(parent.top)
@@ -157,7 +215,8 @@ fun ProfileScreen(
             onSelected = { selectedIndex ->
                 selectedLanguage = listLanguageListItemModel[selectedIndex]
             },
-            context
+            context,
+            isDarkTheme
         )
 
         Image(
@@ -194,9 +253,9 @@ fun ProfileScreen(
                 user.firstName ?: "",
                 user.lastName ?: ""
             ),
-            style = customTextDescriptionStyle, // Use your custom text style here
+            style = MaterialTheme.typography.labelMedium,
+            color = returnLabelDarkBlueColor(isDarkTheme), // Use your custom text style here
             fontSize = 18.sp,
-            color = dark_blue, // Replace with your desired color
         )
         Text(
             modifier = Modifier
@@ -209,10 +268,10 @@ fun ProfileScreen(
                 }
                 .padding(top = 5.dp),
             textAlign = TextAlign.Center,
-            text = user.emailAddress?:"",
-            style = customTextDescriptionStyle, // Use your custom text style here
+            text = user.emailAddress ?: "",
             fontSize = 14.sp,
-            color = dark_blue, // Replace with your desired color
+            style = MaterialTheme.typography.labelMedium,
+            color = returnLabelDarkBlueColor(isDarkTheme),
         )
         Text(
             modifier = Modifier
@@ -249,32 +308,40 @@ fun ProfileScreen(
             Column(modifier = Modifier.fillMaxSize()) {
                 ProfileTab(stringResource(id = R.string.PortrCode),
                     modifier,
+                    isDarkTheme,
                     onClick = {
                         navHostController.moveOnNewScreen(Screen.PortrCode.route, false)
 
                     })
                 ProfileTab(stringResource(id = R.string.profileDetail),
                     modifier,
+                    isDarkTheme,
                     onClick = {
-
+                        navHostController.moveOnNewScreen(Screen.ProfileDetail.route, false)
                     })
                 ProfileTab(stringResource(id = R.string.whats_new),
                     modifier,
+                    isDarkTheme,
                     onClick = {
-
+                        navHostController.moveOnNewScreen(Screen.WhatsNewDetail.route, false)
                     })
                 ProfileTab(stringResource(id = R.string.night_mode),
                     modifier,
+                    isDarkTheme,
                     onClick = {
 
                     })
                 ProfileTab(stringResource(id = R.string.switchProfile),
                     modifier,
+                    isDarkTheme,
                     onClick = {
-
+                        navHostController.navigate(Screen.WelcomeScreen.route) {
+                            popUpTo(0) { inclusive = true }
+                        }
                     })
                 ProfileTab(stringResource(id = R.string.give_feedback),
                     modifier,
+                    isDarkTheme,
                     onClick = {
 
                     })
@@ -289,6 +356,7 @@ fun ProfileScreen(
 fun ProfileTab(
     tabName: String,
     modifier: Modifier = Modifier,
+    isDarkTheme :Boolean,
     onClick: () -> Unit = {}
 ) {
     Column(
@@ -308,9 +376,9 @@ fun ProfileTab(
             // Custom Text View Equivalent
             Text(
                 text = tabName,
-                style = customTextLabelStyle, // Use your custom text style here
                 fontSize = 14.sp,
-                color = dark_blue,
+                style = MaterialTheme.typography.labelMedium,
+                color = returnLabelDarkBlueColor(isDarkTheme),
                 modifier = Modifier
             )
 
@@ -325,9 +393,103 @@ fun ProfileTab(
 
         // Bottom Divider
         Divider(
-            color = light_white, // Replace with `viewBorderColor`
-            thickness = 1.dp,
-            modifier = Modifier.fillMaxWidth()
+            thickness = 0.5.dp, // Adjust this value for thickness
+            modifier = Modifier.fillMaxWidth(),
+            color = if(isDarkTheme) editTextBorderStrockColor  else light_white
         )
+    }
+}
+
+@Composable
+fun CustomDropdownMenuForThemeChange(
+    selectedLanguage: LanguageListItemModel,
+    list: List<LanguageListItemModel>, // Menu Options
+    color: Color, // Color
+    modifier: Modifier, //
+    onSelected: (Int) -> Unit, // Pass the Selected Option
+    context: Context
+) {
+    var selectedIndex by remember { mutableIntStateOf(0) }
+    var expand by remember { mutableStateOf(false) }
+    var stroke by remember { mutableIntStateOf(1) }
+    Box(
+        modifier
+            .clickable {
+                expand = !expand
+                stroke = if (expand) 2 else 1
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        Row {
+            Image(
+                painter = painterResource(id = selectedLanguage.flag), // Replace with your image resource
+                contentDescription = "language",
+                modifier = Modifier
+                    .size(width = 41.dp, height = 41.dp)
+                    .padding(vertical = 10.dp),
+            )
+            androidx.compose.material3.Text(
+                text = selectedLanguage.languageName,
+                color = color,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(vertical = 10.dp)
+            )
+
+        }
+
+
+        DropdownMenu(
+            expanded = expand,
+            onDismissRequest = {
+                expand = false
+                stroke = 1
+            },
+            properties = PopupProperties(
+                focusable = false,
+                dismissOnBackPress = true,
+                dismissOnClickOutside = true,
+            ),
+            modifier = Modifier
+                .background(Color.White)
+                .padding(2.dp)
+                .fillMaxWidth(.4f)
+        ) {
+            list.forEachIndexed { index, item ->
+                DropdownMenuItem(
+                    onClick = {
+                        selectedIndex = index
+                        expand = false
+                        stroke = if (expand) 2 else 1 // Ensure `stroke` logic is meaningful
+                        onSelected(selectedIndex) // Notify about the selected index
+                        changeLanguage(item, context) // Update language
+                    },
+                    text = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            // Flag Image
+                            Image(
+                                painter = painterResource(id = item.flag),
+                                contentDescription = "language",
+                                modifier = Modifier
+                                    .size(41.dp) // Use fixed size for consistency
+                                    .padding(end = 8.dp) // Space between image and text
+                            )
+
+                            // Language Text
+                            Text(
+                                text = item.languageName,
+                                style = customTextLabelStyle,
+                                fontSize = 16.sp
+                            )
+                        }
+                    }
+                )
+
+            }
+        }
+
     }
 }

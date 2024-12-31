@@ -1,11 +1,13 @@
 package com.ops.airportr.ui.screens.splashscreen
 
+import android.app.Activity
 import android.content.Intent
 import androidx.compose.animation.core.EaseInOutElastic
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,6 +30,7 @@ import androidx.navigation.compose.rememberNavController
 import com.ops.airportr.AppApplication
 import com.ops.airportr.R
 import com.ops.airportr.common.theme.air_purple
+import com.ops.airportr.common.theme.colorPrimaryDarkTheme
 import com.ops.airportr.common.theme.white
 import com.ops.airportr.common.utils.moveOnNewScreen
 import com.ops.airportr.route.Screen
@@ -39,7 +42,9 @@ import kotlinx.coroutines.delay
 fun SplashScreen(
     navHostController: NavHostController
 ) {
+    val activity = LocalContext.current as? Activity
     val context = LocalContext.current
+    val isDarkTheme = isSystemInDarkTheme()
     var scale by remember {
         mutableStateOf(0.dp)
     }
@@ -52,7 +57,7 @@ fun SplashScreen(
 
         if (AppApplication.sessionManager.isLoggedIn) {
             if (!AppApplication.sessionManager.isFlowSelected) {
-                navHostController.moveOnNewScreen(Screen.HomeScreen.route, true)
+                navHostController.moveOnNewScreen(Screen.WelcomeScreen.route, true)
             } else {
                 navHostController.moveOnNewScreen(Screen.WelcomeScreen.route, true)
             }
@@ -72,7 +77,7 @@ fun SplashScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(air_purple),
+            .background(if (isDarkTheme) colorPrimaryDarkTheme else air_purple),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

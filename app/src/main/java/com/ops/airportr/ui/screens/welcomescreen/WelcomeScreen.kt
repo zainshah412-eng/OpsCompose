@@ -4,6 +4,7 @@ import android.app.Activity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -22,6 +24,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
@@ -38,9 +41,14 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.ops.airportr.AppApplication
 import com.ops.airportr.R
 import com.ops.airportr.common.theme.air_awesome_white
+import com.ops.airportr.common.theme.buttonBackgroundColorDarkTheme
+import com.ops.airportr.common.theme.colorPrimaryDarkTheme
 import com.ops.airportr.common.theme.dark_blue
+import com.ops.airportr.common.utils.returnBackGroundColor
+import com.ops.airportr.common.utils.returnLabelDarkBlueColor
 import com.ops.airportr.route.Screen
 import com.ops.airportr.ui.componts.BackPressHandler
 import com.ops.airportr.ui.screens.loginscreen.OverlappingImagesBottom
@@ -51,8 +59,9 @@ import com.ops.airportr.ui.screens.loginscreen.OverlappingImagesTop
 fun WelcomeScreen(
     navHostController: NavHostController
 ) {
-    val scope = rememberCoroutineScope()
     val activity = LocalContext.current as? Activity
+    val context = LocalContext.current
+    val isDarkTheme = isSystemInDarkTheme()
 
 
 
@@ -65,7 +74,7 @@ fun WelcomeScreen(
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White) // Use your desired background color
+            .background(returnBackGroundColor(isDarkTheme)) // Use your desired background color
     ) {
         val (topBox, logoImage, weightBox, bottomBox) = createRefs()
 
@@ -91,8 +100,9 @@ fun WelcomeScreen(
                     end.linkTo(parent.end)
                 }
                 .padding(top = 40.dp) // Padding for logo image
+                .width(200.dp)
                 .height(120.dp), // Height for the logo
-            contentScale = ContentScale.Inside // Adjust image scaling as needed
+            contentScale = ContentScale.FillWidth // Adjust image scaling as needed
         )
         // Bottom Box
         Box(
@@ -140,8 +150,8 @@ fun WelcomeScreen(
                     ),
                     shape = RoundedCornerShape(dimensionResource(id = R.dimen._20sdp)),
                     colors = CardDefaults.cardColors(
-                        containerColor = air_awesome_white,
-                        contentColor = MaterialTheme.colorScheme.onSurface
+                        containerColor = if (isDarkTheme) buttonBackgroundColorDarkTheme else air_awesome_white,
+                        contentColor = if (isDarkTheme) buttonBackgroundColorDarkTheme else air_awesome_white
                     )
                 ) {
                     Column(
@@ -150,6 +160,7 @@ fun WelcomeScreen(
                             .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
                             .clickable(onClick = {
                                 navHostController.navigate(Screen.HomeScreen.route) {
+                                    AppApplication.sessionManager.saveCurrentFlow(true)
                                     popUpTo(0) { inclusive = true }
                                 }
                             }),
@@ -161,6 +172,7 @@ fun WelcomeScreen(
                             contentDescription = null,
                             modifier = Modifier
                                 .size(dimensionResource(id = R.dimen._70sdp)),
+                            colorFilter = ColorFilter.tint(returnLabelDarkBlueColor(isDarkTheme))
                             // Equivalent to IconTint
                         )
 
@@ -168,7 +180,7 @@ fun WelcomeScreen(
                             text = stringResource(id = R.string.bags_check_in_main),
                             modifier = Modifier.padding(top = dimensionResource(id = R.dimen._15sdp)),
                             textAlign = TextAlign.Center,
-                            color = dark_blue,
+                            color = returnLabelDarkBlueColor(isDarkTheme),
                             style = TextStyle(
                                 fontSize = dimensionResource(id = R.dimen._16ssp).value.sp,
                                 fontFamily = FontFamily(Font(R.font.objective_medium)) // Replace with your custom font
@@ -195,8 +207,8 @@ fun WelcomeScreen(
                     ),
                     shape = RoundedCornerShape(dimensionResource(id = R.dimen._20sdp)),
                     colors = CardDefaults.cardColors(
-                        containerColor = air_awesome_white,
-                        contentColor = MaterialTheme.colorScheme.onSurface
+                        containerColor = if (isDarkTheme) buttonBackgroundColorDarkTheme else air_awesome_white,
+                        contentColor = if (isDarkTheme) buttonBackgroundColorDarkTheme else air_awesome_white
                     )
                 ) {
                     Column(
@@ -211,14 +223,15 @@ fun WelcomeScreen(
                             painter = painterResource(id = R.drawable.ic_ccd_icon),
                             contentDescription = null,
                             modifier = Modifier
-                                .size(dimensionResource(id = R.dimen._70sdp)) // Equivalent to IconTint
+                                .size(dimensionResource(id = R.dimen._70sdp)),
+                            colorFilter = ColorFilter.tint(returnLabelDarkBlueColor(isDarkTheme))// Equivalent to IconTint
                         )
 
                         Text(
                             text = stringResource(id = R.string.ccd),
                             modifier = Modifier.padding(top = dimensionResource(id = R.dimen._15sdp)),
                             textAlign = TextAlign.Center,
-                            color = dark_blue,
+                            color = returnLabelDarkBlueColor(isDarkTheme),
                             style = TextStyle(
                                 fontSize = dimensionResource(id = R.dimen._16ssp).value.sp,
                                 fontFamily = FontFamily(Font(R.font.objective_medium)) // Replace with your custom font

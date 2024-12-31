@@ -9,6 +9,7 @@ import com.ops.airportr.domain.model.bookingdetails.BookingDetails
 import com.ops.airportr.domain.model.login.AuthTokenResp
 import com.ops.airportr.domain.model.login.logincred.LoginCred
 import com.ops.airportr.domain.model.user.User
+import com.ops.airportr.domain.model.whatsnew.WhatsNewResponse
 
 class SessionManager(
     // Context
@@ -69,14 +70,14 @@ class SessionManager(
         editor.putString(KEY_USER_DETAILS, json)
         editor.commit()
     }
-//
-//    fun saveAppVersions(appVersions: WhatsNewResponse) {
-//        editor.remove(KEY_APP_VERSIONS)
-//        val json = Gson().toJson(appVersions)
-//        editor.putString(KEY_APP_VERSIONS, json)
-//        editor.commit()
-//    }
-//
+
+    fun saveAppVersions(appVersions: WhatsNewResponse) {
+        editor.remove(KEY_APP_VERSIONS)
+        val json = Gson().toJson(appVersions)
+        editor.putString(KEY_APP_VERSIONS, json)
+        editor.commit()
+    }
+
     fun saveBaseUrl(url: BaseUrl) {
         editor.remove(KEY_BASE_URL)
         val json = Gson().toJson(url)
@@ -114,13 +115,13 @@ class SessionManager(
 //        editor.commit()
 //    }
 //
-//    fun saveBookingDetails(bookingDetails: BookingDetails?) {
-//        editor.remove(KEY_BOOKING_DETAILS)
-//        editor.commit()
-//        val json = Gson().toJson(bookingDetails)
-//        editor.putString(KEY_BOOKING_DETAILS, json)
-//        editor.commit()
-//    }
+    fun saveBookingDetails(bookingDetails: BookingDetails?) {
+        editor.remove(KEY_BOOKING_DETAILS)
+        editor.commit()
+        val json = Gson().toJson(bookingDetails)
+        editor.putString(KEY_BOOKING_DETAILS, json)
+        editor.commit()
+    }
 //
 //    fun saveActiveBookingDetails(bookingDetails: BookingDetails?) {
 //        editor.remove(KEY_ACTIVE_BOOKING_DETAILS)
@@ -449,21 +450,21 @@ class SessionManager(
             }
         }
 
-//    val appVersions: WhatsNewResponse
-//        get() {
-//            try {
-//                // some code
-//                val json: String? = pref.getString(KEY_APP_VERSIONS, "")
-//                return Gson().fromJson(json, WhatsNewResponse::class.java)
-//            } catch (e: Exception) {
-//                // handler
-//                return return Gson().fromJson("", WhatsNewResponse::class.java)
-//            } finally {
-//                // optional finally block
-//            }
-//
-//        }
-//
+    val appVersions: WhatsNewResponse
+        get() {
+            try {
+                // some code
+                val json: String? = pref.getString(KEY_APP_VERSIONS, "")
+                return Gson().fromJson(json, WhatsNewResponse::class.java)
+            } catch (e: Exception) {
+                // handler
+                return return Gson().fromJson("", WhatsNewResponse::class.java)
+            } finally {
+                // optional finally block
+            }
+
+        }
+
     val baseUrl: BaseUrl?
         get() {
             val json: String? = pref.getString(KEY_BASE_URL, "")
@@ -590,25 +591,25 @@ class SessionManager(
 //            return Gson().fromJson(json, type)
 //        }
 
-//    val bookingDetails: BookingDetails
-//        get() {
-//            if (pref.getString(KEY_BOOKING_DETAILS, "") != null) {
-//                val json: String? = pref.getString(KEY_BOOKING_DETAILS, "")
-//                return Gson().fromJson(json, BookingDetails::class.java)
-//            } else {
-//                return Gson().fromJson("", BookingDetails::class.java)
-//            }
-//        }
-
-    val bookingDetails: BookingDetails?
+    val bookingDetails: BookingDetails
         get() {
-            val json: String? = pref.getString(KEY_BOOKING_DETAILS, "")
-            return if (!json.isNullOrEmpty()) {
-                Gson().fromJson(json, BookingDetails::class.java)
+            if (pref.getString(KEY_BOOKING_DETAILS, "") != null) {
+                val json: String? = pref.getString(KEY_BOOKING_DETAILS, "")
+                return Gson().fromJson(json, BookingDetails::class.java)
             } else {
-                null
+                return Gson().fromJson("", BookingDetails::class.java)
             }
         }
+
+//    val bookingDetails: BookingDetails?
+//        get() {
+//            val json: String? = pref.getString(KEY_BOOKING_DETAILS, "")
+//            return if (!json.isNullOrEmpty()) {
+//                Gson().fromJson(json, BookingDetails::class.java)
+//            } else {
+//                null
+//            }
+//        }
 
 
     val activeBookingDetails: BookingDetails?

@@ -1,27 +1,28 @@
-package com.ops.airportr.domain.use_case
+package com.ops.airportr.domain.use_case.whatsnew
 
 import com.ops.airportr.common.network.Either
 import com.ops.airportr.common.network.Resource
 import com.ops.airportr.domain.model.apierror.ApiError
-import com.ops.airportr.domain.model.registerdevice.RegisterDeviceParams
-import com.ops.airportr.domain.model.registerdevice.response.RegisterDeviceResponse
+import com.ops.airportr.domain.model.joblist.retrievejobs.params.RetrieveJobsParams
+import com.ops.airportr.domain.model.joblist.retrievejobs.response.RetrieveJobsResponse
+import com.ops.airportr.domain.model.whatsnew.WhatsNewResponse
 import com.ops.airportr.domain.repository.CoinRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.io.IOException
 import javax.inject.Inject
 
-class RegisterDeviceUseCase @Inject constructor(
+class WhatsNewUseCase @Inject constructor(
     private val repository: CoinRepository
 ) {
     operator fun invoke(
-        url: String, params: RegisterDeviceParams
-    ): Flow<Resource<Either<RegisterDeviceResponse, ApiError>>> = flow {
+        url: String, populate:String
+    ): Flow<Resource<Either<WhatsNewResponse, ApiError>>> = flow {
         try {
             emit(Resource.Loading())
-            val result = repository.registerDevice(
+            val result = repository.getAppVersionsApi(
                 url,
-                params
+                populate
             )
             emit(Resource.Success(result))
         } catch (e: IOException) {

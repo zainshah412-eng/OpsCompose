@@ -1,17 +1,15 @@
 package com.ops.airportr.ui.componts.sidenavigation
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
@@ -30,10 +28,9 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.ops.airportr.common.theme.air_awesome_light_white
-import com.ops.airportr.common.theme.air_awesome_purple_100
-import com.ops.airportr.common.theme.air_purple
-import com.ops.airportr.common.theme.custom_white
-import com.ops.airportr.common.theme.fonts
+import com.ops.airportr.common.utils.bottomNavBackGroundColor
+import com.ops.airportr.common.utils.returnLabelAirPurple100Color
+import com.ops.airportr.common.utils.returnLabelAirPurpleColor
 import com.ops.airportr.route.sidenavigationscreens.BottomScreens
 
 
@@ -41,11 +38,14 @@ import com.ops.airportr.route.sidenavigationscreens.BottomScreens
 fun BottomBar(
     modifier: Modifier = Modifier,
     screens: List<BottomScreens.BottomNavigationScreens>,
-    navController: NavController
+    navController: NavController,
+    isDarkTheme: Boolean
 ) {
+
     NavigationBar(
         modifier = modifier,
-        containerColor = custom_white // Background color of the Bottom Bar
+        containerColor = bottomNavBackGroundColor(isDarkTheme),
+        tonalElevation = 8.dp // Background color of the Bottom Bar
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
@@ -56,16 +56,17 @@ fun BottomBar(
 
             NavigationBarItem(
                 icon = {
-                    Icon(
+                    Image(
                         painter = painterResource(id = if (selected) screen.icon_focused else screen.icon),
-                        contentDescription = "icon",
-                        tint = if (selected) air_purple else air_awesome_purple_100
+                        contentDescription = null
                     )
                 },
                 label = {
                     Text(
                         screen.title,
-                        color = if (selected) air_purple else air_awesome_purple_100
+                        color = if (selected) returnLabelAirPurpleColor(isDarkTheme) else returnLabelAirPurple100Color(
+                            isDarkTheme
+                        )
                     )
                 },
                 selected = selected,
@@ -80,9 +81,6 @@ fun BottomBar(
         }
     }
 }
-
-
-
 
 
 @Composable
@@ -126,11 +124,10 @@ fun AddItem_(
             )
 
             AnimatedVisibility(visible = selected) {
-                androidx.compose.material3.Text(
+                Text(
                     text = screen.title,
                     color = contentColor,
                     textAlign = TextAlign.Center,
-                    fontFamily = fonts
                 )
             }
         }
