@@ -41,10 +41,10 @@ import com.ops.airportr.R
 import com.ops.airportr.common.utils.returnBackGroundColor
 import com.ops.airportr.common.utils.returnLabelAirPurpleColor
 import com.ops.airportr.common.utils.returnLabelDarkBlueColor
-import com.ops.airportr.ui.screens.bookingmanifest.tabs.BookingActivityScreen
+import com.ops.airportr.ui.screens.bookingmanifest.tabs.bookingactivity.BookingActivityScreen
 import com.ops.airportr.ui.screens.bookingmanifest.tabs.BookingJobsScreen
-import com.ops.airportr.ui.screens.bookingmanifest.tabs.BookingSummaryScreen
-import com.ops.airportr.ui.screens.scannertabs.IdentityBagScreen
+import com.ops.airportr.ui.screens.bookingmanifest.tabs.bookingmanifest.BookingManifestScreen
+import com.ops.airportr.ui.screens.bookingmanifest.tabs.bookingsummary.BookingSummaryScreen
 
 @Composable
 fun BookingDetailScreen(
@@ -156,7 +156,7 @@ fun BookingDetailScreen(
         ) {
             when (selectedIndex) {
                 0 -> BookingSummaryScreen(navHostController)
-                1 -> IdentityBagScreen(navHostController)
+                1 -> BookingManifestScreen(navHostController)
                 2 -> BookingActivityScreen(navHostController)
                 3 -> BookingJobsScreen(navHostController)
             }

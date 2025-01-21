@@ -246,7 +246,6 @@ fun JobsScreen(
                 )
             }
         }
-
     )
     { paddingValues ->
         // Main content

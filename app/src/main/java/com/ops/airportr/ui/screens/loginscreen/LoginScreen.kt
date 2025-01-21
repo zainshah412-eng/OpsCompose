@@ -324,6 +324,7 @@ fun LoginScreen(
             }
         }
         val errorBarrier = createBottomBarrier(languageSpinner, errorBox)
+
         Column(
             modifier = Modifier
                 .constrainAs(authBox) {

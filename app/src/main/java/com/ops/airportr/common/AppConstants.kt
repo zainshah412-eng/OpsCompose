@@ -223,7 +223,7 @@ object AppConstants {
     const val STORE_TRACKING_DATA = API_END_POINT_CCD + "/Tracking/StoreTrackingData"
     const val SEND_LOGIN_CODE = API_END_WEB + "/SMS/SendOneTimeLoginCode"
     const val VALIDATE_LOGIN_CODE = API_END_WEB + "/User/ValidateSMSCode"
-
+    const val SEND_DEVICE_DATA = API_END_POINT + "Job/SaveDeviceData"
 
 
 }

@@ -19,5 +19,11 @@ object Graph {
     const val GIVE_FEEDBACK = "give_feedback"
     const val SEARCH_BOOKING = "search_booking"
     const val BOOKING_DETAIL = "booking_detail"
+    const val BAG_DETAIL = "bag_detail"
+    const val PROCESS_BAG = "process_bag"
+    const val ACCEPTANCE_SCREEN = "acceptance_"
+    const val JOB_DETAILS = "job_details"
+    const val NOTES = "notes_"
+    const val MESSAGES = "messages_"
 
 }

@@ -123,13 +123,13 @@ class SessionManager(
         editor.commit()
     }
 //
-//    fun saveActiveBookingDetails(bookingDetails: BookingDetails?) {
-//        editor.remove(KEY_ACTIVE_BOOKING_DETAILS)
-//        editor.commit()
-//        val json = Gson().toJson(bookingDetails)
-//        editor.putString(KEY_ACTIVE_BOOKING_DETAILS, json)
-//        editor.commit()
-//    }
+    fun saveActiveBookingDetails(bookingDetails: BookingDetails?) {
+        editor.remove(KEY_ACTIVE_BOOKING_DETAILS)
+        editor.commit()
+        val json = Gson().toJson(bookingDetails)
+        editor.putString(KEY_ACTIVE_BOOKING_DETAILS, json)
+        editor.commit()
+    }
 
     fun removeActiveBookingDetail() {
         editor.remove(KEY_ACTIVE_BOOKING_DETAILS)

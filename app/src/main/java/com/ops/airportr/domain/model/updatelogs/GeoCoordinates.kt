@@ -1,0 +1,13 @@
+package com.ops.airportr.domain.model.updatelogs
+
+import android.os.Parcelable
+import com.google.gson.annotations.SerializedName
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
+data class GeoCoordinates(
+    @SerializedName("latitude")
+    var latitude: Double = 0.0,
+    @SerializedName("longitude")
+    var longitude: Double = 0.0
+) : Parcelable

@@ -1,6 +1,11 @@
 package com.ops.airportr.data.remote
 
 
+import com.ops.airportr.domain.model.acceptance.UpdateAcceptanceParam
+import com.ops.airportr.domain.model.acceptance.response.UpdateAcceptanceLockResponce
+import com.ops.airportr.domain.model.bookingnotes.GetBookingNotesByReference
+import com.ops.airportr.domain.model.getImage.GetImageParams
+import com.ops.airportr.domain.model.getImage.response.GetImageResponse
 import com.ops.airportr.domain.model.joblist.retrievejobs.params.RetrieveJobsParams
 import com.ops.airportr.domain.model.joblist.retrievejobs.response.RetrieveJobsResponse
 import com.ops.airportr.domain.model.login.AuthTokenResp
@@ -9,6 +14,12 @@ import com.ops.airportr.domain.model.resetpassword.ResetPasswordResponse
 import com.ops.airportr.domain.model.registerdevice.RegisterDeviceParams
 import com.ops.airportr.domain.model.registerdevice.response.RegisterDeviceResponse
 import com.ops.airportr.domain.model.searchbooking.BookingDetail
+import com.ops.airportr.domain.model.senddevicedata.SendDeviceDataParam
+import com.ops.airportr.domain.model.senddevicedata.response.SendDeviceDataResponse
+import com.ops.airportr.domain.model.updatejob.UpdateJobParam
+import com.ops.airportr.domain.model.updatejob.UpdateUserResponse
+import com.ops.airportr.domain.model.updatelogs.GetActionUpdateLogsResponse
+import com.ops.airportr.domain.model.updatelogs.params.GetActionUpdateLogsParams
 import com.ops.airportr.domain.model.user.UserDetails
 import com.ops.airportr.domain.model.whatsnew.WhatsNewResponse
 import retrofit2.Response
@@ -76,4 +87,40 @@ interface ApiService {
         @Url url: String,
         @Query("bookingReference") bookingReference: String,
     ): Response<BookingDetail>
+
+    @GET
+    suspend fun getBookingNotesByBookingReference(
+        @Url url: String,
+        @Query("bookingReference") bookingReference: String,
+    ): Response<GetBookingNotesByReference>
+
+    @POST
+    suspend fun getActionUpdateLog(
+        @Url url: String,
+        @Body body: GetActionUpdateLogsParams,
+    ): Response<GetActionUpdateLogsResponse>
+
+    @POST
+    suspend fun getImage(
+        @Url url: String,
+        @Body body: GetImageParams,
+    ): Response<GetImageResponse>
+
+    @POST
+    suspend fun updateAcceptanceLock(
+        @Url url: String,
+        @Body updateAcceptanceParam: UpdateAcceptanceParam,
+    ): Response<UpdateAcceptanceLockResponce>
+
+    @POST
+    suspend fun smsDeviceData(
+        @Url url: String,
+        @Body body: SendDeviceDataParam,
+    ): Response<SendDeviceDataResponse>
+    @POST
+    suspend fun updateJob(
+        @Url url: String,
+        @Body body: UpdateJobParam,
+    ): Response<UpdateUserResponse>
+
 }

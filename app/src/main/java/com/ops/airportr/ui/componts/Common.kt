@@ -226,8 +226,6 @@ fun LoaderDialog(showDialog: Boolean, onDismiss: () -> Unit = {}) {
 fun SnackbarDemo(message:String) {
     // Create a SnackbarHostState
     val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
-
     // Show the Snackbar immediately
     LaunchedEffect(Unit) {
         snackbarHostState.showSnackbar(

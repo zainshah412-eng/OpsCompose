@@ -10,7 +10,9 @@ import com.ops.airportr.common.network.AuthInterceptor
 import com.ops.airportr.common.network.NetworkInterceptor
 import com.ops.airportr.common.network.SessionApiKeyInterceptor
 import com.ops.airportr.data.remote.ApiService
+import com.ops.airportr.data.remote.CCDApiService
 import com.ops.airportr.data.repository.CoinRepositoryImpl
+import com.ops.airportr.domain.repository.CCDCoinRepository
 import com.ops.airportr.domain.repository.CoinRepository
 import dagger.Module
 import dagger.Provides
@@ -59,6 +61,27 @@ object AppModule {
 
     @Provides
     fun provideApiService(retrofit: Retrofit): ApiService = retrofit.create(ApiService::class.java)
+    @Provides
+    fun provideCCDApiService(retrofit: Retrofit): CCDApiService = retrofit.create(CCDApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideCoinRepository(
+        api: ApiService,
+        ccdApiService: CCDApiService
+    ): CoinRepository {
+        return CoinRepositoryImpl(api, ccdApiService)
+    }
+
+    @Provides
+    @Singleton
+    fun provideCCDCoinRepository(
+        api: ApiService,
+        ccdApiService: CCDApiService
+    ): CCDCoinRepository {
+        return CoinRepositoryImpl(api, ccdApiService)
+    }
+
 
 //    @Singleton
 //    @Provides
@@ -83,9 +106,15 @@ object AppModule {
 //            .create(CoinPaprikaApi::class.java)
 //    }
 
-    @Provides
-    @Singleton
-    fun provideCoinRepository(api: ApiService): CoinRepository {
-        return CoinRepositoryImpl(api)
-    }
+//    @Provides
+//    @Singleton
+//    fun provideCoinRepository(api: ApiService): CoinRepository {
+//        return CoinRepositoryImpl(api)
+//    }
+//
+//    @Provides
+//    @Singleton
+//    abstract fun bindCCDCoinRepository(
+//        coinRepositoryImpl: CoinRepositoryImpl
+//    ): CCDCoinRepository
 }

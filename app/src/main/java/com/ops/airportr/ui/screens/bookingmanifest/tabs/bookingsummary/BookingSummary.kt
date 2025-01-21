@@ -1,20 +1,14 @@
-package com.ops.airportr.ui.screens.bookingmanifest.tabs
+package com.ops.airportr.ui.screens.bookingmanifest.tabs.bookingsummary
 
 import android.app.Activity
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,7 +18,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -37,7 +30,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
@@ -70,16 +62,18 @@ import com.ops.airportr.common.utils.BookingDetailsSingleton
 import com.ops.airportr.common.utils.abcTagBackGroundColor
 import com.ops.airportr.common.utils.convertDateForBagCheckIn
 import com.ops.airportr.common.utils.convertDateWithoutZoneTime
-import com.ops.airportr.common.utils.convertIntoDateTimeFormat
 import com.ops.airportr.common.utils.overSizeBagTagBackGroundColor
 import com.ops.airportr.common.utils.returnBackGroundColor
 import com.ops.airportr.common.utils.returnFlightTagsBackGround
-import com.ops.airportr.common.utils.returnJobsNumberCircleBackground
 import com.ops.airportr.common.utils.returnLabelAirPurple100Color
 import com.ops.airportr.common.utils.returnLabelDarkBlueColor
 import com.ops.airportr.domain.model.bookingdetails.BookingJourneyDetail
 import com.ops.airportr.domain.model.bookingdetails.Job
 import com.ops.airportr.ui.componts.Space
+import com.ops.airportr.ui.screens.bookingmanifest.tabs.bookingsummary.helper.ConditionAcceptanceBox
+import com.ops.airportr.ui.screens.bookingmanifest.tabs.bookingsummary.helper.ExcessChargesBox
+import com.ops.airportr.ui.screens.bookingmanifest.tabs.bookingsummary.helper.ExtraChargesBox
+import com.ops.airportr.ui.screens.bookingmanifest.tabs.bookingsummary.item.JobInnerItem
 
 @Composable
 fun BookingSummaryScreen(
@@ -123,8 +117,6 @@ fun BookingSummaryScreen(
                     .fillMaxSize()
                     .background(returnBackGroundColor(isDarkTheme))
             ) {
-
-
                 ConstraintLayout(
                     modifier = Modifier
                         .fillMaxSize()
@@ -364,7 +356,8 @@ fun BookingSummaryScreen(
                         width = Dimension.fillToConstraints
                         height = Dimension.wrapContent
                     }
-                    .padding(start = 10.dp, end = 10.dp)) {
+                    .padding(start = 10.dp, end = 10.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         modifier = Modifier
                             .padding(top = 5.dp)
@@ -424,7 +417,8 @@ fun BookingSummaryScreen(
                         end.linkTo(parent.end)
                         width = Dimension.fillToConstraints
                     }
-                    .padding(start = 10.dp, end = 10.dp, top = 5.dp))
+                    .padding(start = 10.dp, end = 10.dp, top = 5.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally)
                 {
                     Text(
                         modifier = Modifier
@@ -626,6 +620,7 @@ fun BookingSummaryScreen(
                         )
 
                     }
+
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -681,32 +676,43 @@ fun BookingSummaryScreen(
                         color = returnLabelDarkBlueColor(isDarkTheme), // Replace with your desired color
                     )
                     Space(10, 0)
-                    Box(
-                        modifier = Modifier
-                            .offset(x = 4.dp) // Equivalent to layout_marginStart
-                            .background(
-                                color = if (bookingDetails.bookingJourneyDetail?.isPreAcceptanceEligible == true)
-                                    dim_green_color else light_orange, // Replace with your badge background color
-                                shape = RoundedCornerShape(4.dp) // Adjust radius as needed
+                    if (bookingDetails.bookingJourneyDetail?.isPreAcceptanceEligible == true) {
+                        Box(
+                            modifier = Modifier
+                                //.offset(x = 4.dp) // Equivalent to layout_marginStart
+                                .background(
+                                    color = if (bookingDetails.bookingJourneyDetail?.isPreAcceptanceEligible == true)
+                                        dim_green_color else light_orange, // Replace with your badge background color
+                                    shape = RoundedCornerShape(4.dp) // Adjust radius as needed
+                                )
+                                .fillMaxWidth()
+                                .height(50.dp)
+                                .padding(
+                                    horizontal = 10.dp,
+                                    vertical = 10.dp,
+                                ) // Equivalent to paddingHorizontal, paddingTop, paddingBottom
+                            //.visible(false) // Replace with your visibility logic
+                        ) {
+
+                            Text(
+                                text = stringResource(id = R.string.pre_acceptance),
+                                color = dark_blue, // Text color
+                                style = MaterialTheme.typography.labelMedium, // Use your custom text style
+                                fontSize = 16.sp,
+                                modifier = Modifier.align(Alignment.CenterStart)
                             )
-                            .fillMaxWidth()
-
-                            .padding(
-                                horizontal = 10.dp,
-                                vertical = 10.dp,
-                            ) // Equivalent to paddingHorizontal, paddingTop, paddingBottom
-                        //.visible(false) // Replace with your visibility logic
-                    ) {
-
-                        Text(
-                            text = stringResource(id = R.string.pre_acceptance),
-                            color = dark_blue, // Text color
-                            style = MaterialTheme.typography.labelMedium, // Use your custom text style
-                            fontSize = 16.sp,
-                            modifier = Modifier.align(Alignment.CenterStart)
-                        )
+                        }
                     }
-                    AnimatedCollapsibleBox()
+                    if (bookingDetails.bookingJourneyDetail?.excessBaggagePayment != null) {
+                        ExcessChargesBox(isDarkTheme, bookingDetails)
+                    }
+                    if (bookingDetails.bookingJourneyDetail?.extraBagPayment != null) {
+                        ExtraChargesBox(isDarkTheme, bookingDetails)
+                    }
+                    if (bookingDetails.passengersList!!.size > 0 && bookingDetails.bookingJourneyDetail?.acceptanceMode == 1) {
+                        ConditionAcceptanceBox(isDarkTheme, bookingDetails)
+                    }
+                    Space(height = 50, width = 0)
                 }
 
             }
@@ -717,223 +723,4 @@ fun BookingSummaryScreen(
 }
 
 
-@Composable
-fun AnimatedCollapsibleBox() {
-    var isExpanded by remember { mutableStateOf(true) } // Track expanded/collapsed state
-    val boxHeight by animateDpAsState(targetValue = if (isExpanded) 200.dp else 50.dp) // Animate height
-    val boxColor by animateColorAsState(targetValue = if (isExpanded) Color.Blue else Color.Gray) // Animate color
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(boxHeight)
-                .background(boxColor)
-                .animateContentSize(), // Animate content changes
-            contentAlignment = Alignment.Center
-        ) {
-            this@Column.AnimatedVisibility(visible = isExpanded) {
-                Text(
-                    text = "Expanded Content",
-                    color = Color.White,
-                    style = MaterialTheme.typography.labelSmall
-                )
-            }
-            if (!isExpanded) {
-                Text(
-                    text = "Collapsed",
-                    color = Color.White,
-                    style = MaterialTheme.typography.labelSmall
-                )
-            }
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = { isExpanded = !isExpanded }) {
-            Text(text = if (isExpanded) "Collapse" else "Expand")
-        }
-    }
-}
-
-
-@Composable
-fun JobInnerItem(
-    itemAtPos: Job,
-    index: Int,
-    onClick: (Job) -> Unit
-) {
-    val isDarkTheme = isSystemInDarkTheme()
-
-    Box(modifier = Modifier.fillMaxWidth()) {
-        ConstraintLayout(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(returnBackGroundColor(isDarkTheme))
-                .padding(10.dp)
-                .clickable {
-                    onClick(itemAtPos)
-                }
-        ) {
-            val (roundedNumber, jobTitle, driverName, dateAndTime, jobStatus, dividerTag) = createRefs()
-
-            if (itemAtPos.jobType == 1 || itemAtPos.jobType == 6 || itemAtPos.jobType == 7) {
-                Box(
-                    modifier = Modifier
-                        .constrainAs(roundedNumber) {
-                            top.linkTo(parent.top)
-                            start.linkTo(parent.start)
-                            bottom.linkTo(parent.bottom)
-                        }
-                        .offset(x = 4.dp) // Equivalent to layout_marginStart
-                        .background(
-                            color = if (isDarkTheme) returnJobsNumberCircleBackground(
-                                isDarkTheme
-                            )
-                            else returnLabelAirPurple100Color(isDarkTheme), // Replace with your badge background color
-                            shape = RoundedCornerShape(15.dp) // Adjust radius as needed
-                        )
-                        .padding(
-                            horizontal = 10.dp,
-                            vertical = 4.dp
-                        ) // Equivalent to paddingHorizontal, paddingTop, paddingBottom
-                    //.visible(false) // Replace with your visibility logic
-                ) {
-                    Text(
-                        text = index.toString(),
-                        color = returnLabelDarkBlueColor(isDarkTheme), // Text color
-                        style = customTextLabelSmallStyle, // Use your custom text style
-                        fontSize = 10.sp,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
-
-
-                Box(
-                    modifier = Modifier
-                        .constrainAs(jobStatus) {
-                            top.linkTo(parent.top)
-                            end.linkTo(parent.end)
-                            bottom.linkTo(parent.bottom)
-                        }
-                        .offset(x = 4.dp) // Equivalent to layout_marginStart
-                        .background(
-                            color = if (isDarkTheme) returnJobsNumberCircleBackground(
-                                isDarkTheme
-                            )
-                            else returnLabelAirPurple100Color(isDarkTheme), // Replace with your badge background color
-                            shape = RoundedCornerShape(4.dp) // Adjust radius as needed
-                        )
-                        .padding(
-                            horizontal = 10.dp,
-                            vertical = 4.dp
-                        ) // Equivalent to paddingHorizontal, paddingTop, paddingBottom
-                    //.visible(false) // Replace with your visibility logic
-                ) {
-
-                    Text(
-                        text = if (itemAtPos.jobActivityStatus == 5)
-                            stringResource(id = R.string.done) else stringResource(id = R.string.to_do),
-                        color = returnLabelDarkBlueColor(isDarkTheme), // Text color
-                        style = customTextLabelSmallStyle, // Use your custom text style
-                        fontSize = 10.sp,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
-
-                var jobName = ""
-                when (itemAtPos.jobType) {
-                    1 -> {
-                        jobName = stringResource(id = R.string.job_acceptance)
-                    }
-
-                    6 -> {
-                        jobName = stringResource(id = R.string.job_repatriation)
-                    }
-
-                    7 -> {
-                        jobName = stringResource(id = R.string.job_inject)
-                    }
-
-                }
-
-                Text(
-                    modifier = Modifier
-                        .constrainAs(jobTitle) {
-                            top.linkTo(parent.top)
-                            start.linkTo(roundedNumber.end)
-                        }
-                        .padding(top = 5.dp, start = 10.dp)
-                        .fillMaxWidth(),
-                    textAlign = TextAlign.Start,
-                    text = jobName,
-                    style = MaterialTheme.typography.labelMedium, // Use your custom text style here
-                    fontSize = 18.sp,
-                    color = returnLabelDarkBlueColor(isDarkTheme), // Replace with your desired color
-                )
-
-                Text(
-                    modifier = Modifier
-                        .constrainAs(driverName) {
-                            top.linkTo(jobTitle.bottom)
-                            start.linkTo(roundedNumber.end)
-                            end.linkTo(jobStatus.start)
-                            width = Dimension.fillToConstraints
-
-                        }
-                        .padding(top = 5.dp, start = 10.dp),
-                    textAlign = TextAlign.Start,
-                    text = stringResource(
-                        id =
-                        R.string.champ_data,
-                        itemAtPos.currentChampion?.firstName ?: "",
-                        itemAtPos.currentChampion?.lastName ?: ""
-                    ),
-                    style = MaterialTheme.typography.labelSmall, // Use your custom text style here
-                    fontSize = 16.sp,
-                    color = returnLabelAirPurple100Color(isDarkTheme), // Replace with your desired color
-                )
-
-                Text(
-                    modifier = Modifier
-                        .constrainAs(dateAndTime) {
-                            top.linkTo(driverName.bottom)
-                            start.linkTo(roundedNumber.end)
-                            end.linkTo(jobStatus.start)
-                            width = Dimension.fillToConstraints
-
-                        }
-                        .padding(top = 5.dp, start = 10.dp),
-                    textAlign = TextAlign.Start,
-                    text = stringResource(
-                        id =
-                        R.string.date_data,
-                        itemAtPos.startDueDateTimeUTC?.convertIntoDateTimeFormat() ?: "",
-                        itemAtPos.endDueDateTimeUTC?.convertIntoDateTimeFormat() ?: ""
-                    ),
-                    style = MaterialTheme.typography.labelSmall, // Use your custom text style here
-                    fontSize = 16.sp,
-                    color = returnLabelAirPurple100Color(isDarkTheme), // Replace with your desired color
-                )
-                Divider(
-                    modifier = Modifier
-                        .constrainAs(dividerTag) {
-                            top.linkTo(dateAndTime.bottom)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                            width = Dimension.fillToConstraints
-
-                        }
-                        .padding(top = 10.dp),
-                    thickness = 0.5.dp, // Adjust this value for thickness
-                    color = if (isDarkTheme) editTextBorderStrockColor else light_white
-                )
-            }
-        }
-
-    }
-
-}

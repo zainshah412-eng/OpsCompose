@@ -29,9 +29,12 @@ import com.ops.airportr.R
 import com.ops.airportr.common.theme.customTextLabelSmallStyle
 import com.ops.airportr.common.theme.editTextBorderStrockColor
 import com.ops.airportr.common.theme.light_white
+import com.ops.airportr.common.theme.white
 import com.ops.airportr.common.utils.convertIntoDateTimeFormat
 import com.ops.airportr.common.utils.returnBackGroundColor
 import com.ops.airportr.common.utils.returnJobsNumberCircleBackground
+import com.ops.airportr.common.utils.returnJobsNumberCircleBackgroundOnJobComplete
+import com.ops.airportr.common.utils.returnJobsNumberCircleBackgroundOnJobInComplete
 import com.ops.airportr.common.utils.returnLabelAirPurple100Color
 import com.ops.airportr.common.utils.returnLabelDarkBlueColor
 import com.ops.airportr.domain.model.bookingdetails.Job
@@ -67,10 +70,23 @@ fun JobItem(
                                 }
                                 .offset(x = 4.dp) // Equivalent to layout_marginStart
                                 .background(
-                                    color = if (isDarkTheme) returnJobsNumberCircleBackground(
-                                        isDarkTheme
-                                    )
-                                    else returnLabelAirPurple100Color(isDarkTheme), // Replace with your badge background color
+                                    color = if (isDarkTheme) {
+                                        if (itemAtPos.jobActivityStatus == 5){
+                                            returnJobsNumberCircleBackgroundOnJobComplete(isDarkTheme)
+                                        } else{
+                                            returnJobsNumberCircleBackground(
+                                                isDarkTheme
+                                            )
+                                        }
+                                    } else {
+                                        if (itemAtPos.jobActivityStatus == 5){
+                                            returnJobsNumberCircleBackgroundOnJobComplete(isDarkTheme)
+                                        } else{
+                                            returnJobsNumberCircleBackground(
+                                                isDarkTheme
+                                            )
+                                        }
+                                    }, // Replace with your badge background color
                                     shape = RoundedCornerShape(15.dp) // Adjust radius as needed
                                 )
                                 .padding(
@@ -98,10 +114,23 @@ fun JobItem(
                                 }
                                 .offset(x = 4.dp) // Equivalent to layout_marginStart
                                 .background(
-                                    color = if (isDarkTheme) returnJobsNumberCircleBackground(
-                                        isDarkTheme
-                                    )
-                                    else returnLabelAirPurple100Color(isDarkTheme), // Replace with your badge background color
+                                    color = if (isDarkTheme) {
+                                        if (itemAtPos.jobActivityStatus == 5){
+                                            returnJobsNumberCircleBackgroundOnJobComplete(isDarkTheme)
+                                        } else{
+                                            returnJobsNumberCircleBackground(
+                                                isDarkTheme
+                                            )
+                                        }
+                                    } else {
+                                        if (itemAtPos.jobActivityStatus == 5){
+                                            returnJobsNumberCircleBackgroundOnJobComplete(isDarkTheme)
+                                        } else{
+                                            returnJobsNumberCircleBackgroundOnJobInComplete(
+                                                isDarkTheme
+                                            )
+                                        }
+                                    }, // Replace with your badge background color
                                     shape = RoundedCornerShape(4.dp) // Adjust radius as needed
                                 )
                                 .padding(
@@ -114,7 +143,17 @@ fun JobItem(
                             Text(
                                 text = if (itemAtPos.jobActivityStatus == 5)
                                     stringResource(id = R.string.done) else stringResource(id = R.string.to_do),
-                                color = returnLabelDarkBlueColor(isDarkTheme), // Text color
+                                color = if (isDarkTheme) {
+                                    if (itemAtPos.jobActivityStatus == 5){
+                                        white
+                                    } else{
+                                        returnLabelDarkBlueColor(
+                                            isDarkTheme
+                                        )
+                                    }
+                                } else {
+                                    white
+                                }, // Text color
                                 style = customTextLabelSmallStyle, // Use your custom text style
                                 fontSize = 10.sp,
                                 modifier = Modifier.align(Alignment.Center)

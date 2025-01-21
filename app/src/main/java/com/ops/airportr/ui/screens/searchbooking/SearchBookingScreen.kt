@@ -1,6 +1,7 @@
 package com.ops.airportr.ui.screens.searchbooking
 
 import android.app.Activity
+import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -48,6 +49,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.google.gson.Gson
 import com.ops.airportr.AppApplication
 import com.ops.airportr.R
 import com.ops.airportr.common.AppActionValues
@@ -188,6 +190,7 @@ fun SearchBookingScreen(
 
                 }
             }
+
             if (state.response != null && state.response?.bookingDetails != null) {
 
                 state.response?.bookingDetails?.let { it1 ->
@@ -409,7 +412,50 @@ fun SearchBookingScreen(
                             detailModel.jobs?.let { jobs.value.addAll(it) }
                             JobItem(
                                 context,
-                                onClick = {
+                                onClick = { jobObj ->
+                                    var name = ""
+                                    var flag = false
+                                    var seal = ""
+                                    var jobObject: Job = Job()
+                                    if (jobObj.jobType == AppActionValues.ACCEPTANCE_ACTION_VALUE) {
+                                        if (!detailModel.bookingContact?.firstName.isNullOrEmpty())
+                                            name =
+                                                "${
+                                                    detailModel.bookingContact?.firstName
+                                                } ${detailModel.bookingContact?.lastName}"
+
+                                        if (jobObj.currentChampion?.championId == null) {
+                                            AppApplication.sessionManager.saveCurrentChampionId("")
+                                        } else {
+                                            jobObj.currentChampion?.championId?.let {
+                                                AppApplication.sessionManager.saveCurrentChampionId(
+                                                    it
+                                                )
+                                            }
+                                        }
+                                        for (obj in detailModel.jobs!!) {
+                                            if (obj.jobType == AppActionValues.ACCEPTANCE_ACTION_VALUE) {
+                                                jobObject = obj
+                                                break
+                                            }
+                                        }
+
+                                        if (jobObject != null) {
+                                            // Convert jobObject to JSON
+                                            val jobJson = Gson().toJson(jobObject)
+
+                                            // Construct route with arguments
+                                            val encodedName = Uri.encode(name)
+                                            val encodedJobJson = Uri.encode(jobJson)
+                                            val route =
+                                                Screen.ProcessBag.route + "/${encodedName}/${encodedJobJson}"
+
+                                            // Navigate to the new screen
+                                            navHostController.moveOnNewScreen(route, false)
+                                        }
+
+
+                                    }
 
                                 },
                                 itemAtPos = jobs
@@ -486,7 +532,7 @@ fun SearchBookingScreen(
                         color = air_awesome_purple_100, // Replace with your desired color
                     )
 
-                    
+
                 }
             }
         }
