@@ -77,6 +77,7 @@ android {
             buildConfigField "String", "PRODUCTION_URL_CCD_UAT", "\"https://uat-apigateway.airportr.com/\""
             buildConfigField "String", "TWILIO", "\"https://puat-twiliotoken.azurewebsites.net/accesstoken\""
             buildConfigField "String", "CLARITY_", "\"mndfs6v68g\""
+            buildConfigField "String", "MAPBOX_KEY", "\"pk.eyJ1IjoiYWlycG9ydHIiLCJhIjoiY2xzbjE1aXo5MGdobDJyb2VweXEwdWpieSJ9.WB4rQNA8XI2zOY1oUAt0AA\""
             buildConfigField "String", "EMAILS", "\"zainshah412.za@gmail.com;saad7aeed@gmail.com;shazuvirk@gmail.com\""
         }
         uat {
@@ -99,6 +100,7 @@ android {
             buildConfigField "String", "PRODUCTION_URL_CCD_UAT", "\"https://uat-apigateway.airportr.com/\""
             buildConfigField "String", "TWILIO", "\"https://puat-twiliotoken.azurewebsites.net/accesstoken\""
             buildConfigField "String", "CLARITY_", "\"mndfs6v68g\""
+            buildConfigField "String", "MAPBOX_KEY", "\"pk.eyJ1IjoiYWlycG9ydHIiLCJhIjoiY2xzbjE1aXo5MGdobDJyb2VweXEwdWpieSJ9.WB4rQNA8XI2zOY1oUAt0AA\""
             buildConfigField "String", "EMAILS", "\"zainshah412.za@gmail.com;saad7aeed@gmail.com;shazuvirk@gmail.com\""
 
         }
@@ -122,6 +124,7 @@ android {
             buildConfigField "String", "PRODUCTION_URL_CCD_UAT", "\"https://uat-apigateway.airportr.com/\""
             buildConfigField "String", "TWILIO", "\"https://twimldialer.azurewebsites.net/accesstoken\""
             buildConfigField "String", "CLARITY_", "\"o89e9dvfwq\""
+            buildConfigField "String", "MAPBOX_KEY", "\"pk.eyJ1IjoiYWlycG9ydHIiLCJhIjoiY2xzbjE1aXo5MGdobDJyb2VweXEwdWpieSJ9.WB4rQNA8XI2zOY1oUAt0AA\""
             buildConfigField "String", "EMAILS", "\"appfeedback@portr.com;ggreen@portr.com;ccollins@portr.com;sgehnich@portr.com\""
 
         }

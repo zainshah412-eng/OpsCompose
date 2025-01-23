@@ -14,6 +14,7 @@ object AppConstants {
     const val CLARITY_ = BuildConfig.CLARITY_ //UAT
     const val TWILIO = BuildConfig.TWILIO //UAT
     const val EMAILS = BuildConfig.EMAILS //UAT
+    const val MAPBOX = BuildConfig.MAPBOX_KEY //UAT
 
     const val AZURE_STORAGE_BASE_URL = "https://portrdevimagestorage.blob.core.windows.net/"
     const val SMS_CHAT_URL_DEV = "https://pdev-comms-microservice.azurewebsites.net/"

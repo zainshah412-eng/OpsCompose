@@ -15,6 +15,7 @@ import com.mapbox.navigation.base.route.RouterOrigin
 import com.mapbox.navigation.base.route.toDirectionsRoutes
 import com.mapbox.navigation.core.MapboxNavigation
 import com.mapbox.navigation.core.MapboxNavigationProvider
+import com.ops.airportr.common.AppConstants.MAPBOX
 
 class GetTimeAndDistanceBtwTwoPoints(private var context: Context?) {
     private var mapboxNavigation: MapboxNavigation? = null
@@ -31,7 +32,7 @@ class GetTimeAndDistanceBtwTwoPoints(private var context: Context?) {
     private fun mapBoxInitialize() {
         context?.let { ctx ->
             val navigationOptions = NavigationOptions.Builder(ctx)
-                .accessToken(constants.mapboxApiKey)
+                .accessToken(MAPBOX)
                 .build()
             mapboxNavigation = MapboxNavigationProvider.create(navigationOptions)
 //            mapboxNavigation = if (MapboxNavigationProvider.isCreated()) {
