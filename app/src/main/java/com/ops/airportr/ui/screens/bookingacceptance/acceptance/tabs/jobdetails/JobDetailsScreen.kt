@@ -3,6 +3,7 @@ package com.ops.airportr.ui.screens.bookingacceptance.acceptance.tabs.jobdetails
 import android.app.Activity
 import android.os.Build
 import android.util.Log
+import android.view.View
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -39,9 +40,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -55,6 +58,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.mapbox.geojson.Point
 import com.ops.airportr.AppApplication
 import com.ops.airportr.BuildConfig
 import com.ops.airportr.R
@@ -78,6 +82,7 @@ import com.ops.airportr.common.utils.convertIntoRelativeDateForAcceptanceDetail
 import com.ops.airportr.common.utils.getAirlineLogo
 import com.ops.airportr.common.utils.getCurrentTimeStampIntoFormat
 import com.ops.airportr.common.utils.getNetworkType
+import com.ops.airportr.common.utils.mapbox.GetTimeAndDistanceBtwTwoPoints
 import com.ops.airportr.common.utils.maskPhoneNumber
 import com.ops.airportr.common.utils.overSizeBagTagBackGroundColor
 import com.ops.airportr.common.utils.returnBackGroundColor
@@ -103,6 +108,9 @@ import com.ops.airportr.ui.componts.Space
 import com.ops.airportr.ui.componts.TickAnimation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 
 var bookingDetails: BookingDetailsSingleton = BookingDetailsSingleton()
@@ -119,11 +127,11 @@ fun JobDetailsScreen(
     val context = LocalContext.current
     val isDarkTheme = isSystemInDarkTheme()
     val scrollState = rememberScrollState()
+    var getTimeAndDistanceBtwTwoPoints: GetTimeAndDistanceBtwTwoPoints? = null
 
     var snackBarShowFlag by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
     var showLoader by remember { mutableStateOf(false) }
-    var isLoading by remember { mutableStateOf(false) }
 
 
     var detailModel by remember { mutableStateOf(BookingJourneyDetail()) }
@@ -140,21 +148,23 @@ fun JobDetailsScreen(
     var isConditionalFlag by remember { mutableStateOf(false) }
     var showSnackBarCheckForZeroBagCount by remember { mutableStateOf(false) }
     var showSnackBarCheckForJobStarted by remember { mutableStateOf(false) }
-    var snackBarMessage by remember {
-        mutableStateOf("")
-    }
-    var bottomSheetShowCases by remember {
-        mutableStateOf(-1)
-    }
+    var snackBarMessage by remember { mutableStateOf("") }
+    var bottomSheetShowCases by remember { mutableStateOf(-1) }
+
+    //ETA
+    var etaText by remember { mutableStateOf("") } // Initial text
+    var etaBackGroundColor by remember { mutableStateOf(Color.Black) } // Initial text
+    var etaBackTextColor by remember { mutableStateOf(Color.Black) } // Initial text
+    var timeDuration by remember { mutableStateOf(0.0) } // Initial text
+    var etaLoader by remember { mutableStateOf(false) } // Initial text
+    var etaBoxColorFlag by remember { mutableStateOf(false) } // Initial text
+
     val coroutineScope = rememberCoroutineScope()
-
-
     val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
 
 
     // Trigger reappearance logic
     LaunchedEffect(showTickStartJob) {
-        Log.wtf("showTickStartJob", showTickStartJob.toString())
         if (showTickStartJob) {
             delay(1000) // Duration of tick animation
             showTickStartJob = false
@@ -187,15 +197,11 @@ fun JobDetailsScreen(
 
                 }
             }
-
-            //  delay(1000) // Delay before showing the slider again
-
         }
     }
 
     // Trigger reappearance logic
     LaunchedEffect(showTickStartAcceptance) {
-        Log.wtf("showTickStartAcceptance", showTickStartAcceptance.toString())
         if (showTickStartAcceptance) {
             delay(1500) // Duration of tick animation
             showTickStartAcceptance = false
@@ -211,6 +217,8 @@ fun JobDetailsScreen(
             sheetState.show()
         }
     }
+
+
 
     val acceptanceLockState = viewModel.stateAcceptance.value
     val smsDeviceDataState = viewModel.smsDeviceData.value
@@ -592,43 +600,19 @@ fun JobDetailsScreen(
                                             .padding(top = 5.dp)
                                             .fillMaxWidth(),
                                         textAlign = TextAlign.Start,
-                                        text = timeDate.toString(),
+                                        text = timeDate,
                                         style = MaterialTheme.typography.labelSmall, // Use your custom text style here
                                         fontSize = 12.sp,
                                         color = returnLabelDarkBlueColor(isDarkTheme), // Replace with your desired color
                                     )
 
                                     Space(height = 5, width = 5)
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(RoundedCornerShape(5.dp)) // Apply rounded corners
-                                            .background(returnETABackGroundBox(isDarkTheme)) // Set background color
-                                            .border(
-                                                0.dp,
-                                                returnETABackGroundBox(isDarkTheme),
-                                                RoundedCornerShape(5.dp)
-                                            )
-                                            .padding(
-                                                top = 6.dp,
-                                                bottom = 6.dp,
-                                                start = 10.dp,
-                                                end = 10.dp
-                                            )
-
-                                    ) {
-                                        val isAbcBooking =
-                                            detailModel.addOnProductsOverview?.isEmpty() != true
-                                                    && detailModel.addOnProductsOverview.get(
-                                                0
-                                            ).addOnProductType == 1
-                                        Text(
-                                            text = stringResource(id = R.string.eta),
-                                            color = if (isDarkTheme) badgeTextColor else customEditTextColorDarkTheme, // Text color
-                                            style = MaterialTheme.typography.labelSmall, // Use your custom text style
-                                            fontSize = 10.sp,
-                                            modifier = Modifier.align(Alignment.Center)
-                                        )
-                                    }
+                                    returnETABox(
+                                        eta = if (etaText == "") stringResource(id = R.string.eta) else etaText,
+                                        isDarkTheme = isDarkTheme,
+                                        etaBackGroundColor,
+                                        etaBackTextColor
+                                    )
 
                                     Divider(
                                         modifier = Modifier
@@ -1111,6 +1095,20 @@ fun JobDetailsScreen(
                     snackBarMessage = stringResource(id = R.string.job_started)
                     SnackbarDemo(snackBarMessage)
                 }
+
+                if(etaBoxColorFlag){
+                    calculateRemainingTimeAndDis(
+                        timeDuration,
+                        time = { time ->
+                            etaText = time
+                        },
+                        textColorCode = { color ->
+                                 etaBackTextColor = color
+                        },
+                        backgroundColorCode = { color ->
+                            etaBackGroundColor = color
+                        })
+                }
             }
 
 
@@ -1122,8 +1120,7 @@ fun JobDetailsScreen(
                 AppApplication.sessionManager.saveJobStartDateAndTime(
                     getCurrentTimeStampIntoFormat()
                 )
-                showSliderStartJob = true
-                isAcceptanceStarted = true
+
                 if (bookingDetails.bookingJourneyDetail?.isConditionalAcceptance == true
                 ) {
                     isConditionalFlag = true
@@ -1132,6 +1129,23 @@ fun JobDetailsScreen(
                     showSnackBarCheckForJobStarted = true
                     AppApplication.sessionManager.saveActiveBookingDetails(bookingDetails.bookingDetailFromDb)
                     AppApplication.sessionManager.saveTrackingApi(true)
+                    getTimeAndDistanceBtwTwoPoints = GetTimeAndDistanceBtwTwoPoints(activity)
+                    if (getTimeAndDistanceBtwTwoPoints != null) {
+                        getTimeAndDistanceFromDestination(
+                            getTimeAndDistanceBtwTwoPoints!!,
+                            onEtaDistanceDuration = { distance, duration ->
+                                showSliderStartJob = true
+                                isAcceptanceStarted = true
+                                etaBoxColorFlag = true
+                                timeDuration = duration
+
+
+                            },
+                            etaLoader = { flag ->
+                                etaLoader = flag
+                            }
+                        )
+                    }
                 }
 
             }
@@ -1180,6 +1194,9 @@ fun JobDetailsScreen(
             }
             if (acceptanceLockState.isLoading || smsDeviceDataState.isLoading || updateJobDataState.isLoading) {
                 showLoader = true
+                LoaderDialog(showDialog = showLoader)
+            }
+            if (etaLoader) {
                 LoaderDialog(showDialog = showLoader)
             }
         }
@@ -1266,6 +1283,40 @@ fun TimeLockAlert(
             }
         }
 
+    }
+}
+
+@Composable
+fun returnETABox(
+    eta: String,
+    isDarkTheme: Boolean,
+    backGroundColor: Color,
+    textColor: Color
+) {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(5.dp)) // Apply rounded corners
+            .background(backGroundColor) // Set background color
+            .border(
+                0.dp,
+                backGroundColor,
+                RoundedCornerShape(5.dp)
+            )
+            .padding(
+                top = 6.dp,
+                bottom = 6.dp,
+                start = 10.dp,
+                end = 10.dp
+            )
+
+    ) {
+        Text(
+            text = eta,
+            color = textColor, // Text color
+            style = MaterialTheme.typography.labelSmall, // Use your custom text style
+            fontSize = 10.sp,
+            modifier = Modifier.align(Alignment.Center)
+        )
     }
 }
 
@@ -1413,4 +1464,174 @@ private fun returnChampionExistOrNot(): Boolean {
     } else {
         return true
     }
+}
+
+@Composable
+private fun getTimeAndDistanceFromDestination(
+    getTimeAndDistanceBtwTwoPoints: GetTimeAndDistanceBtwTwoPoints,
+    onEtaDistanceDuration: (Double, Double) -> Unit,
+    etaLoader: (Boolean) -> Unit
+) {
+    val currentLat = AppApplication.sessionManager.getLastUserLocation.latitude
+    val currentLng = AppApplication.sessionManager.getLastUserLocation.longitude
+
+    val destinationLat =
+        bookingDetails.bookingJourneyDetail?.collectionLocation?.geoCoord?.latitude
+
+    val destinationLng =
+        bookingDetails.bookingJourneyDetail?.collectionLocation?.geoCoord?.longitude
+
+    if (currentLat != null && currentLng != null && destinationLat != null && destinationLng != null) {
+        val origin = Point.fromLngLat(currentLng, currentLat)
+        val destination = Point.fromLngLat(destinationLng, destinationLat)
+        getTimeAndDistanceBtwTwoPoints?.setOnGetDistanceAndDurationListener(object :
+            GetTimeAndDistanceBtwTwoPoints.OnGetDistanceAndDurationListener {
+            override fun onSuccess(distance: Double, duration: Double) {
+                etaLoader(false)
+                onEtaDistanceDuration(distance, duration)
+            }
+
+            override fun onFailed(message: String) {
+                Log.wtf("getDistanceAndTime2", "onFailed -> $message")
+                // (activity as AcceptanceJobAct).hideLoader()
+                etaLoader(false)
+            }
+
+            override fun onLoading(isLoading: Boolean) {
+                Log.wtf("getDistanceAndTime1", "onLoading -> $isLoading")
+                if (AppApplication.sessionManager.userDetails.userId ==
+                    AppApplication.sessionManager.currentChampId && isLoading
+                ) {
+                    etaLoader(true)
+                }
+
+            }
+
+        })
+        getTimeAndDistanceBtwTwoPoints?.getDirectionalRoute(origin, destination)
+    }
+}
+
+@Composable
+fun calculateRemainingTimeAndDis(
+    duration: Double,
+    time: (String) -> Unit,
+    textColorCode: (Color) -> Unit,
+    backgroundColorCode: (Color) -> Unit
+) {
+    var timeSlot = ""
+    for (obj in bookingDetails.bookingJourneyDetail?.jobs!!) {
+        if (obj.jobType == 1) {
+            var conditionalAcceptanceColorPair: Pair<Color, Color> =
+                Pair(
+                    colorResource(id = R.color.dim_orange_15),
+                    colorResource(id = R.color.dark_orange)
+                )
+
+            val whenReach = getSlotDifference(
+                obj.startDueDateTimeUTC,
+                obj.endDueDateTimeUTC,
+                duration.toInt()
+            )
+            if (whenReach.equals("orange_early") || whenReach.equals("orange_late")) {
+                timeSlot =
+                    if (whenReach.equals("orange_early")) stringResource(id = R.string.arriving_early)
+                    else stringResource(id = R.string.arriving_late)
+                conditionalAcceptanceColorPair =
+                    Pair(
+                        colorResource(id = R.color.dim_orange_15),
+                        colorResource(id = R.color.dark_orange)
+                    )
+
+
+            } else if (whenReach.equals("red_early") || whenReach.equals("red_late")) {
+                timeSlot =
+                    if (whenReach.equals("red_early")) stringResource(id = R.string.arriving_early) else stringResource(
+                        id = R.string.arriving_late
+                    )
+                conditionalAcceptanceColorPair = Pair(
+                    colorResource(id = R.color.light_red),
+                    colorResource(id = R.color.red)
+                )
+            } else if (whenReach.equals("in_slot")) {
+                timeSlot = stringResource(id = R.string.arriving_on_time)
+                conditionalAcceptanceColorPair = Pair(
+                    colorResource(id = R.color.air_purple),
+                    colorResource(id = R.color.air_awesome_purple_light_50)
+                )
+            }
+            time(timeSlot)
+            textColorCode(conditionalAcceptanceColorPair.second)
+            backgroundColorCode(conditionalAcceptanceColorPair.first)
+        }
+    }
+
+    var distance = AppApplication.sessionManager.distance
+    var activeBooking = AppApplication.sessionManager.activeBookingDetails
+//    if (activeBooking != null && distance > 10) {
+//        if (activeBooking.bookingJourneyDetails.get(0).bookingReference ==
+//            bookingDetailFromDb?.bookingReference
+//        ) {
+//            binding.onFleetLayout.visibility = View.VISIBLE
+//            binding.acceptMsgDescription.visibility = View.VISIBLE
+//            binding.slideToUnlockForStartJobBox.visibility = View.VISIBLE
+//            binding.slideToUnlock.visibility = View.GONE
+//        } else {
+//            checkStatusOfAcceptance()
+//            binding.onFleetLayout.visibility = View.GONE
+//            binding.acceptMsgDescription.visibility = View.GONE
+//            binding.slideToUnlockForStartJobBox.visibility = View.GONE
+//            binding.slideToUnlock.visibility = View.VISIBLE
+//        }
+//    }
+//
+//    callTrackData(duration)
+}
+
+private fun getSlotDifference(start: String?, end: String?, seconds: Int): String {
+    if (!start.isNullOrEmpty() && !end.isNullOrEmpty()) {
+        try {
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH)
+
+            val startTime = dateFormat.parse(start)
+            val endTime = dateFormat.parse(end)
+
+            val calendar = java.util.Calendar.getInstance()
+            calendar.time = Date()
+            if (seconds >= 0) {
+                calendar.add(java.util.Calendar.SECOND, seconds)
+            }
+
+            val formattedDate = dateFormat.format(calendar.time)
+
+            val currentTime = dateFormat.parse(formattedDate)
+
+            val fifteenMinutes = 15 * 60 * 1000 // 15 minutes in milliseconds
+
+            val startTimeMinus15Minutes = Date(startTime!!.time - fifteenMinutes)
+            val endTimePlus15Minutes = Date(endTime!!.time + fifteenMinutes)
+
+            return if (currentTime.after(startTimeMinus15Minutes) && currentTime.before(
+                    startTime
+                )
+            ) {
+                "orange_early"
+            } else if (currentTime.after(endTime) && currentTime.before(endTimePlus15Minutes)) {
+                "orange_late"
+            } else if (currentTime.before(startTimeMinus15Minutes)
+            ) {
+                "red_early"
+            } else if (currentTime.after(
+                    endTimePlus15Minutes
+                )
+            ) {
+                "red_late"
+            } else {
+                "in_slot"
+            }
+        } catch (e: Exception) {
+            Log.wtf("getSlotDifference", "Exception -> ${e.message}")
+        }
+    }
+    return ""
 }

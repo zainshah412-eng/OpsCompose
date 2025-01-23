@@ -8,6 +8,7 @@ import com.ops.airportr.domain.model.BaseUrl
 import com.ops.airportr.domain.model.bookingdetails.BookingDetails
 import com.ops.airportr.domain.model.login.AuthTokenResp
 import com.ops.airportr.domain.model.login.logincred.LoginCred
+import com.ops.airportr.domain.model.user.GeoCoord
 import com.ops.airportr.domain.model.user.User
 import com.ops.airportr.domain.model.whatsnew.WhatsNewResponse
 
@@ -507,24 +508,24 @@ class SessionManager(
 //            val json: String? = pref.getString(KEY_VIEW_JOB_DETAILS, "")
 //            return Gson().fromJson(json, ViewJobResponse::class.java)
 //        }
-//
-//    val getLastUserLocation: GeoCoord
-//        get() {
-//            var lat = pref.getString(KEY_LATITUDE, "")
-//            var lon = pref.getString(KEY_LONGITUDE, "")
-//            if (lat == "" || lon == "") {
-//                return GeoCoord(
-//                    0.0,
-//                    0.0
-//                )
-//            } else {
-//                return GeoCoord(
-//                    pref.getString(KEY_LATITUDE, "")!!.toDouble(),
-//                    pref.getString(KEY_LONGITUDE, "")!!.toDouble()
-//                )
-//            }
-//        }
-//
+
+    val getLastUserLocation: GeoCoord
+        get() {
+            var lat = pref.getString(KEY_LATITUDE, "")
+            var lon = pref.getString(KEY_LONGITUDE, "")
+            if (lat == "" || lon == "") {
+                return GeoCoord(
+                    0.0,
+                    0.0
+                )
+            } else {
+                return GeoCoord(
+                    pref.getString(KEY_LATITUDE, "")!!.toDouble(),
+                    pref.getString(KEY_LONGITUDE, "")!!.toDouble()
+                )
+            }
+        }
+
 //    val tagInjectHeaderCustomModel: ArrayList<TagInjectHeaderCustomModel>
 //        get() {
 //            val emptyList = Gson().toJson(ArrayList<TagInjectHeaderCustomModel>())
