@@ -1,7 +1,6 @@
 package com.ops.airportr.ui.screens.splashscreen
 
 import android.app.Activity
-import android.content.Intent
 import androidx.compose.animation.core.EaseInOutElastic
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -32,9 +31,8 @@ import com.ops.airportr.R
 import com.ops.airportr.common.theme.air_purple
 import com.ops.airportr.common.theme.colorPrimaryDarkTheme
 import com.ops.airportr.common.theme.white
-import com.ops.airportr.common.utils.moveOnNewScreen
+import com.ops.airportr.common.utils.extension.moveOnNewScreen
 import com.ops.airportr.route.Screen
-import com.ops.airportr.ui.componts.LoaderDialog
 import kotlinx.coroutines.delay
 
 

@@ -39,8 +39,7 @@ import com.google.zxing.qrcode.QRCodeWriter
 import com.ops.airportr.AppApplication
 import com.ops.airportr.R
 import com.ops.airportr.common.theme.air_purple
-import com.ops.airportr.common.theme.dark_blue
-import com.ops.airportr.common.utils.getCurrentTimeStampIntoFormat
+import com.ops.airportr.common.utils.extension.getCurrentTimeStampIntoFormat
 import com.ops.airportr.common.utils.returnBackGroundColor
 import com.ops.airportr.common.utils.returnLabelAirPurple100Color
 import com.ops.airportr.common.utils.returnLabelDarkBlueColor

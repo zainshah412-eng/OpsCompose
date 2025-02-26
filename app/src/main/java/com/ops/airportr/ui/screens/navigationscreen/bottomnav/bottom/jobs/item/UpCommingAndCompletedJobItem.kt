@@ -48,8 +48,8 @@ import com.ops.airportr.common.theme.editTextBorderStrockColor
 import com.ops.airportr.common.theme.light_white
 import com.ops.airportr.common.theme.white
 import com.ops.airportr.common.utils.abcTagBackGroundColor
-import com.ops.airportr.common.utils.convertIntoDateTimeFormat
-import com.ops.airportr.common.utils.convertIntoRelativeDateWithTimeSlot
+import com.ops.airportr.common.utils.extension.convertIntoDateTimeFormat
+import com.ops.airportr.common.utils.extension.convertIntoRelativeDateWithTimeSlot
 import com.ops.airportr.common.utils.overSizeBagTagBackGroundColor
 import com.ops.airportr.common.utils.returnBackGroundColor
 import com.ops.airportr.common.utils.returnLabelAirPurple100Color

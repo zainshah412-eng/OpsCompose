@@ -32,13 +32,13 @@ import com.ops.airportr.R
 import com.ops.airportr.common.theme.customTextLabelSmallStyle
 import com.ops.airportr.common.utils.callbacks.ImageLoadCallbacks
 import com.ops.airportr.common.utils.callbacks.LoadImageUsingCallback
-import com.ops.airportr.common.utils.removeLastChar
+import com.ops.airportr.common.utils.extension.removeLastChar
 import com.ops.airportr.common.utils.returnBackGroundColor
 import com.ops.airportr.common.utils.returnLabelAirPurple100Color
 import com.ops.airportr.common.utils.returnLabelDarkBlueColor
 import com.ops.airportr.common.utils.returnLeadPassengerBackGround
 import com.ops.airportr.common.utils.returnSealAndIataTagsColor
-import com.ops.airportr.common.utils.sealReturn
+import com.ops.airportr.common.utils.extension.sealReturn
 import com.ops.airportr.domain.model.bookingdetails.BookingLuggageTamperAwareLiteSeal
 import com.ops.airportr.domain.model.bookingdetails.PassengerLuggage
 

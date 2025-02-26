@@ -40,8 +40,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ops.airportr.R
-import com.ops.airportr.common.theme.air_green
-import com.ops.airportr.common.theme.air_green_new_light
 import com.ops.airportr.common.theme.air_orange
 import com.ops.airportr.common.theme.avocarto
 import com.ops.airportr.common.theme.dark_blue
@@ -50,8 +48,8 @@ import com.ops.airportr.common.theme.green
 import com.ops.airportr.common.theme.light_red
 import com.ops.airportr.common.theme.red
 import com.ops.airportr.common.utils.BookingDetailsSingleton
-import com.ops.airportr.common.utils.convertDateForHHMM
-import com.ops.airportr.common.utils.convertDateInto_dd_MMM_yyyy
+import com.ops.airportr.common.utils.extension.convertDateForHHMM
+import com.ops.airportr.common.utils.extension.convertDateInto_dd_MMM_yyyy
 import com.ops.airportr.common.utils.imagedownloader.ImageDownloaderWorker
 import com.ops.airportr.common.utils.returnConditionalAcceptanceBackGround
 import com.ops.airportr.common.utils.returnFlagsBackGround

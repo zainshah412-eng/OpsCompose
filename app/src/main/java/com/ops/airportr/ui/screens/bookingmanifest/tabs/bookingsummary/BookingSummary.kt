@@ -60,8 +60,8 @@ import com.ops.airportr.common.theme.light_white
 import com.ops.airportr.common.theme.white
 import com.ops.airportr.common.utils.BookingDetailsSingleton
 import com.ops.airportr.common.utils.abcTagBackGroundColor
-import com.ops.airportr.common.utils.convertDateForBagCheckIn
-import com.ops.airportr.common.utils.convertDateWithoutZoneTime
+import com.ops.airportr.common.utils.extension.convertDateForBagCheckIn
+import com.ops.airportr.common.utils.extension.convertDateWithoutZoneTime
 import com.ops.airportr.common.utils.overSizeBagTagBackGroundColor
 import com.ops.airportr.common.utils.returnBackGroundColor
 import com.ops.airportr.common.utils.returnFlightTagsBackGround

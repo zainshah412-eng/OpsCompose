@@ -3,12 +3,18 @@ package com.ops.airportr.data.remote
 
 import com.ops.airportr.domain.model.acceptance.UpdateAcceptanceParam
 import com.ops.airportr.domain.model.acceptance.response.UpdateAcceptanceLockResponce
+import com.ops.airportr.domain.model.applyactionupdate.params.ApplyActionUpdateSealParams
+import com.ops.airportr.domain.model.applyactionupdate.response.ApplyActionUpdateSealResponse
 import com.ops.airportr.domain.model.bookingnotes.GetBookingNotesByReference
 import com.ops.airportr.domain.model.getImage.GetImageParams
 import com.ops.airportr.domain.model.getImage.response.GetImageResponse
 import com.ops.airportr.domain.model.joblist.retrievejobs.params.RetrieveJobsParams
 import com.ops.airportr.domain.model.joblist.retrievejobs.response.RetrieveJobsResponse
 import com.ops.airportr.domain.model.login.AuthTokenResp
+import com.ops.airportr.domain.model.message.GetMessagesParam
+import com.ops.airportr.domain.model.message.response.GetMessagesResponse
+import com.ops.airportr.domain.model.note.BookingNoteParams
+import com.ops.airportr.domain.model.note.BookingNoteResponseModel
 import com.ops.airportr.domain.model.resetpassword.ResetPasswordParam
 import com.ops.airportr.domain.model.resetpassword.ResetPasswordResponse
 import com.ops.airportr.domain.model.registerdevice.RegisterDeviceParams
@@ -122,5 +128,23 @@ interface ApiService {
         @Url url: String,
         @Body body: UpdateJobParam,
     ): Response<UpdateUserResponse>
+
+    @POST
+    suspend fun applyActionUpdateNew(
+        @Url url: String,
+        @Body body: ApplyActionUpdateSealParams,
+    ): Response<ApplyActionUpdateSealResponse>
+
+    @POST
+    suspend fun addBookingNote(
+        @Url url: String,
+        @Body body: BookingNoteParams,
+    ): Response<BookingNoteResponseModel>
+
+    @POST
+    suspend fun getMessages(
+        @Url url: String,
+        @Body body: GetMessagesParam,
+    ): Response<GetMessagesResponse>
 
 }

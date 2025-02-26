@@ -42,9 +42,9 @@ import com.ops.airportr.common.utils.returnBackGroundColor
 import com.ops.airportr.common.utils.returnLabelAirPurpleColor
 import com.ops.airportr.common.utils.returnLabelDarkBlueColor
 import com.ops.airportr.domain.model.bookingdetails.Job
+import com.ops.airportr.ui.screens.bookingacceptance.acceptance.tabs.jobsms.MessagesScreen
 import com.ops.airportr.ui.screens.bookingacceptance.acceptance.tabs.jobdetails.JobDetailsScreen
-import com.ops.airportr.ui.screens.bookingacceptance.acceptance.tabs.MessagesScreen
-import com.ops.airportr.ui.screens.bookingacceptance.acceptance.tabs.NotesScreen
+import com.ops.airportr.ui.screens.bookingacceptance.acceptance.tabs.jobnotes.JobNotesScreen
 
 @Composable
 fun AcceptanceScreen(
@@ -164,7 +164,11 @@ fun AcceptanceScreen(
                     passengerName
                 )
 
-                1 -> NotesScreen(navHostController)
+                1 -> JobNotesScreen(
+                    navHostController,
+                    job
+                )
+
                 2 -> MessagesScreen(navHostController)
             }
         }

@@ -1,9 +1,7 @@
 package com.ops.airportr.ui.screens.bookingacceptance.acceptance.tabs.jobdetails
 
 import android.app.Activity
-import android.os.Build
 import android.util.Log
-import android.view.View
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -13,7 +11,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -44,7 +41,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -58,13 +54,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.mapbox.geojson.Point
 import com.ops.airportr.AppApplication
-import com.ops.airportr.BuildConfig
 import com.ops.airportr.R
 import com.ops.airportr.common.AppActionValues
+import com.ops.airportr.common.AppActionValues.Companion.DISTANCE_GREATER_THAN_75
+import com.ops.airportr.common.AppActionValues.Companion.DISTANCE_LESS_THAN_75
 import com.ops.airportr.common.AppConstants
-import com.ops.airportr.common.AppConstants.SEND_DEVICE_DATA
 import com.ops.airportr.common.AppConstants.UPDATE_ACCEPTANCE_LOCK
 import com.ops.airportr.common.theme.air_purple
 import com.ops.airportr.common.theme.air_red
@@ -77,40 +72,42 @@ import com.ops.airportr.common.theme.light_white
 import com.ops.airportr.common.theme.white
 import com.ops.airportr.common.utils.BookingDetailsSingleton
 import com.ops.airportr.common.utils.abcTagBackGroundColor
-import com.ops.airportr.common.utils.convertIntoDateTimeFormat
-import com.ops.airportr.common.utils.convertIntoRelativeDateForAcceptanceDetail
-import com.ops.airportr.common.utils.getAirlineLogo
-import com.ops.airportr.common.utils.getCurrentTimeStampIntoFormat
-import com.ops.airportr.common.utils.getNetworkType
+import com.ops.airportr.common.utils.extension.checkForTimeInMillisToCheckTimeSlot
+import com.ops.airportr.common.utils.extension.convertIntoDateTimeFormat
+import com.ops.airportr.common.utils.extension.convertIntoRelativeDateForAcceptanceDetail
+import com.ops.airportr.common.utils.extension.getAirlineLogo
+import com.ops.airportr.common.utils.extension.getCurrentTimeStampIntoFormat
+import com.ops.airportr.common.utils.extension.maskPhoneNumber
+import com.ops.airportr.common.utils.extension.text2Html
+import com.ops.airportr.common.utils.extension.toast
+import com.ops.airportr.common.utils.extension.urlForAcceptance
 import com.ops.airportr.common.utils.mapbox.GetTimeAndDistanceBtwTwoPoints
-import com.ops.airportr.common.utils.maskPhoneNumber
 import com.ops.airportr.common.utils.overSizeBagTagBackGroundColor
 import com.ops.airportr.common.utils.returnBackGroundColor
-import com.ops.airportr.common.utils.returnETABackGroundBox
-import com.ops.airportr.common.utils.returnJobsNumberCircleBackgroundOnJobInComplete
 import com.ops.airportr.common.utils.returnLabelAirPurple100Color
 import com.ops.airportr.common.utils.returnLabelAirPurpleColor
 import com.ops.airportr.common.utils.returnLabelDarkBlueColor
-import com.ops.airportr.common.utils.text2Html
 import com.ops.airportr.common.utils.translations.AppMessagesTranslation
-import com.ops.airportr.common.utils.urlForAcceptance
 import com.ops.airportr.domain.model.acceptance.UpdateAcceptanceParam
 import com.ops.airportr.domain.model.bookingdetails.BookingJourneyDetail
 import com.ops.airportr.domain.model.bookingdetails.Job
-import com.ops.airportr.domain.model.senddevicedata.SendDeviceDataParam
 import com.ops.airportr.domain.model.updatejob.UpdateJobParam
-import com.ops.airportr.domain.model.updatelogs.params.GetActionUpdateLogsParams
-import com.ops.airportr.ui.componts.CustomButton
 import com.ops.airportr.ui.componts.LoaderDialog
 import com.ops.airportr.ui.componts.SlideToStart
 import com.ops.airportr.ui.componts.SnackbarDemo
 import com.ops.airportr.ui.componts.Space
 import com.ops.airportr.ui.componts.TickAnimation
+import com.ops.airportr.ui.screens.bookingacceptance.acceptance.tabs.jobdetails.helper.JobDetailApiHelper
+import com.ops.airportr.ui.screens.bookingacceptance.acceptance.tabs.jobdetails.helper.TimeLockAlert
+import com.ops.airportr.ui.screens.bookingacceptance.acceptance.tabs.jobdetails.helper.allPassengerBottomSheet
+import com.ops.airportr.ui.screens.bookingacceptance.acceptance.tabs.jobdetails.helper.calculateRemainingTimeAndDis
+import com.ops.airportr.ui.screens.bookingacceptance.acceptance.tabs.jobdetails.helper.conditionalAcceptanceBottomSheet
+import com.ops.airportr.ui.screens.bookingacceptance.acceptance.tabs.jobdetails.helper.getTimeAndDistanceFromDestination
+import com.ops.airportr.ui.screens.bookingacceptance.acceptance.tabs.jobdetails.helper.returnETABox
+import com.ops.airportr.ui.screens.bookingacceptance.acceptance.tabs.jobdetails.helper.timeLockInSideGeoLocationBottomSheet
+import com.ops.airportr.ui.screens.bookingacceptance.acceptance.tabs.jobdetails.helper.timeLockOutsideGeoLocationBottomSheet
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 
 var bookingDetails: BookingDetailsSingleton = BookingDetailsSingleton()
@@ -158,6 +155,12 @@ fun JobDetailsScreen(
     var timeDuration by remember { mutableStateOf(0.0) } // Initial text
     var etaLoader by remember { mutableStateOf(false) } // Initial text
     var etaBoxColorFlag by remember { mutableStateOf(false) } // Initial text
+    var etaCounterFlag by remember { mutableStateOf(false) } // Initial text
+    var isInCollectionTimeKey by remember { mutableStateOf(false) } // Initial text
+    var timeLockInSideGeoLocation by remember { mutableStateOf(false) } // Initial text
+    var timeLockOutsideGeoLocation by remember { mutableStateOf(false) } // Initial text
+    var callTrackingApi by remember { mutableStateOf(true) } // Initial text
+    var callCount by remember { mutableStateOf(0) } // Initial text
 
     val coroutineScope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
@@ -177,19 +180,10 @@ fun JobDetailsScreen(
                 ) {
                     etaStart = AppApplication.sessionManager.duration
 
-                    val sendDeviceDataParam = SendDeviceDataParam(
-                        BuildConfig.VERSION_NAME,
-                        bookingDetails.bookingJourneyDetail?.bookingReference,
-                        getCurrentTimeStampIntoFormat(),
-                        Build.VERSION.RELEASE ?: "Unknown",
-                        "Android",
-                        getNetworkType(context),
-                        "Acceptance"
-                    )
-
-                    viewModel.smsDeviceData(
-                        context.urlForAcceptance() + SEND_DEVICE_DATA,
-                        sendDeviceDataParam
+                    JobDetailApiHelper().smsDeviceData(
+                        context,
+                        viewModel,
+                        bookingDetails
                     )
                 } else {
                     bottomSheetShowCases = 1
@@ -205,13 +199,37 @@ fun JobDetailsScreen(
         if (showTickStartAcceptance) {
             delay(1500) // Duration of tick animation
             showTickStartAcceptance = false
+
+            AppApplication.sessionManager.saveTrackingApi(false)
+            var endTime = ""
+            for (obj in bookingDetails.bookingJourneyDetail?.jobs!!) {
+                if (obj.jobType!! == 1) {
+                    endTime = obj.endDueDateTimeUTC.toString()
+                }
+            }
+            isInCollectionTimeKey =
+                bookingDetails.bookingJourneyDetail?.collectionDateTimeUTC?.let {
+                    checkForTimeInMillisToCheckTimeSlot(
+                        it, endTime
+                    )
+                } == true
+
+            if (!isInCollectionTimeKey) {
+                if (AppApplication.sessionManager.distance <= 75) {
+                    timeLockInSideGeoLocation = true
+                    timeLockOutsideGeoLocation = false
+                } else {
+                    timeLockOutsideGeoLocation = true
+                    timeLockInSideGeoLocation = false
+                }
+            }
+
             delay(1000) // Delay before showing the slider again
             showSliderStartAcceptance = true
         }
     }
 
     LaunchedEffect(isConditionalFlag) {
-        Log.wtf("isConditionalFlag", isConditionalFlag.toString())
         if (isConditionalFlag) {
             bottomSheetShowCases = 2
             sheetState.show()
@@ -219,11 +237,36 @@ fun JobDetailsScreen(
     }
 
 
+    LaunchedEffect(isInCollectionTimeKey) {
+        if (isInCollectionTimeKey == true) {
+            bottomSheetShowCases = 3
+            sheetState.show()
+        }
+    }
+
+    LaunchedEffect(timeLockInSideGeoLocation) {
+        if (timeLockInSideGeoLocation) {
+            bottomSheetShowCases = 4
+            sheetState.show()
+        }
+    }
+
+
+    LaunchedEffect(timeLockOutsideGeoLocation) {
+        if (timeLockOutsideGeoLocation) {
+            bottomSheetShowCases = 5
+            sheetState.show()
+        }
+    }
+
 
     val acceptanceLockState = viewModel.stateAcceptance.value
     val smsDeviceDataState = viewModel.smsDeviceData.value
     val updateJobDataState = viewModel.updateJob.value
     val actionUpdateLogsState = viewModel.stateActonUpdateLogs.value
+    val storeTrackingDataState = viewModel.storeTrackingData.value
+    val applyActionUpdateNewState = viewModel.applyActionUpdateNew.value
+    val trackingUserState = viewModel.trackingUser.value
 
     //TODO: On Resume
     //TODO:========================================================
@@ -231,15 +274,13 @@ fun JobDetailsScreen(
     LaunchedEffect(currentBackStackEntry.value?.lifecycle) {
         currentBackStackEntry.value?.lifecycle?.addObserver(LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                // viewModel.loadData() // Call your ViewModel function
                 bookingDetails = BookingDetailsSingleton()
                 bookingDetails.init()
                 detailModel = bookingDetails.bookingDetailFromDb?.bookingJourneyDetails?.get(0)!!
-                viewModel.updateAcceptanceLock(
-                    context.urlForAcceptance() + UPDATE_ACCEPTANCE_LOCK,
-                    UpdateAcceptanceParam(
-                        bookingDetails.bookingJourneyDetail?.bookingReference ?: ""
-                    )
+                JobDetailApiHelper().updateAcceptanceLock(
+                    context,
+                    viewModel,
+                    bookingDetails
                 )
             }
         })
@@ -251,7 +292,13 @@ fun JobDetailsScreen(
             Box(
                 Modifier
                     .fillMaxWidth()
-                    .height(200.dp)
+                    .height(
+                        when (bottomSheetShowCases) {
+                            4, 5 -> 400.dp
+                            3 -> 250.dp // Assuming you meant to have a height for case 3
+                            else -> 200.dp
+                        }
+                    )
                     .padding(6.dp),
                 contentAlignment = Alignment.TopCenter
             ) {
@@ -269,40 +316,20 @@ fun JobDetailsScreen(
                             coroutineScope.launch {
                                 sheetState.hide()
                                 if (returnChampionExistOrNot()) {
-                                    var jobIdAgainstAcceptance = ""
-                                    for (obj in bookingDetails.bookingJourneyDetail?.jobs!!) {
-                                        if (obj.jobType == 1)
-                                            jobIdAgainstAcceptance = obj.jobId.toString()
-                                    }
-                                    AppApplication.sessionManager.userDetails.userId?.let { it1 ->
-                                        viewModel.updateJob(
-                                            context.urlForAcceptance() + AppConstants.UPDATE_JOB,
-                                            UpdateJobParam(
-                                                it1,
-                                                jobIdAgainstAcceptance
-                                            )
-                                        )
-                                    }
+                                    JobDetailApiHelper().updateJob(
+                                        context, viewModel, bookingDetails
+                                    )
+
                                 } else {
-                                    bookingDetails.bookingDetailFromDb?.bookingReference?.let { bookRef ->
-                                        bookingDetails.bookingDetailFromDb!!.bookingJourneyDetails[0].bookingJourneyReference?.let { bookJourRef ->
-                                            // viewModel.loadData() // Call your ViewModel function
-                                            viewModel.getActionUpdateLog(
-                                                context.urlForAcceptance() + AppConstants.GET_ACTION_UPDATE_LOG,
-                                                GetActionUpdateLogsParams(
-                                                    bookRef,
-                                                    bookJourRef
-                                                )
-                                            )
-                                        }
-                                    }
+                                    JobDetailApiHelper().getActionUpdateLog(
+                                        context, viewModel, bookingDetails
+                                    )
                                 }
                             }
 
                         },
-                        isDarkTheme,
-
-                        )
+                        isDarkTheme
+                    )
 
                 } else if (bottomSheetShowCases == 2) {
                     conditionalAcceptanceBottomSheet(onAssignClick = {
@@ -312,6 +339,57 @@ fun JobDetailsScreen(
                             sheetState.hide()
                         }
                     }, isDarkTheme)
+                } else if (bottomSheetShowCases == 3) {
+                    allPassengerBottomSheet(
+                        onAssignClick = {
+                            coroutineScope.launch {
+                                sheetState.hide()
+                            }
+                            isInCollectionTimeKey = false
+                            getTimeAndDistanceBtwTwoPoints?.onDestroy()
+                            callTrackingApi = false
+                            JobDetailApiHelper().applyActionUpdateNewData(
+                                context,
+                                viewModel,
+                                bookingDetails
+                            )
+
+                        },
+                        isDarkTheme
+                    )
+                } else if (bottomSheetShowCases == 4) {
+                    timeLockInSideGeoLocationBottomSheet(
+                        onAssignClick = {
+                            coroutineScope.launch {
+                                sheetState.hide()
+                            }
+                            isInCollectionTimeKey = true
+                            timeLockInSideGeoLocation = false
+                        },
+                        onCancelClick = {
+                            coroutineScope.launch {
+                                sheetState.hide()
+                            }
+                            timeLockInSideGeoLocation = false
+                        },
+                        isDarkTheme
+                    )
+                } else if (bottomSheetShowCases == 5) {
+                    timeLockOutsideGeoLocationBottomSheet(
+                        onAssignClick = {
+                            coroutineScope.launch {
+                                sheetState.hide()
+                            }
+                            timeLockOutsideGeoLocation = false
+                        },
+                        onCancelClick = {
+                            coroutineScope.launch {
+                                sheetState.hide()
+                            }
+                            timeLockOutsideGeoLocation = false
+                        },
+                        isDarkTheme
+                    )
                 }
 
             }
@@ -613,6 +691,9 @@ fun JobDetailsScreen(
                                         etaBackGroundColor,
                                         etaBackTextColor
                                     )
+                                    if (etaCounterFlag) {
+                                        Log.wtf("ETA", etaText.toString())
+                                    }
 
                                     Divider(
                                         modifier = Modifier
@@ -1016,7 +1097,6 @@ fun JobDetailsScreen(
                         width = Dimension.fillToConstraints
                     }
                     .height(100.dp)) {
-
                     if (!isAcceptanceStarted) {
                         if (showSliderStartJob) {
                             SlideToStart(
@@ -1066,7 +1146,7 @@ fun JobDetailsScreen(
                                         showSliderStartAcceptance = false
                                         showTickStartAcceptance = true
                                     },
-                                    stringResource(id = R.string.slide_to_start_job),
+                                    stringResource(id = R.string.start_acceptance),
                                     modifier = Modifier.align(Alignment.CenterVertically),
                                     isAcceptanceStarted
                                 )
@@ -1096,14 +1176,22 @@ fun JobDetailsScreen(
                     SnackbarDemo(snackBarMessage)
                 }
 
-                if(etaBoxColorFlag){
+                if (etaBoxColorFlag) {
                     calculateRemainingTimeAndDis(
+                        context,
                         timeDuration,
                         time = { time ->
                             etaText = time
+                            if(callTrackingApi) {
+                                JobDetailApiHelper().callTrackData(
+                                    context,
+                                    viewModel,
+                                    timeDuration
+                                )
+                            }
                         },
                         textColorCode = { color ->
-                                 etaBackTextColor = color
+                            etaBackTextColor = color
                         },
                         backgroundColorCode = { color ->
                             etaBackGroundColor = color
@@ -1186,207 +1274,82 @@ fun JobDetailsScreen(
                 }
 
             }
-
-
             if (acceptanceLockState.error != null || updateJobDataState.error != null || smsDeviceDataState.error != null) {
                 errorMessage = acceptanceLockState.error ?: context.getString(R.string.no_internet)
                 snackBarShowFlag = true
             }
-            if (acceptanceLockState.isLoading || smsDeviceDataState.isLoading || updateJobDataState.isLoading) {
+            if (storeTrackingDataState.error != null || storeTrackingDataState.error != null || storeTrackingDataState.error != null) {
+                storeTrackingDataState.response = null
+                storeTrackingDataState.error = null
+                storeTrackingDataState.isLoading = false
+            }
+            if (applyActionUpdateNewState.error != null || applyActionUpdateNewState.response?.responseStatus != null) {
+                applyActionUpdateNewState.response = null
+                applyActionUpdateNewState.error = null
+                applyActionUpdateNewState.isLoading = false
+                callCount += 1
+                JobDetailApiHelper().updateJobForTracking(
+                    context,
+                    viewModel,
+                    bookingDetails,
+                    70
+                )
+            }
+
+
+            if (trackingUserState.error != null || trackingUserState.response?.responseStatus != null) {
+                trackingUserState.response = null
+                trackingUserState.error = null
+                trackingUserState.isLoading = false
+
+                callCount += 1
+                if (callCount == 3) {
+                    val distance = AppApplication.sessionManager.distance
+//                    AmplitudeWork().driverTrackingEnd(
+//                        bookingDetailFromDb!!,
+//                        distance < 10,
+//                        timeSlot
+//                    )
+                    AppApplication.sessionManager.removeActiveBookingDetail()
+                    AppApplication.sessionManager.saveToastTimer(true)
+                    AppApplication.sessionManager.saveDurationAndDistance(0L, 0L)
+                    context.toast("Ready to GO to Next Screen")
+                    Log.wtf("TOAST", "Ready to GO to Next Screen")
+                    //   viewModel.updateTimeAndDistanceMapbox(0.0)
+
+//                    val intent = Intent(requireContext(), AddPassengersAct::class.java)
+//                    intent.putExtra("jobObj", jobObj)
+//                    startActivityForResult(intent, 2)
+                } else {
+                    if (AppApplication.sessionManager.distance <= 75) {
+                        JobDetailApiHelper().updateJobForTracking(
+                            context,
+                            viewModel,
+                            bookingDetails,
+                            DISTANCE_LESS_THAN_75
+                        )
+                    } else {
+                        JobDetailApiHelper().updateJobForTracking(
+                            context,
+                            viewModel,
+                            bookingDetails,
+                            DISTANCE_GREATER_THAN_75
+                        )
+                    }
+                }
+            }
+
+
+            if (acceptanceLockState.isLoading || smsDeviceDataState.isLoading || updateJobDataState.isLoading || etaLoader) {
                 showLoader = true
                 LoaderDialog(showDialog = showLoader)
             }
-            if (etaLoader) {
-                LoaderDialog(showDialog = showLoader)
-            }
+
+
         }
     }
 }
 
-
-@Composable
-fun TimeLockAlert(
-    onCancelClick: () -> Unit,
-    onAssignClick: () -> Unit,
-    isDarkTheme: Boolean
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = dimensionResource(id = R.dimen._14sdp))
-    ) {
-        // Alert Title
-        Text(
-            text = stringResource(id = R.string.assign_to_yourself),
-            style = MaterialTheme.typography.labelLarge,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    top = dimensionResource(id = R.dimen._28sdp),
-                    bottom = dimensionResource(id = R.dimen._10sdp)
-                ),
-            textAlign = TextAlign.Start,
-            fontSize = 20.sp,
-            color = returnLabelDarkBlueColor(isDarkTheme)
-        )
-
-
-        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen._20sdp)))
-
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            // Reset Button
-
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(vertical = 5.dp),
-
-                ) {
-                CustomButton(
-                    name = stringResource(id = R.string.no_cancel),
-                    onButtonClick = {
-                        onCancelClick()
-                    },
-                    paddingTop = 10,
-                    paddingHorizontal = 0,
-                    modifier = Modifier.height(60.dp),
-                    containerColor = returnJobsNumberCircleBackgroundOnJobInComplete(isDarkTheme),
-                    textColor = returnLabelAirPurpleColor(isDarkTheme),
-                    isEnabled = true,
-                    focusedElevation = 0,
-                    defaultElevation = 0,
-                )
-            }
-            Space(height = 10, width = 10)
-            // Apply Button
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(vertical = 5.dp)
-            ) {
-                CustomButton(
-                    name = stringResource(id = R.string.yes_assign),
-                    onButtonClick = {
-                        onAssignClick()
-                    },
-                    paddingTop = 10,
-                    paddingHorizontal = 0,
-                    modifier = Modifier.height(60.dp),
-                    containerColor = returnLabelAirPurpleColor(isDarkTheme),
-                    textColor = white,
-                    isEnabled = true
-                )
-            }
-        }
-
-    }
-}
-
-@Composable
-fun returnETABox(
-    eta: String,
-    isDarkTheme: Boolean,
-    backGroundColor: Color,
-    textColor: Color
-) {
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(5.dp)) // Apply rounded corners
-            .background(backGroundColor) // Set background color
-            .border(
-                0.dp,
-                backGroundColor,
-                RoundedCornerShape(5.dp)
-            )
-            .padding(
-                top = 6.dp,
-                bottom = 6.dp,
-                start = 10.dp,
-                end = 10.dp
-            )
-
-    ) {
-        Text(
-            text = eta,
-            color = textColor, // Text color
-            style = MaterialTheme.typography.labelSmall, // Use your custom text style
-            fontSize = 10.sp,
-            modifier = Modifier.align(Alignment.Center)
-        )
-    }
-}
-
-@Composable
-fun conditionalAcceptanceBottomSheet(
-    onAssignClick: () -> Unit,
-    isDarkTheme: Boolean
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = dimensionResource(id = R.dimen._14sdp))
-    ) {
-        // Alert Title
-        Text(
-            text = stringResource(id = R.string.reminder),
-            style = MaterialTheme.typography.labelLarge,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    top = dimensionResource(id = R.dimen._5sdp),
-                    bottom = dimensionResource(id = R.dimen._10sdp)
-                ),
-            textAlign = TextAlign.Start,
-            fontSize = 20.sp,
-            color = returnLabelDarkBlueColor(isDarkTheme)
-        )
-
-
-        Text(
-            text = stringResource(id = R.string.this_is_a_conditional_acceptance_booking),
-            style = MaterialTheme.typography.labelSmall,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    top = dimensionResource(id = R.dimen._5sdp),
-                    bottom = dimensionResource(id = R.dimen._10sdp)
-                ),
-            textAlign = TextAlign.Start,
-            color = returnLabelDarkBlueColor(isDarkTheme)
-        )
-
-
-        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen._20sdp)))
-
-
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .padding(vertical = 5.dp),
-
-            ) {
-            CustomButton(
-                name = stringResource(id = R.string.alert_passenger_button),
-                onButtonClick = {
-                    onAssignClick()
-                },
-                paddingTop = 10,
-                paddingHorizontal = 0,
-                modifier = Modifier.height(60.dp),
-                containerColor = returnLabelAirPurpleColor(isDarkTheme),
-                textColor = white,
-                isEnabled = true,
-                focusedElevation = 0,
-                defaultElevation = 0,
-            )
-        }
-
-    }
-}
 
 private fun bagCount(bookingDetails: BookingDetailsSingleton): Int {
 
@@ -1466,172 +1429,6 @@ private fun returnChampionExistOrNot(): Boolean {
     }
 }
 
-@Composable
-private fun getTimeAndDistanceFromDestination(
-    getTimeAndDistanceBtwTwoPoints: GetTimeAndDistanceBtwTwoPoints,
-    onEtaDistanceDuration: (Double, Double) -> Unit,
-    etaLoader: (Boolean) -> Unit
-) {
-    val currentLat = AppApplication.sessionManager.getLastUserLocation.latitude
-    val currentLng = AppApplication.sessionManager.getLastUserLocation.longitude
-
-    val destinationLat =
-        bookingDetails.bookingJourneyDetail?.collectionLocation?.geoCoord?.latitude
-
-    val destinationLng =
-        bookingDetails.bookingJourneyDetail?.collectionLocation?.geoCoord?.longitude
-
-    if (currentLat != null && currentLng != null && destinationLat != null && destinationLng != null) {
-        val origin = Point.fromLngLat(currentLng, currentLat)
-        val destination = Point.fromLngLat(destinationLng, destinationLat)
-        getTimeAndDistanceBtwTwoPoints?.setOnGetDistanceAndDurationListener(object :
-            GetTimeAndDistanceBtwTwoPoints.OnGetDistanceAndDurationListener {
-            override fun onSuccess(distance: Double, duration: Double) {
-                etaLoader(false)
-                onEtaDistanceDuration(distance, duration)
-            }
-
-            override fun onFailed(message: String) {
-                Log.wtf("getDistanceAndTime2", "onFailed -> $message")
-                // (activity as AcceptanceJobAct).hideLoader()
-                etaLoader(false)
-            }
-
-            override fun onLoading(isLoading: Boolean) {
-                Log.wtf("getDistanceAndTime1", "onLoading -> $isLoading")
-                if (AppApplication.sessionManager.userDetails.userId ==
-                    AppApplication.sessionManager.currentChampId && isLoading
-                ) {
-                    etaLoader(true)
-                }
-
-            }
-
-        })
-        getTimeAndDistanceBtwTwoPoints?.getDirectionalRoute(origin, destination)
-    }
-}
-
-@Composable
-fun calculateRemainingTimeAndDis(
-    duration: Double,
-    time: (String) -> Unit,
-    textColorCode: (Color) -> Unit,
-    backgroundColorCode: (Color) -> Unit
-) {
-    var timeSlot = ""
-    for (obj in bookingDetails.bookingJourneyDetail?.jobs!!) {
-        if (obj.jobType == 1) {
-            var conditionalAcceptanceColorPair: Pair<Color, Color> =
-                Pair(
-                    colorResource(id = R.color.dim_orange_15),
-                    colorResource(id = R.color.dark_orange)
-                )
-
-            val whenReach = getSlotDifference(
-                obj.startDueDateTimeUTC,
-                obj.endDueDateTimeUTC,
-                duration.toInt()
-            )
-            if (whenReach.equals("orange_early") || whenReach.equals("orange_late")) {
-                timeSlot =
-                    if (whenReach.equals("orange_early")) stringResource(id = R.string.arriving_early)
-                    else stringResource(id = R.string.arriving_late)
-                conditionalAcceptanceColorPair =
-                    Pair(
-                        colorResource(id = R.color.dim_orange_15),
-                        colorResource(id = R.color.dark_orange)
-                    )
 
 
-            } else if (whenReach.equals("red_early") || whenReach.equals("red_late")) {
-                timeSlot =
-                    if (whenReach.equals("red_early")) stringResource(id = R.string.arriving_early) else stringResource(
-                        id = R.string.arriving_late
-                    )
-                conditionalAcceptanceColorPair = Pair(
-                    colorResource(id = R.color.light_red),
-                    colorResource(id = R.color.red)
-                )
-            } else if (whenReach.equals("in_slot")) {
-                timeSlot = stringResource(id = R.string.arriving_on_time)
-                conditionalAcceptanceColorPair = Pair(
-                    colorResource(id = R.color.air_purple),
-                    colorResource(id = R.color.air_awesome_purple_light_50)
-                )
-            }
-            time(timeSlot)
-            textColorCode(conditionalAcceptanceColorPair.second)
-            backgroundColorCode(conditionalAcceptanceColorPair.first)
-        }
-    }
 
-    var distance = AppApplication.sessionManager.distance
-    var activeBooking = AppApplication.sessionManager.activeBookingDetails
-//    if (activeBooking != null && distance > 10) {
-//        if (activeBooking.bookingJourneyDetails.get(0).bookingReference ==
-//            bookingDetailFromDb?.bookingReference
-//        ) {
-//            binding.onFleetLayout.visibility = View.VISIBLE
-//            binding.acceptMsgDescription.visibility = View.VISIBLE
-//            binding.slideToUnlockForStartJobBox.visibility = View.VISIBLE
-//            binding.slideToUnlock.visibility = View.GONE
-//        } else {
-//            checkStatusOfAcceptance()
-//            binding.onFleetLayout.visibility = View.GONE
-//            binding.acceptMsgDescription.visibility = View.GONE
-//            binding.slideToUnlockForStartJobBox.visibility = View.GONE
-//            binding.slideToUnlock.visibility = View.VISIBLE
-//        }
-//    }
-//
-//    callTrackData(duration)
-}
-
-private fun getSlotDifference(start: String?, end: String?, seconds: Int): String {
-    if (!start.isNullOrEmpty() && !end.isNullOrEmpty()) {
-        try {
-            val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH)
-
-            val startTime = dateFormat.parse(start)
-            val endTime = dateFormat.parse(end)
-
-            val calendar = java.util.Calendar.getInstance()
-            calendar.time = Date()
-            if (seconds >= 0) {
-                calendar.add(java.util.Calendar.SECOND, seconds)
-            }
-
-            val formattedDate = dateFormat.format(calendar.time)
-
-            val currentTime = dateFormat.parse(formattedDate)
-
-            val fifteenMinutes = 15 * 60 * 1000 // 15 minutes in milliseconds
-
-            val startTimeMinus15Minutes = Date(startTime!!.time - fifteenMinutes)
-            val endTimePlus15Minutes = Date(endTime!!.time + fifteenMinutes)
-
-            return if (currentTime.after(startTimeMinus15Minutes) && currentTime.before(
-                    startTime
-                )
-            ) {
-                "orange_early"
-            } else if (currentTime.after(endTime) && currentTime.before(endTimePlus15Minutes)) {
-                "orange_late"
-            } else if (currentTime.before(startTimeMinus15Minutes)
-            ) {
-                "red_early"
-            } else if (currentTime.after(
-                    endTimePlus15Minutes
-                )
-            ) {
-                "red_late"
-            } else {
-                "in_slot"
-            }
-        } catch (e: Exception) {
-            Log.wtf("getSlotDifference", "Exception -> ${e.message}")
-        }
-    }
-    return ""
-}

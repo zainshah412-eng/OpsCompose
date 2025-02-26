@@ -1,4 +1,4 @@
-package com.ops.airportr.ui.screens.bookingacceptance.acceptance.tabs
+package com.ops.airportr.ui.screens.bookingacceptance.acceptance.tabs.jobsms
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController

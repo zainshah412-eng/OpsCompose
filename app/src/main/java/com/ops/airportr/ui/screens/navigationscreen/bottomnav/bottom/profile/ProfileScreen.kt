@@ -51,14 +51,11 @@ import com.ops.airportr.BuildConfig
 import com.ops.airportr.R
 import com.ops.airportr.common.theme.air_awesome_purple_100
 import com.ops.airportr.common.theme.customTextDescriptionStyle
-import com.ops.airportr.common.theme.customTextHeadingStyle
 import com.ops.airportr.common.theme.customTextLabelStyle
-import com.ops.airportr.common.theme.dark_blue
 import com.ops.airportr.common.theme.editTextBorderStrockColor
 import com.ops.airportr.common.theme.light_white
-import com.ops.airportr.common.theme.white
-import com.ops.airportr.common.utils.changeLanguage
-import com.ops.airportr.common.utils.moveOnNewScreen
+import com.ops.airportr.common.utils.extension.changeLanguage
+import com.ops.airportr.common.utils.extension.moveOnNewScreen
 import com.ops.airportr.common.utils.returnBackGroundColor
 import com.ops.airportr.common.utils.returnLabelDarkBlueColor
 import com.ops.airportr.domain.model.language.LanguageListItemModel

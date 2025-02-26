@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,25 +21,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.ops.airportr.R
-import com.ops.airportr.common.theme.customTextLabelSmallStyle
-import com.ops.airportr.common.utils.removeLastChar
 import com.ops.airportr.common.utils.returnBackGroundColor
 import com.ops.airportr.common.utils.returnLabelAirPurple100Color
 import com.ops.airportr.common.utils.returnLabelDarkBlueColor
-import com.ops.airportr.common.utils.returnLeadPassengerBackGround
 import com.ops.airportr.common.utils.returnLineColorForAuditTrailItem
-import com.ops.airportr.common.utils.returnSealAndIataTagsColor
-import com.ops.airportr.common.utils.sealReturn
-import com.ops.airportr.domain.model.bookingdetails.BookingLuggageTamperAwareLiteSeal
-import com.ops.airportr.domain.model.bookingdetails.PassengerLuggage
-import com.ops.airportr.domain.model.getcommunicationlog.CustomActionUpdateModel
 
 @Composable
 fun ActivityFeedItem(

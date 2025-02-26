@@ -65,13 +65,13 @@ import com.ops.airportr.common.theme.customTextLabelSmallStyle
 import com.ops.airportr.common.theme.fontsRegular
 import com.ops.airportr.common.theme.white
 import com.ops.airportr.common.utils.abcTagBackGroundColor
-import com.ops.airportr.common.utils.moveOnNewScreen
+import com.ops.airportr.common.utils.extension.moveOnNewScreen
 import com.ops.airportr.common.utils.overSizeBagTagBackGroundColor
 import com.ops.airportr.common.utils.returnBackGroundColor
 import com.ops.airportr.common.utils.returnLabelAirPurple100Color
 import com.ops.airportr.common.utils.returnLabelAirPurpleColor
 import com.ops.airportr.common.utils.returnLabelDarkBlueColor
-import com.ops.airportr.common.utils.urlForAcceptance
+import com.ops.airportr.common.utils.extension.urlForAcceptance
 import com.ops.airportr.domain.model.bookingdetails.Job
 import com.ops.airportr.route.Screen
 import com.ops.airportr.ui.componts.LoaderDialog

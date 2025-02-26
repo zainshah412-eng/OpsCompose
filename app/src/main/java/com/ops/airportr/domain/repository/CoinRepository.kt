@@ -4,10 +4,16 @@ import com.ops.airportr.common.network.Either
 import com.ops.airportr.domain.model.acceptance.UpdateAcceptanceParam
 import com.ops.airportr.domain.model.acceptance.response.UpdateAcceptanceLockResponce
 import com.ops.airportr.domain.model.apierror.ApiError
+import com.ops.airportr.domain.model.applyactionupdate.params.ApplyActionUpdateSealParams
+import com.ops.airportr.domain.model.applyactionupdate.response.ApplyActionUpdateSealResponse
 import com.ops.airportr.domain.model.bookingnotes.GetBookingNotesByReference
 import com.ops.airportr.domain.model.joblist.retrievejobs.params.RetrieveJobsParams
 import com.ops.airportr.domain.model.joblist.retrievejobs.response.RetrieveJobsResponse
 import com.ops.airportr.domain.model.login.AuthTokenResp
+import com.ops.airportr.domain.model.message.GetMessagesParam
+import com.ops.airportr.domain.model.message.response.GetMessagesResponse
+import com.ops.airportr.domain.model.note.BookingNoteParams
+import com.ops.airportr.domain.model.note.BookingNoteResponseModel
 
 import com.ops.airportr.domain.model.resetpassword.ResetPasswordParam
 import com.ops.airportr.domain.model.resetpassword.ResetPasswordResponse
@@ -46,5 +52,8 @@ interface CoinRepository {
     suspend fun updateAcceptanceLock(url: String, body: UpdateAcceptanceParam): Either<UpdateAcceptanceLockResponce, ApiError>
     suspend fun smsDeviceData(url: String, body: SendDeviceDataParam): Either<SendDeviceDataResponse, ApiError>
     suspend fun updateJob(url: String, body: UpdateJobParam): Either<UpdateUserResponse, ApiError>
+    suspend fun applyActionUpdateNew(url: String, body: ApplyActionUpdateSealParams): Either<ApplyActionUpdateSealResponse, ApiError>
+    suspend fun addBookingNote(url: String, body: BookingNoteParams): Either<BookingNoteResponseModel, ApiError>
+    suspend fun getMessages(url: String, body: GetMessagesParam): Either<GetMessagesResponse, ApiError>
 
 }

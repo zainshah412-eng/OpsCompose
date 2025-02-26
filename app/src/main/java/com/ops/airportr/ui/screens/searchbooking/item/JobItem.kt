@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -30,7 +29,7 @@ import com.ops.airportr.common.theme.customTextLabelSmallStyle
 import com.ops.airportr.common.theme.editTextBorderStrockColor
 import com.ops.airportr.common.theme.light_white
 import com.ops.airportr.common.theme.white
-import com.ops.airportr.common.utils.convertIntoDateTimeFormat
+import com.ops.airportr.common.utils.extension.convertIntoDateTimeFormat
 import com.ops.airportr.common.utils.returnBackGroundColor
 import com.ops.airportr.common.utils.returnJobsNumberCircleBackground
 import com.ops.airportr.common.utils.returnJobsNumberCircleBackgroundOnJobComplete
@@ -71,17 +70,21 @@ fun JobItem(
                                 .offset(x = 4.dp) // Equivalent to layout_marginStart
                                 .background(
                                     color = if (isDarkTheme) {
-                                        if (itemAtPos.jobActivityStatus == 5){
-                                            returnJobsNumberCircleBackgroundOnJobComplete(isDarkTheme)
-                                        } else{
+                                        if (itemAtPos.jobActivityStatus == 5) {
+                                            returnJobsNumberCircleBackgroundOnJobComplete(
+                                                isDarkTheme
+                                            )
+                                        } else {
                                             returnJobsNumberCircleBackground(
                                                 isDarkTheme
                                             )
                                         }
                                     } else {
-                                        if (itemAtPos.jobActivityStatus == 5){
-                                            returnJobsNumberCircleBackgroundOnJobComplete(isDarkTheme)
-                                        } else{
+                                        if (itemAtPos.jobActivityStatus == 5) {
+                                            returnJobsNumberCircleBackgroundOnJobComplete(
+                                                isDarkTheme
+                                            )
+                                        } else {
                                             returnJobsNumberCircleBackground(
                                                 isDarkTheme
                                             )
@@ -96,7 +99,7 @@ fun JobItem(
                             //.visible(false) // Replace with your visibility logic
                         ) {
                             Text(
-                                text = index.toString(),
+                                text = (index).toString(),
                                 color = returnLabelDarkBlueColor(isDarkTheme), // Text color
                                 style = customTextLabelSmallStyle, // Use your custom text style
                                 fontSize = 10.sp,
@@ -115,17 +118,21 @@ fun JobItem(
                                 .offset(x = 4.dp) // Equivalent to layout_marginStart
                                 .background(
                                     color = if (isDarkTheme) {
-                                        if (itemAtPos.jobActivityStatus == 5){
-                                            returnJobsNumberCircleBackgroundOnJobComplete(isDarkTheme)
-                                        } else{
+                                        if (itemAtPos.jobActivityStatus == 5) {
+                                            returnJobsNumberCircleBackgroundOnJobComplete(
+                                                isDarkTheme
+                                            )
+                                        } else {
                                             returnJobsNumberCircleBackground(
                                                 isDarkTheme
                                             )
                                         }
                                     } else {
-                                        if (itemAtPos.jobActivityStatus == 5){
-                                            returnJobsNumberCircleBackgroundOnJobComplete(isDarkTheme)
-                                        } else{
+                                        if (itemAtPos.jobActivityStatus == 5) {
+                                            returnJobsNumberCircleBackgroundOnJobComplete(
+                                                isDarkTheme
+                                            )
+                                        } else {
                                             returnJobsNumberCircleBackgroundOnJobInComplete(
                                                 isDarkTheme
                                             )
@@ -144,9 +151,9 @@ fun JobItem(
                                 text = if (itemAtPos.jobActivityStatus == 5)
                                     stringResource(id = R.string.done) else stringResource(id = R.string.to_do),
                                 color = if (isDarkTheme) {
-                                    if (itemAtPos.jobActivityStatus == 5){
+                                    if (itemAtPos.jobActivityStatus == 5) {
                                         white
-                                    } else{
+                                    } else {
                                         returnLabelDarkBlueColor(
                                             isDarkTheme
                                         )

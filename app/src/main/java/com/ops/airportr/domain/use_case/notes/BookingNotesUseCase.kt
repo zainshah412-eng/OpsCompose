@@ -27,4 +27,5 @@ class BookingNotesUseCase @Inject constructor(
             emit(Resource.Error("Internet Connection Error"))
         }
     }
+
 }

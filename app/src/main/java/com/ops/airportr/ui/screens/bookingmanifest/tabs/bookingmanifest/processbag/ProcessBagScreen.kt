@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -48,7 +47,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import coil.compose.AsyncImage
 import com.ops.airportr.R
 import com.ops.airportr.common.AppActionValues
 import com.ops.airportr.common.theme.badgeTextColor
@@ -58,9 +56,9 @@ import com.ops.airportr.common.theme.light_white
 import com.ops.airportr.common.utils.BookingDetailsSingleton
 import com.ops.airportr.common.utils.callbacks.ImageLoadCallbacks
 import com.ops.airportr.common.utils.callbacks.LoadImageUsingCallback
-import com.ops.airportr.common.utils.convertDateForBagDetail
-import com.ops.airportr.common.utils.getJobTypeInjectDetails
-import com.ops.airportr.common.utils.removeLastChar
+import com.ops.airportr.common.utils.extension.convertDateForBagDetail
+import com.ops.airportr.common.utils.extension.getJobTypeInjectDetails
+import com.ops.airportr.common.utils.extension.removeLastChar
 import com.ops.airportr.common.utils.returnBackGroundColor
 import com.ops.airportr.common.utils.returnBagDetailStatusBackGroundBox
 import com.ops.airportr.common.utils.returnBagStatusBackGroundBox

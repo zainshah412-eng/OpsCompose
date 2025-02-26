@@ -263,4 +263,5 @@ dependencies {
 
     //Mapbox
     implementation 'com.mapbox.navigation:android:2.20.1'
+
 }

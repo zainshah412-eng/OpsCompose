@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.WriterException
 import com.google.zxing.common.BitMatrix
@@ -40,7 +39,7 @@ import com.google.zxing.qrcode.QRCodeWriter
 import com.ops.airportr.AppApplication
 import com.ops.airportr.R
 import com.ops.airportr.common.theme.air_purple
-import com.ops.airportr.common.utils.getCurrentTimeStampIntoFormat
+import com.ops.airportr.common.utils.extension.getCurrentTimeStampIntoFormat
 import com.ops.airportr.common.utils.returnBackGroundColor
 import com.ops.airportr.common.utils.returnLabelAirPurple100Color
 import com.ops.airportr.common.utils.returnLabelDarkBlueColor

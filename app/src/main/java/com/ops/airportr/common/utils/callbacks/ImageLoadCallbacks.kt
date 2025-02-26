@@ -6,7 +6,7 @@ import com.ops.airportr.common.network.AuthApiKeyInterceptor
 import com.ops.airportr.common.network.AuthInterceptor
 import com.ops.airportr.common.network.NetworkInterceptor
 import com.ops.airportr.common.network.SessionApiKeyInterceptor
-import com.ops.airportr.common.utils.urlForAcceptance
+import com.ops.airportr.common.utils.extension.urlForAcceptance
 import com.ops.airportr.data.remote.ApiService
 import com.ops.airportr.domain.model.getImage.GetImageParams
 import kotlinx.coroutines.CoroutineScope

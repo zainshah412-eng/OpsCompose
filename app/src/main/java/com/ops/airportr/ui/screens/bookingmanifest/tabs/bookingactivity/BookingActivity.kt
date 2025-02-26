@@ -52,17 +52,17 @@ import com.ops.airportr.common.AppConstants.GET_BOOKING_NOTES_BY_BOOKING_REFEREN
 import com.ops.airportr.common.AppConstants.GET_COMMUNICATION_LOG_CCD
 import com.ops.airportr.common.theme.fontsRegular
 import com.ops.airportr.common.utils.BookingDetailsSingleton
-import com.ops.airportr.common.utils.convertDateFormatForNotes
-import com.ops.airportr.common.utils.getActionType
-import com.ops.airportr.common.utils.getAgentActionName
-import com.ops.airportr.common.utils.getAgentActionTypeImage1
-import com.ops.airportr.common.utils.getCommunicationEmailActionType
-import com.ops.airportr.common.utils.getCommunicationSMSActionType
-import com.ops.airportr.common.utils.getScanType
+import com.ops.airportr.common.utils.extension.convertDateFormatForNotes
+import com.ops.airportr.common.utils.extension.getActionType
+import com.ops.airportr.common.utils.extension.getAgentActionName
+import com.ops.airportr.common.utils.extension.getAgentActionTypeImage1
+import com.ops.airportr.common.utils.extension.getCommunicationEmailActionType
+import com.ops.airportr.common.utils.extension.getCommunicationSMSActionType
+import com.ops.airportr.common.utils.extension.getScanType
 import com.ops.airportr.common.utils.returnBackGroundColor
 import com.ops.airportr.common.utils.returnLabelAirPurpleColor
 import com.ops.airportr.common.utils.returnLabelDarkBlueColor
-import com.ops.airportr.common.utils.urlForAcceptance
+import com.ops.airportr.common.utils.extension.urlForAcceptance
 import com.ops.airportr.domain.model.bookingdetails.BookingJourneyDetail
 import com.ops.airportr.domain.model.bookingnotes.GetBookingNotesByReference
 import com.ops.airportr.domain.model.getcommunicationlog.CCDGetCommunicationLogResponse
@@ -119,8 +119,6 @@ fun BookingActivityScreen(
                         )
                     }
                 }
-
-
             }
         })
     }
@@ -449,7 +447,7 @@ private fun setDataForNotes(
     actionUpdate: MutableState<ArrayList<CustomActionUpdateModel>>
 ) {
     getBookingNotesByReference?.let {
-        for (obj in getBookingNotesByReference.bookingNote) {
+        for (obj in getBookingNotesByReference.bookingNote!!) {
             actionUpdate.value.add(
                 CustomActionUpdateModel(
                     name = stringResource(

@@ -7,19 +7,26 @@ import com.ops.airportr.data.remote.CCDApiService
 import com.ops.airportr.domain.model.acceptance.UpdateAcceptanceParam
 import com.ops.airportr.domain.model.acceptance.response.UpdateAcceptanceLockResponce
 import com.ops.airportr.domain.model.apierror.ApiError
+import com.ops.airportr.domain.model.applyactionupdate.params.ApplyActionUpdateSealParams
+import com.ops.airportr.domain.model.applyactionupdate.response.ApplyActionUpdateSealResponse
 import com.ops.airportr.domain.model.bookingnotes.GetBookingNotesByReference
 import com.ops.airportr.domain.model.getcommunicationlog.CCDGetCommunicationLogResponse
 import com.ops.airportr.domain.model.getcommunicationlog.params.CCDGetCommunicationLogParam
 import com.ops.airportr.domain.model.joblist.retrievejobs.params.RetrieveJobsParams
 import com.ops.airportr.domain.model.joblist.retrievejobs.response.RetrieveJobsResponse
 import com.ops.airportr.domain.model.login.AuthTokenResp
-import com.ops.airportr.domain.model.resetpassword.ResetPasswordParam
-import com.ops.airportr.domain.model.resetpassword.ResetPasswordResponse
+import com.ops.airportr.domain.model.message.GetMessagesParam
+import com.ops.airportr.domain.model.message.response.GetMessagesResponse
+import com.ops.airportr.domain.model.note.BookingNoteParams
+import com.ops.airportr.domain.model.note.BookingNoteResponseModel
 import com.ops.airportr.domain.model.registerdevice.RegisterDeviceParams
 import com.ops.airportr.domain.model.registerdevice.response.RegisterDeviceResponse
+import com.ops.airportr.domain.model.resetpassword.ResetPasswordResponse
 import com.ops.airportr.domain.model.searchbooking.BookingDetail
 import com.ops.airportr.domain.model.senddevicedata.SendDeviceDataParam
 import com.ops.airportr.domain.model.senddevicedata.response.SendDeviceDataResponse
+import com.ops.airportr.domain.model.storetrackingdata.StoreTrackingDataParams
+import com.ops.airportr.domain.model.storetrackingdata.StoreTrackingDataResponse
 import com.ops.airportr.domain.model.updatejob.UpdateJobParam
 import com.ops.airportr.domain.model.updatejob.UpdateUserResponse
 import com.ops.airportr.domain.model.updatelogs.GetActionUpdateLogsResponse
@@ -96,7 +103,14 @@ class CoinRepositoryImpl @Inject constructor(
                 val errorResponse = errorBody?.let {
                     Gson().fromJson(it, ApiError::class.java)
                 }
-                Either.Error(errorResponse ?: ApiError("unknown_error", response.message(), null, null))
+                Either.Error(
+                    errorResponse ?: ApiError(
+                        "unknown_error",
+                        response.message(),
+                        null,
+                        null
+                    )
+                )
             }
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()
@@ -108,10 +122,12 @@ class CoinRepositoryImpl @Inject constructor(
     }
 
 
-    override suspend fun resetPassword(url: String,
-                                       emailAddress: String): Either<ResetPasswordResponse, ApiError> {
+    override suspend fun resetPassword(
+        url: String,
+        emailAddress: String
+    ): Either<ResetPasswordResponse, ApiError> {
         return try {
-            val response = api.resetPassword(url,emailAddress)
+            val response = api.resetPassword(url, emailAddress)
             if (response.isSuccessful) {
                 val resetPassword = response.body()
                 if (resetPassword != null) {
@@ -124,7 +140,14 @@ class CoinRepositoryImpl @Inject constructor(
                 val errorResponse = errorBody?.let {
                     Gson().fromJson(it, ApiError::class.java)
                 }
-                Either.Error(errorResponse ?: ApiError("unknown_error", response.message(), null, null))
+                Either.Error(
+                    errorResponse ?: ApiError(
+                        "unknown_error",
+                        response.message(),
+                        null,
+                        null
+                    )
+                )
             }
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()
@@ -140,7 +163,7 @@ class CoinRepositoryImpl @Inject constructor(
         params: RetrieveJobsParams
     ): Either<RetrieveJobsResponse, ApiError> {
         return try {
-            val response = api.retrieveJobs(url,params)
+            val response = api.retrieveJobs(url, params)
             if (response.isSuccessful) {
                 val retrieveJobs = response.body()
                 if (retrieveJobs != null) {
@@ -153,7 +176,14 @@ class CoinRepositoryImpl @Inject constructor(
                 val errorResponse = errorBody?.let {
                     Gson().fromJson(it, ApiError::class.java)
                 }
-                Either.Error(errorResponse ?: ApiError("unknown_error", response.message(), null, null))
+                Either.Error(
+                    errorResponse ?: ApiError(
+                        "unknown_error",
+                        response.message(),
+                        null,
+                        null
+                    )
+                )
             }
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()
@@ -169,7 +199,7 @@ class CoinRepositoryImpl @Inject constructor(
         params: RegisterDeviceParams
     ): Either<RegisterDeviceResponse, ApiError> {
         return try {
-            val response = api.registerDevice(url,params)
+            val response = api.registerDevice(url, params)
             if (response.isSuccessful) {
                 val registerDeviceResponse = response.body()
                 if (registerDeviceResponse != null) {
@@ -183,7 +213,14 @@ class CoinRepositoryImpl @Inject constructor(
                 val errorResponse = errorBody?.let {
                     Gson().fromJson(it, ApiError::class.java)
                 }
-                Either.Error(errorResponse ?: ApiError("unknown_error", response.message(), null, null))
+                Either.Error(
+                    errorResponse ?: ApiError(
+                        "unknown_error",
+                        response.message(),
+                        null,
+                        null
+                    )
+                )
             }
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()
@@ -200,7 +237,7 @@ class CoinRepositoryImpl @Inject constructor(
         populate: String
     ): Either<WhatsNewResponse, ApiError> {
         return try {
-            val response = api.getAppVersionsApi(url,populate)
+            val response = api.getAppVersionsApi(url, populate)
             if (response.isSuccessful) {
                 val registerDeviceResponse = response.body()
                 if (registerDeviceResponse != null) {
@@ -214,7 +251,14 @@ class CoinRepositoryImpl @Inject constructor(
                 val errorResponse = errorBody?.let {
                     Gson().fromJson(it, ApiError::class.java)
                 }
-                Either.Error(errorResponse ?: ApiError("unknown_error", response.message(), null, null))
+                Either.Error(
+                    errorResponse ?: ApiError(
+                        "unknown_error",
+                        response.message(),
+                        null,
+                        null
+                    )
+                )
             }
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()
@@ -230,7 +274,7 @@ class CoinRepositoryImpl @Inject constructor(
         bookingReference: String
     ): Either<BookingDetail, ApiError> {
         return try {
-            val response = api.getSpecificBookingDetails(url,bookingReference)
+            val response = api.getSpecificBookingDetails(url, bookingReference)
             if (response.isSuccessful) {
                 val resp = response.body()
                 if (resp != null) {
@@ -244,7 +288,14 @@ class CoinRepositoryImpl @Inject constructor(
                 val errorResponse = errorBody?.let {
                     Gson().fromJson(it, ApiError::class.java)
                 }
-                Either.Error(errorResponse ?: ApiError("unknown_error", response.message(), null, null))
+                Either.Error(
+                    errorResponse ?: ApiError(
+                        "unknown_error",
+                        response.message(),
+                        null,
+                        null
+                    )
+                )
             }
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()
@@ -260,7 +311,7 @@ class CoinRepositoryImpl @Inject constructor(
         bookingReference: String
     ): Either<GetBookingNotesByReference, ApiError> {
         return try {
-            val response = api.getBookingNotesByBookingReference(url,bookingReference)
+            val response = api.getBookingNotesByBookingReference(url, bookingReference)
             if (response.isSuccessful) {
                 val resp = response.body()
                 if (resp != null) {
@@ -274,7 +325,14 @@ class CoinRepositoryImpl @Inject constructor(
                 val errorResponse = errorBody?.let {
                     Gson().fromJson(it, ApiError::class.java)
                 }
-                Either.Error(errorResponse ?: ApiError("unknown_error", response.message(), null, null))
+                Either.Error(
+                    errorResponse ?: ApiError(
+                        "unknown_error",
+                        response.message(),
+                        null,
+                        null
+                    )
+                )
             }
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()
@@ -290,7 +348,7 @@ class CoinRepositoryImpl @Inject constructor(
         body: GetActionUpdateLogsParams
     ): Either<GetActionUpdateLogsResponse, ApiError> {
         return try {
-            val response = api.getActionUpdateLog(url,body)
+            val response = api.getActionUpdateLog(url, body)
             if (response.isSuccessful) {
                 val resp = response.body()
                 if (resp != null) {
@@ -304,7 +362,14 @@ class CoinRepositoryImpl @Inject constructor(
                 val errorResponse = errorBody?.let {
                     Gson().fromJson(it, ApiError::class.java)
                 }
-                Either.Error(errorResponse ?: ApiError("unknown_error", response.message(), null, null))
+                Either.Error(
+                    errorResponse ?: ApiError(
+                        "unknown_error",
+                        response.message(),
+                        null,
+                        null
+                    )
+                )
             }
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()
@@ -320,7 +385,7 @@ class CoinRepositoryImpl @Inject constructor(
         body: UpdateAcceptanceParam
     ): Either<UpdateAcceptanceLockResponce, ApiError> {
         return try {
-            val response = api.updateAcceptanceLock(url,body)
+            val response = api.updateAcceptanceLock(url, body)
             if (response.isSuccessful) {
                 val resp = response.body()
                 if (resp != null) {
@@ -334,7 +399,14 @@ class CoinRepositoryImpl @Inject constructor(
                 val errorResponse = errorBody?.let {
                     Gson().fromJson(it, ApiError::class.java)
                 }
-                Either.Error(errorResponse ?: ApiError("unknown_error", response.message(), null, null))
+                Either.Error(
+                    errorResponse ?: ApiError(
+                        "unknown_error",
+                        response.message(),
+                        null,
+                        null
+                    )
+                )
             }
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()
@@ -350,7 +422,7 @@ class CoinRepositoryImpl @Inject constructor(
         body: SendDeviceDataParam
     ): Either<SendDeviceDataResponse, ApiError> {
         return try {
-            val response = api.smsDeviceData(url,body)
+            val response = api.smsDeviceData(url, body)
             if (response.isSuccessful) {
                 val resp = response.body()
                 if (resp != null) {
@@ -364,7 +436,14 @@ class CoinRepositoryImpl @Inject constructor(
                 val errorResponse = errorBody?.let {
                     Gson().fromJson(it, ApiError::class.java)
                 }
-                Either.Error(errorResponse ?: ApiError("unknown_error", response.message(), null, null))
+                Either.Error(
+                    errorResponse ?: ApiError(
+                        "unknown_error",
+                        response.message(),
+                        null,
+                        null
+                    )
+                )
             }
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()
@@ -380,7 +459,7 @@ class CoinRepositoryImpl @Inject constructor(
         body: UpdateJobParam
     ): Either<UpdateUserResponse, ApiError> {
         return try {
-            val response = api.updateJob(url,body)
+            val response = api.updateJob(url, body)
             if (response.isSuccessful) {
                 val resp = response.body()
                 if (resp != null) {
@@ -394,7 +473,125 @@ class CoinRepositoryImpl @Inject constructor(
                 val errorResponse = errorBody?.let {
                     Gson().fromJson(it, ApiError::class.java)
                 }
-                Either.Error(errorResponse ?: ApiError("unknown_error", response.message(), null, null))
+                Either.Error(
+                    errorResponse ?: ApiError(
+                        "unknown_error",
+                        response.message(),
+                        null,
+                        null
+                    )
+                )
+            }
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val errorResponse = errorBody?.let {
+                Gson().fromJson(it, ApiError::class.java)
+            }
+            Either.Error(errorResponse ?: ApiError("unknown_error", e.message(), null, null))
+        }
+    }
+
+    override suspend fun applyActionUpdateNew(
+        url: String,
+        body: ApplyActionUpdateSealParams
+    ): Either<ApplyActionUpdateSealResponse, ApiError> {
+        return try {
+            val response = api.applyActionUpdateNew(url, body)
+            if (response.isSuccessful) {
+                val resp = response.body()
+                if (resp != null) {
+                    Either.Success(resp)
+
+                } else {
+                    Either.Error(ApiError("null_body", "Response body is null", null, null))
+                }
+            } else {
+                val errorBody = response.errorBody()?.string()
+                val errorResponse = errorBody?.let {
+                    Gson().fromJson(it, ApiError::class.java)
+                }
+                Either.Error(
+                    errorResponse ?: ApiError(
+                        "unknown_error",
+                        response.message(),
+                        null,
+                        null
+                    )
+                )
+            }
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val errorResponse = errorBody?.let {
+                Gson().fromJson(it, ApiError::class.java)
+            }
+            Either.Error(errorResponse ?: ApiError("unknown_error", e.message(), null, null))
+        }
+    }
+
+    override suspend fun addBookingNote(
+        url: String,
+        body: BookingNoteParams
+    ): Either<BookingNoteResponseModel, ApiError> {
+        return try {
+            val response = api.addBookingNote(url, body)
+            if (response.isSuccessful) {
+                val resp = response.body()
+                if (resp != null) {
+                    Either.Success(resp)
+
+                } else {
+                    Either.Error(ApiError("null_body", "Response body is null", null, null))
+                }
+            } else {
+                val errorBody = response.errorBody()?.string()
+                val errorResponse = errorBody?.let {
+                    Gson().fromJson(it, ApiError::class.java)
+                }
+                Either.Error(
+                    errorResponse ?: ApiError(
+                        "unknown_error",
+                        response.message(),
+                        null,
+                        null
+                    )
+                )
+            }
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val errorResponse = errorBody?.let {
+                Gson().fromJson(it, ApiError::class.java)
+            }
+            Either.Error(errorResponse ?: ApiError("unknown_error", e.message(), null, null))
+        }
+    }
+
+    override suspend fun getMessages(
+        url: String,
+        body: GetMessagesParam
+    ): Either<GetMessagesResponse, ApiError> {
+        return try {
+            val response = api.getMessages(url, body)
+            if (response.isSuccessful) {
+                val resp = response.body()
+                if (resp != null) {
+                    Either.Success(resp)
+
+                } else {
+                    Either.Error(ApiError("null_body", "Response body is null", null, null))
+                }
+            } else {
+                val errorBody = response.errorBody()?.string()
+                val errorResponse = errorBody?.let {
+                    Gson().fromJson(it, ApiError::class.java)
+                }
+                Either.Error(
+                    errorResponse ?: ApiError(
+                        "unknown_error",
+                        response.message(),
+                        null,
+                        null
+                    )
+                )
             }
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()
@@ -410,7 +607,7 @@ class CoinRepositoryImpl @Inject constructor(
         body: CCDGetCommunicationLogParam
     ): Either<CCDGetCommunicationLogResponse, ApiError> {
         return try {
-            val response = ccdApiService.getCommunicationLog(url,body)
+            val response = ccdApiService.getCommunicationLog(url, body)
             if (response.isSuccessful) {
                 val resp = response.body()
                 if (resp != null) {
@@ -424,7 +621,51 @@ class CoinRepositoryImpl @Inject constructor(
                 val errorResponse = errorBody?.let {
                     Gson().fromJson(it, ApiError::class.java)
                 }
-                Either.Error(errorResponse ?: ApiError("unknown_error", response.message(), null, null))
+                Either.Error(
+                    errorResponse ?: ApiError(
+                        "unknown_error",
+                        response.message(),
+                        null,
+                        null
+                    )
+                )
+            }
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val errorResponse = errorBody?.let {
+                Gson().fromJson(it, ApiError::class.java)
+            }
+            Either.Error(errorResponse ?: ApiError("unknown_error", e.message(), null, null))
+        }
+    }
+
+    override suspend fun storeTrackingData(
+        url: String,
+        body: StoreTrackingDataParams
+    ): Either<StoreTrackingDataResponse, ApiError> {
+        return try {
+            val response = ccdApiService.storeTrackingData(url, body)
+            if (response.isSuccessful) {
+                val resp = response.body()
+                if (resp != null) {
+                    Either.Success(resp)
+
+                } else {
+                    Either.Error(ApiError("null_body", "Response body is null", null, null))
+                }
+            } else {
+                val errorBody = response.errorBody()?.string()
+                val errorResponse = errorBody?.let {
+                    Gson().fromJson(it, ApiError::class.java)
+                }
+                Either.Error(
+                    errorResponse ?: ApiError(
+                        "unknown_error",
+                        response.message(),
+                        null,
+                        null
+                    )
+                )
             }
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()

@@ -35,14 +35,6 @@ class GetTimeAndDistanceBtwTwoPoints(private var context: Context?) {
                 .accessToken(MAPBOX)
                 .build()
             mapboxNavigation = MapboxNavigationProvider.create(navigationOptions)
-//            mapboxNavigation = if (MapboxNavigationProvider.isCreated()) {
-//                MapboxNavigationProvider.retrieve()
-//            } else {
-//                val navigationOptions = NavigationOptions.Builder(ctx)
-//                    .accessToken(constants.mapboxApiKey)
-//                    .build()
-//                MapboxNavigationProvider.create(navigationOptions)
-//            }
         }
     }
 
@@ -52,7 +44,6 @@ class GetTimeAndDistanceBtwTwoPoints(private var context: Context?) {
     ) {
         context?.let { ctx ->
             try {
-//                mapBoxInitialize()
                 onDistanceAndDurationListener?.onLoading(true)
                 val routeOptions = RouteOptions.builder()
                     .applyDefaultNavigationOptions()
@@ -60,11 +51,6 @@ class GetTimeAndDistanceBtwTwoPoints(private var context: Context?) {
                     .coordinates(originPoint, null, destinationPoint)
                     .layersList(listOf(mapboxNavigation?.getZLevel(), null))
                     .build()
-
-//                Log.wtf("getDirectionalRoute", "originPoint: $originPoint")
-//                Log.wtf("getDirectionalRoute", "destinationPoint: $destinationPoint")
-//                Log.wtf("getDirectionalRoute", "getZLevel: $${mapboxNavigation?.getZLevel()}")
-
                 mapboxNavigation?.requestRoutes(
                     routeOptions,
                     object : NavigationRouterCallback {

@@ -249,13 +249,13 @@ class SessionManager(
         editor.commit()
     }
 //
-//    fun saveLastLocation(coords: GeoCoord) {
-//        editor.remove(KEY_LATITUDE)
-//        editor.remove(KEY_LONGITUDE)
-//        editor.putString(KEY_LATITUDE, coords.latitude.toString())
-//        editor.putString(KEY_LONGITUDE, coords.longitude.toString())
-//        editor.commit()
-//    }
+    fun saveLastLocation(coords: GeoCoord) {
+        editor.remove(KEY_LATITUDE)
+        editor.remove(KEY_LONGITUDE)
+        editor.putString(KEY_LATITUDE, coords.latitude.toString())
+        editor.putString(KEY_LONGITUDE, coords.longitude.toString())
+        editor.commit()
+    }
 //
 //    fun saveTagInjectHeaderCustomModel(listTagInjectHeaderCustomModel: ArrayList<TagInjectHeaderCustomModel>) {
 //        editor.remove(KEY_TAG_INJECT_HEADER_CUSTOM_MODEL)

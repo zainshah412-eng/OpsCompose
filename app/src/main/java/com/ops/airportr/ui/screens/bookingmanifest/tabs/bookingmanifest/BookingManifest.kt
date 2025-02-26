@@ -61,7 +61,7 @@ import com.ops.airportr.common.theme.white
 import com.ops.airportr.common.utils.BookingDetailsSingleton
 import com.ops.airportr.common.utils.abcTagBackGroundColor
 import com.ops.airportr.common.utils.callbacks.ImageLoadCallbacks
-import com.ops.airportr.common.utils.moveOnNewScreen
+import com.ops.airportr.common.utils.extension.moveOnNewScreen
 import com.ops.airportr.common.utils.overSizeBagTagBackGroundColor
 import com.ops.airportr.common.utils.returnBackGroundColor
 import com.ops.airportr.common.utils.returnLabelAirPurple100Color

@@ -7,14 +7,20 @@ import androidx.lifecycle.viewModelScope
 import com.ops.airportr.common.network.Either
 import com.ops.airportr.common.network.Resource
 import com.ops.airportr.domain.model.acceptance.UpdateAcceptanceParam
+import com.ops.airportr.domain.model.applyactionupdate.params.ApplyActionUpdateSealParams
 import com.ops.airportr.domain.model.senddevicedata.SendDeviceDataParam
+import com.ops.airportr.domain.model.storetrackingdata.StoreTrackingDataParams
 import com.ops.airportr.domain.model.updatejob.UpdateJobParam
 import com.ops.airportr.domain.model.updatelogs.params.GetActionUpdateLogsParams
 import com.ops.airportr.domain.use_case.acceptance.UpdateAcceptanceLockUseCase
 import com.ops.airportr.domain.use_case.actionupdateslogs.GetActionUpdateLogsUseCase
+import com.ops.airportr.domain.use_case.applyacctionupdatenew.ApplyActionUpdateNewUseCase
 import com.ops.airportr.domain.use_case.senddevicedata.SmsDeviceDataUseCase
+import com.ops.airportr.domain.use_case.storetrackingdata.StoreTrackingDataUseCase
 import com.ops.airportr.domain.use_case.updatejob.UpdateJobUseCase
+import com.ops.airportr.ui.screens.bookingacceptance.acceptance.tabs.jobdetails.states.ApplyActionUpdateNewState
 import com.ops.airportr.ui.screens.bookingacceptance.acceptance.tabs.jobdetails.states.SmsDeviceDataState
+import com.ops.airportr.ui.screens.bookingacceptance.acceptance.tabs.jobdetails.states.StoreTrackingDataState
 import com.ops.airportr.ui.screens.bookingacceptance.acceptance.tabs.jobdetails.states.UpdateAcceptanceLockState
 import com.ops.airportr.ui.screens.bookingacceptance.acceptance.tabs.jobdetails.states.UpdateJobState
 import com.ops.airportr.ui.screens.bookingmanifest.tabs.bookingactivity.states.GetActionUpdateLogsState
@@ -28,7 +34,9 @@ class JobDetailsScreenViewModel @Inject constructor(
     private val updateAcceptanceLockUseCase: UpdateAcceptanceLockUseCase,
     private val smsDeviceDataUseCase: SmsDeviceDataUseCase,
     private val updateJobUseCase: UpdateJobUseCase,
-    private val getActionUpdateLogsUseCase: GetActionUpdateLogsUseCase
+    private val getActionUpdateLogsUseCase: GetActionUpdateLogsUseCase,
+    private val storeTrackingDataUseCase: StoreTrackingDataUseCase,
+    private val applyActionUpdateNewUseCase: ApplyActionUpdateNewUseCase
 
 ) : ViewModel() {
     private val _stateAcceptance = mutableStateOf(UpdateAcceptanceLockState())
@@ -44,6 +52,15 @@ class JobDetailsScreenViewModel @Inject constructor(
 
     private val _stateActonUpdateLogs = mutableStateOf(GetActionUpdateLogsState())
     val stateActonUpdateLogs: State<GetActionUpdateLogsState> = _stateActonUpdateLogs
+
+    private val _storeTrackingData = mutableStateOf(StoreTrackingDataState())
+    val storeTrackingData: State<StoreTrackingDataState> = _storeTrackingData
+
+    private val _applyActionUpdateNew = mutableStateOf(ApplyActionUpdateNewState())
+    val applyActionUpdateNew: State<ApplyActionUpdateNewState> = _applyActionUpdateNew
+
+    private val _trackingUser = mutableStateOf(ApplyActionUpdateNewState())
+    val trackingUser: State<ApplyActionUpdateNewState> = _trackingUser
 
     fun updateAcceptanceLock(
         url: String,
@@ -191,6 +208,119 @@ class JobDetailsScreenViewModel @Inject constructor(
 
                 is Resource.Loading -> {
                     _stateActonUpdateLogs.value = GetActionUpdateLogsState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    fun storeTrackingData(
+        url: String,
+        body: StoreTrackingDataParams
+    ) {
+        storeTrackingDataUseCase(
+            url,
+            body
+        ).onEach {
+            when (it) {
+                is Resource.Success -> {
+                    when (val result = it.data) {
+                        is Either.Success -> {
+                            _storeTrackingData.value =
+                                StoreTrackingDataState(response = result.data)
+                        }
+
+                        is Either.Error -> {
+                            _storeTrackingData.value =
+                                StoreTrackingDataState(error = result.error.errorDescription)
+                        }
+
+                        else -> {
+
+                        }
+                    }
+                }
+
+                is Resource.Error -> {
+                    _storeTrackingData.value = StoreTrackingDataState(error = it.message)
+                }
+
+                is Resource.Loading -> {
+                    _storeTrackingData.value = StoreTrackingDataState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    fun applyActionUpdateNew(
+        url: String,
+        body: ApplyActionUpdateSealParams
+    ) {
+        applyActionUpdateNewUseCase(
+            url,
+            body
+        ).onEach {
+            when (it) {
+                is Resource.Success -> {
+                    when (val result = it.data) {
+                        is Either.Success -> {
+                            _applyActionUpdateNew.value =
+                                ApplyActionUpdateNewState(response = result.data)
+                        }
+
+                        is Either.Error -> {
+                            _applyActionUpdateNew.value =
+                                ApplyActionUpdateNewState(error = result.error.errorDescription)
+                        }
+
+                        else -> {
+
+                        }
+                    }
+                }
+
+                is Resource.Error -> {
+                    _applyActionUpdateNew.value = ApplyActionUpdateNewState(error = it.message)
+                }
+
+                is Resource.Loading -> {
+                    _applyActionUpdateNew.value = ApplyActionUpdateNewState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
+    fun trackingUser(
+        url: String,
+        body: ApplyActionUpdateSealParams
+    ) {
+        applyActionUpdateNewUseCase(
+            url,
+            body
+        ).onEach {
+            when (it) {
+                is Resource.Success -> {
+                    when (val result = it.data) {
+                        is Either.Success -> {
+                            _trackingUser.value =
+                                ApplyActionUpdateNewState(response = result.data)
+                        }
+
+                        is Either.Error -> {
+                            _trackingUser.value =
+                                ApplyActionUpdateNewState(error = result.error.errorDescription)
+                        }
+
+                        else -> {
+
+                        }
+                    }
+                }
+
+                is Resource.Error -> {
+                    _trackingUser.value = ApplyActionUpdateNewState(error = it.message)
+                }
+
+                is Resource.Loading -> {
+                    _trackingUser.value = ApplyActionUpdateNewState(isLoading = true)
                 }
             }
         }.launchIn(viewModelScope)

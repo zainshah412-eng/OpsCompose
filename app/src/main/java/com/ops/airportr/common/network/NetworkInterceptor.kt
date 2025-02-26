@@ -8,7 +8,7 @@ import com.microsoft.appcenter.utils.HandlerUtils.runOnUiThread
 import com.ops.airportr.R
 import com.ops.airportr.common.utils.LoggerUtils
 import com.ops.airportr.common.utils.NoConnectivityException
-import com.ops.airportr.common.utils.toast
+import com.ops.airportr.common.utils.extension.toast
 import okhttp3.Interceptor
 import okhttp3.Response
 class NetworkInterceptor(context: Context) : Interceptor {
